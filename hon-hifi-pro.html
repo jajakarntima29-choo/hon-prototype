@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HON · Hi-Fi Prototype Pro</title>
+<style>
+/* ============================================================
+   HON · Design Tokens (semantic — maps to Figma Variables)
+   ============================================================ */
+:root{
+  /* brand */
+  --brand-300:#F0526A; --brand-500:#E11D48; --brand-600:#C1121F; --brand-700:#8B0015;
+  --grad-brand:linear-gradient(135deg,#E11D48 0%,#8B0015 100%);
+  --grad-brand-soft:linear-gradient(135deg,rgba(225,29,72,.16),rgba(139,0,21,.04));
+  /* surfaces */
+  --bg:#0A0A0B; --surface-1:#141416; --surface-2:#1C1C21; --surface-3:#26262D;
+  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.14);
+  /* ink */
+  --ink-1:#F5F5F7; --ink-2:#B4B4BD; --ink-3:#8A8A96;
+  /* status (never reused as series colors) */
+  --ok:#34D07C; --warn:#FFB020; --bad:#FF4D42; --info:#4DA6FF;
+  --ok-bg:rgba(52,208,124,.13); --warn-bg:rgba(255,176,32,.13); --bad-bg:rgba(255,77,66,.13);
+  /* radius */
+  --r-sm:8px; --r-md:14px; --r-lg:20px; --r-xl:28px; --r-pill:999px;
+  /* elevation */
+  --sh-1:0 1px 2px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.35);
+  --sh-2:0 2px 4px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.45);
+  --sh-red:0 4px 16px rgba(225,29,72,.32),0 1px 3px rgba(0,0,0,.4);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans Thai","Noto Sans",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#060607;color:var(--ink-1);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit}
+svg{display:block}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ============================================================
+   Showcase shell
+   ============================================================ */
+.shell{max-width:1480px;margin:0 auto;padding:40px 32px 96px}
+.shell-head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.shell-logo{width:48px;height:48px;border-radius:14px;background:var(--grad-brand);display:grid;place-items:center;box-shadow:var(--sh-red)}
+.shell-head h1{font-size:24px;letter-spacing:.2em;font-weight:800}
+.shell-head .sub{color:var(--ink-2);font-size:13px}
+.shell-nav{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 32px}
+.chip-nav{padding:8px 16px;border-radius:var(--r-pill);border:1px solid var(--line-2);color:var(--ink-2);font-size:13px;font-weight:600;transition:.16s;min-height:36px}
+.chip-nav:hover{border-color:var(--brand-500);color:var(--ink-1)}
+.chip-nav.on{background:var(--grad-brand);border-color:transparent;color:#fff;box-shadow:var(--sh-red)}
+.stage{display:flex;gap:56px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.stage-note{color:var(--ink-3);font-size:12px;text-align:center;margin-top:16px;letter-spacing:.04em}
+
+/* ============================================================
+   Phone frame (390 × 844)
+   ============================================================ */
+.phone{width:390px;height:844px;border-radius:56px;background:#000;position:relative;flex:0 0 auto;
+  border:1px solid #333338;box-shadow:0 0 0 10px #101013,0 0 0 11px #2b2b31,0 40px 90px rgba(0,0,0,.7)}
+.phone-screen{position:absolute;inset:4px;border-radius:52px;overflow:hidden;background:var(--bg)}
+.island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#000;z-index:60;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.statusbar{position:absolute;top:0;left:0;right:0;height:56px;z-index:55;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,10,11,.92) 55%,rgba(10,10,11,0) 100%)}
+.statusbar .time{font-size:15px;font-weight:700;letter-spacing:.02em}
+.statusbar .sicons{display:flex;align-items:center;gap:6px}
+.statusbar svg{stroke:none;fill:var(--ink-1)}
+
+/* ============================================================
+   Real-phone mode: below 560px the mockup chrome disappears and
+   the app fills the actual viewport (judges open this from a QR).
+   ============================================================ */
+@media (max-width:560px){
+  html,body{height:100%}
+  body{overflow:hidden}
+  .shell{max-width:none;height:100dvh;display:flex;flex-direction:column;padding:10px 10px 12px}
+  .shell-head{margin-bottom:2px;gap:10px}
+  .shell-logo{width:34px;height:34px;border-radius:10px}
+  .shell-head h1{font-size:16px}
+  .shell-head .sub{display:none}
+  .shell-nav{flex-wrap:nowrap;overflow-x:auto;margin:8px 0 10px;padding-bottom:2px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .shell-nav::-webkit-scrollbar{display:none}
+  .chip-nav{flex:0 0 auto}
+  .stage{flex:1;min-height:0;display:block;overflow:hidden}
+  .stage>div:first-child{height:100%}
+  .stage>*:not(:first-child){display:none}
+  .phone{width:100%;height:100%;border-radius:22px;border:none;box-shadow:none}
+  .phone-screen{inset:0;border-radius:22px}
+  .island,.statusbar,.homebar{display:none}
+  .screen{padding-top:16px}
+  .stage-note{display:none}
+  /* family cards: keep the name column readable next to the risk badge */
+  .fam-card{gap:10px;padding:16px 14px}
+  .fam-ava{width:44px;height:44px;font-size:16px}
+  .fam-name{font-size:15.5px}
+  .fam-va .n{font-size:15px!important}
+  .fam-va .u{font-size:10.5px}
+}
+
+/* ============================================================
+   Screens
+   ============================================================ */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+  padding:68px 20px 116px;scrollbar-width:none;opacity:0;transform:translateY(6px)}
+.screen::-webkit-scrollbar{display:none}
+.screen>*{flex-shrink:0}
+.screen.active{display:flex;animation:scrIn .28s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes scrIn{to{opacity:1;transform:none}}
+.screen.auth{padding-bottom:32px}
+
+/* app bar inside screen */
+.appbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;min-height:44px}
+.appbar .ttl{font-size:18px;font-weight:800;flex:1}
+.icon-btn{width:44px;height:44px;border-radius:var(--r-md);display:grid;place-items:center;background:var(--surface-1);border:1px solid var(--line);transition:.16s;position:relative}
+.icon-btn:hover{background:var(--surface-2);border-color:var(--line-2)}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn svg{width:20px;height:20px;stroke:var(--ink-2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn .ndot{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--brand-500);box-shadow:0 0 0 2px var(--surface-1)}
+
+/* ============================================================
+   Shared components
+   ============================================================ */
+.card{background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-1)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-pill);
+  font-weight:700;font-size:15px;padding:0 24px;min-height:52px;transition:.18s;text-align:center}
+.btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-primary{background:var(--grad-brand);color:#fff;box-shadow:var(--sh-red)}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:active{transform:scale(.98);filter:brightness(.95)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.btn-secondary{background:var(--surface-2);color:var(--ink-1);border:1px solid var(--line-2)}
+.btn-secondary:hover{background:var(--surface-3)}
+.btn-secondary:active{transform:scale(.98)}
+.btn-ghost{color:var(--brand-300);border:1px solid rgba(225,29,72,.45)}
+.btn-ghost:hover{background:rgba(225,29,72,.1)}
+.btn-sm{min-height:40px;padding:0 16px;font-size:13px}
+.btn-block{width:100%}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-pill);font-size:12px;font-weight:700;min-height:24px;white-space:nowrap}
+.badge svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.b-ok{background:var(--ok-bg);color:var(--ok)}
+.b-warn{background:var(--warn-bg);color:var(--warn)}
+.b-bad{background:var(--bad-bg);color:var(--bad)}
+.b-brand{background:rgba(225,29,72,.15);color:var(--brand-300)}
+.b-mute{background:var(--surface-2);color:var(--ink-2)}
+.sec-label{font-size:13px;font-weight:700;color:var(--ink-2);letter-spacing:.04em;margin:24px 0 12px;display:flex;align-items:center;justify-content:space-between}
+.sec-label .more{font-size:12px;color:var(--brand-300);font-weight:600}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px}
+.input{width:100%;background:var(--surface-1);border:1px solid var(--line-2);border-radius:var(--r-md);min-height:52px;
+  padding:14px 16px;color:var(--ink-1);font-size:15px;outline:none;transition:.16s}
+.input::placeholder{color:var(--ink-3)}
+.input:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(225,29,72,.22)}
+.hint{font-size:12px;color:var(--ink-3);margin-top:6px}
+.seg{display:flex;gap:4px;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-pill);padding:4px}
+.seg button{flex:1;min-height:44px;border-radius:var(--r-pill);font-size:14px;font-weight:600;color:var(--ink-2);transition:.16s}
+.seg button.on{background:var(--grad-brand);color:#fff;box-shadow:var(--sh-red);font-weight:700}
+.seg button:not(.on):hover{color:var(--ink-1)}
+.lrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);min-height:60px}
+.lrow:last-child{border-bottom:none}
+.lrow .li{width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;flex:0 0 auto}
+.lrow .li svg{width:20px;height:20px;stroke:var(--brand-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lrow .lt{font-weight:600;font-size:14px}
+.lrow .ls{font-size:12px;color:var(--ink-3)}
+.lrow .lv{margin-left:auto;font-weight:700;font-size:15px;text-align:right}
+.lrow .chev{margin-left:auto;flex:0 0 auto}
+.chev svg{width:18px;height:18px;stroke:var(--ink-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.disclaimer{display:flex;gap:8px;align-items:flex-start;margin-top:24px;padding:12px 14px;border-radius:var(--r-md);background:var(--surface-1);border:1px solid var(--line)}
+.disclaimer svg{width:16px;height:16px;flex:0 0 auto;margin-top:1px;stroke:var(--ink-3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.disclaimer p{font-size:11px;color:var(--ink-3);line-height:1.55}
+
+/* zone scale (metric range bar — labeled, never color-only) */
+.zone{margin-top:14px}
+.zone-track{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;position:relative}
+.zone-track i{flex:1;display:block}
+.zone-track i.z1{background:var(--ok)}
+.zone-track i.z2{background:var(--warn)}
+.zone-track i.z3{background:var(--bad)}
+.zone-marker{position:absolute;top:-5px;width:4px;height:18px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px var(--surface-1),0 2px 6px rgba(0,0,0,.5)}
+.zone-labels{display:flex;margin-top:8px}
+.zone-labels span{flex:1;font-size:10px;color:var(--ink-3);text-align:center;letter-spacing:.02em}
+
+/* ============================================================
+   Tab bar (glass)
+   ============================================================ */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:50;padding:8px 12px 24px;
+  background:rgba(10,10,11,.78);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid var(--line);display:flex}
+.tabbar.hidden{display:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:52px;border-radius:var(--r-md);transition:.16s;color:var(--ink-3)}
+.tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:.16s}
+.tab span{font-size:10px;font-weight:600;letter-spacing:.02em}
+.tab.on{color:var(--brand-300)}
+.tab.on svg{stroke-width:2.1}
+.tab:not(.on):hover{color:var(--ink-2)}
+.tab:active{transform:scale(.93)}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:5px;border-radius:3px;background:rgba(255,255,255,.28);z-index:51;pointer-events:none}
+
+/* ============================================================
+   04 · Dashboard
+   ============================================================ */
+.dash-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--grad-brand);display:grid;place-items:center;font-weight:800;font-size:16px;color:#fff;box-shadow:var(--sh-red);flex:0 0 auto}
+.dash-head .hi{font-size:12px;color:var(--ink-3)}
+.dash-head .nm{font-size:17px;font-weight:800;line-height:1.25}
+.dash-head .sp{flex:1}
+
+/* hero vascular-age card */
+.hero{position:relative;border-radius:var(--r-xl);border:1px solid rgba(225,29,72,.25);overflow:hidden;
+  background:
+    radial-gradient(130% 90% at 50% -10%,rgba(225,29,72,.22),transparent 55%),
+    linear-gradient(180deg,#17171A 0%,#111113 100%);
+  box-shadow:var(--sh-2);padding:24px 20px 20px;text-align:center}
+.gauge-wrap{position:relative;width:248px;height:196px;margin:0 auto}
+.gauge-wrap svg{position:absolute;inset:0}
+.gauge-center{position:absolute;left:0;right:0;top:52px;text-align:center}
+.gauge-center .glabel{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--ink-3);text-transform:uppercase}
+.gauge-center .gnum{font-size:68px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
+.gauge-center .gunit{font-size:13px;color:var(--ink-2);font-weight:600;margin-top:2px}
+.gauge-center .grisk{font-size:40px;font-weight:800;line-height:1.28;letter-spacing:-.01em;white-space:nowrap}
+.gauge-center .gagi{font-size:13px;color:var(--ink-2);font-weight:600;margin-top:6px}
+.gauge-center .gagi b{color:var(--ink-1)}
+.hero-delta{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
+.hero-sub{font-size:13px;color:var(--ink-2);margin-top:10px}
+.hero-foot{display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.hero-foot .lm{font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px;text-align:left}
+.hero-foot .lm svg{width:14px;height:14px;stroke:var(--ink-3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* metric grid */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mcard{background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;transition:.16s;text-align:left;box-shadow:var(--sh-1)}
+.mcard:hover{border-color:var(--line-2);background:var(--surface-2)}
+.mcard:active{transform:scale(.97)}
+.mcard .mk{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3);font-weight:600}
+.mcard .mk svg{width:16px;height:16px;stroke:var(--brand-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mcard .mv{font-size:26px;font-weight:800;margin-top:10px;line-height:1.1}
+.mcard .mv small{font-size:12px;font-weight:600;color:var(--ink-3);margin-left:3px}
+.mcard .md{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;margin-top:8px}
+.mcard .md svg{width:12px;height:12px;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* policy card */
+.policy{border-radius:var(--r-lg);border:1px solid rgba(225,29,72,.3);background:var(--grad-brand-soft);padding:18px;box-shadow:var(--sh-1)}
+.policy-top{display:flex;align-items:center;gap:12px}
+.policy-top .pic{width:44px;height:44px;border-radius:var(--r-md);background:var(--grad-brand);display:grid;place-items:center;box-shadow:var(--sh-red)}
+.policy-top .pic svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.policy-top .pt{font-weight:800;font-size:15px}
+.policy-top .ps{font-size:12px;color:var(--ink-2)}
+.policy-prog{margin-top:16px}
+.policy-prog .pp-head{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-bottom:8px}
+.policy-prog .pp-head b{color:var(--ink-1)}
+.pbar{height:8px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:4px;background:var(--grad-brand)}
+
+/* shortcuts */
+.short{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sc{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 4px;border-radius:var(--r-lg);background:var(--surface-1);border:1px solid var(--line);transition:.16s;min-height:80px}
+.sc:hover{background:var(--surface-2);border-color:var(--line-2)}
+.sc:active{transform:scale(.94)}
+.sc svg{width:22px;height:22px;stroke:var(--brand-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sc span{font-size:11px;font-weight:600;color:var(--ink-2)}
+
+/* event teaser */
+.teaser{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);min-height:120px;padding:18px;display:flex;flex-direction:column;justify-content:center;gap:6px;transition:.16s;text-align:left;width:100%;
+  background:
+   radial-gradient(90% 160% at 100% 0%,rgba(225,29,72,.35),transparent 60%),
+   linear-gradient(120deg,#1B1B20 30%,#26161B 100%);box-shadow:var(--sh-1)}
+.teaser:hover{border-color:rgba(225,29,72,.4)}
+.teaser:active{transform:scale(.98)}
+.teaser .tt{font-size:17px;font-weight:800}
+.teaser .ts{font-size:12px;color:var(--ink-2)}
+
+/* ============================================================
+   05 · Result detail
+   ============================================================ */
+.result-sum{text-align:center;padding:8px 0 4px}
+.result-sum .rnum{font-size:56px;font-weight:800;line-height:1;letter-spacing:-.02em}
+.result-sum .rlabel{font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;margin-bottom:8px}
+.result-sum .runit{font-size:13px;color:var(--ink-2);margin-top:4px}
+.rmeta{display:flex;justify-content:center;gap:8px;margin:16px 0 20px;flex-wrap:wrap}
+.ppg-card{padding:16px 16px 12px}
+.ppg-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ppg-head .pt{font-size:13px;font-weight:700}
+.ppg-head .pl{font-size:11px;color:var(--ink-3)}
+.ppg-wave{position:relative;height:84px;border-radius:var(--r-sm);background:var(--surface-2);overflow:hidden}
+.ppg-wave svg{position:absolute;inset:0;width:100%;height:100%}
+.metric-detail{margin-bottom:12px}
+.metric-detail .mdh{display:flex;align-items:flex-start;gap:12px}
+.metric-detail .mdi{width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;flex:0 0 auto}
+.metric-detail .mdi svg{width:20px;height:20px;stroke:var(--brand-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.metric-detail .mdt{font-weight:700;font-size:15px}
+.metric-detail .mds{font-size:11px;color:var(--ink-3)}
+.metric-detail .mdv{margin-left:auto;text-align:right}
+.metric-detail .mdv .v{font-size:22px;font-weight:800;line-height:1.1}
+.metric-detail .mdv .u{font-size:11px;color:var(--ink-3);font-weight:600}
+.metric-detail .mexp{font-size:12px;color:var(--ink-2);margin-top:14px;line-height:1.6}
+.tip-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.tip-row:last-child{border-bottom:none;padding-bottom:0}
+.tip-row .tn{width:28px;height:28px;border-radius:50%;background:rgba(225,29,72,.15);color:var(--brand-300);display:grid;place-items:center;font-size:13px;font-weight:800;flex:0 0 auto}
+.tip-row p{font-size:13px;color:var(--ink-2);line-height:1.55}
+.tip-row p b{color:var(--ink-1)}
+
+/* ============================================================
+   01–03 · Auth & Onboarding
+   ============================================================ */
+.auth-logo{width:76px;height:76px;border-radius:22px;background:var(--grad-brand);display:grid;place-items:center;margin:40px auto 20px;box-shadow:var(--sh-red)}
+.auth-title{font-size:26px;font-weight:800;text-align:center;letter-spacing:-.01em}
+.auth-sub{font-size:14px;color:var(--ink-2);text-align:center;margin:8px 0 32px;line-height:1.6}
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--ink-3);font-size:12px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line-2)}
+.sso{display:flex;gap:12px}
+.sso .btn{flex:1}
+.sso svg{width:20px;height:20px}
+.auth-foot{margin-top:auto;padding-top:24px;text-align:center;font-size:13px;color:var(--ink-3)}
+.auth-foot a{color:var(--brand-300);font-weight:700;text-decoration:none}
+/* OTP boxes */
+.otp-row{display:flex;gap:10px;justify-content:center;margin:32px 0 16px}
+.otp-box{width:48px;height:58px;border-radius:var(--r-md);background:var(--surface-1);border:1px solid var(--line-2);
+  text-align:center;font-size:24px;font-weight:800;color:var(--ink-1);outline:none;transition:.16s;caret-color:var(--brand-500)}
+.otp-box:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(225,29,72,.22)}
+.otp-box.filled{border-color:var(--brand-600);background:rgba(225,29,72,.07)}
+.otp-timer{text-align:center;font-size:13px;color:var(--ink-3)}
+.otp-timer b{color:var(--brand-300)}
+/* progress steps */
+.steps{display:flex;align-items:center;gap:8px;flex:1}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--surface-3)}
+.steps i.done{background:var(--grad-brand)}
+.stepnum{font-size:12px;color:var(--ink-3);font-weight:600;white-space:nowrap}
+/* stepper (weight/height) */
+.stepper{display:flex;align-items:center;gap:12px;background:var(--surface-1);border:1px solid var(--line-2);border-radius:var(--r-md);padding:6px}
+.stepper button{width:44px;height:44px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;font-size:20px;font-weight:700;color:var(--ink-2);transition:.15s}
+.stepper button:hover{background:var(--surface-3);color:var(--ink-1)}
+.stepper button:active{transform:scale(.92)}
+.stepper .sval{flex:1;text-align:center;font-size:22px;font-weight:800}
+.stepper .sval small{font-size:12px;color:var(--ink-3);font-weight:600;margin-left:4px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.choice{min-height:48px;border-radius:var(--r-md);border:1px solid var(--line-2);background:var(--surface-1);font-size:14px;font-weight:600;color:var(--ink-2);transition:.15s}
+.choice:hover{border-color:var(--line-2);background:var(--surface-2)}
+.choice.on{background:rgba(225,29,72,.13);border-color:var(--brand-500);color:var(--brand-300);font-weight:700}
+
+/* ============================================================
+   Ruler slider (weight / height) — drag to pick fast
+   ============================================================ */
+/* scroll-snap ruler — value zone (top) separated from scale zone (bottom) so nothing overlaps */
+.ruler{position:relative;height:110px;background:linear-gradient(180deg,var(--surface-1),#0F0F11);border:1px solid var(--line-2);border-radius:var(--r-md);overflow:hidden;user-select:none;-webkit-user-select:none}
+.ruler:focus-visible{outline:2px solid var(--brand-500);outline-offset:2px}
+/* value header — its own row, centred, sits well above the ticks */
+.ruler .rk-val{position:absolute;top:13px;left:0;right:0;text-align:center;z-index:4;pointer-events:none;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;justify-content:center;gap:5px}
+.ruler .rk-val .rk-num{font-size:29px;font-weight:800;letter-spacing:-.02em;color:var(--ink-1)}
+.ruler .rk-val small{font-size:12.5px;font-weight:600;color:var(--ink-3);letter-spacing:.01em}
+/* scale zone pinned to the bottom */
+.ruler .rk-track{position:absolute;left:0;right:0;bottom:0;height:58px;overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.ruler .rk-track::-webkit-scrollbar{display:none}
+.ruler .rk-track.grabbing{cursor:grabbing;scroll-snap-type:none}
+.ruler .rk-scale{display:flex;align-items:flex-start;height:58px;width:max-content}
+.ruler .rk-spacer{flex:0 0 auto;height:1px}
+.ruler .rk-tick{position:relative;width:14px;height:58px;flex:0 0 auto;scroll-snap-align:center}
+.ruler .rk-tick::before{content:"";position:absolute;left:50%;top:6px;width:1.5px;height:9px;background:var(--line-2);transform:translateX(-50%);border-radius:1px}
+.ruler .rk-tick.mid::before{height:15px;background:var(--ink-3)}
+.ruler .rk-tick.maj::before{height:22px;background:var(--ink-2)}
+.ruler .rk-tick i{position:absolute;left:50%;top:33px;transform:translateX(-50%);font-size:11px;font-style:normal;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
+/* needle — caret pointing down from the value into the centre tick */
+.ruler .rk-needle{position:absolute;left:50%;top:52px;height:28px;width:2.5px;background:var(--brand-500);transform:translateX(-50%);z-index:3;border-radius:2px;box-shadow:0 0 12px rgba(225,29,72,.65);pointer-events:none}
+.ruler .rk-needle::before{content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%);border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--brand-500)}
+
+/* Date-of-birth wheel picker (day / month / year) */
+.dob{display:grid;grid-template-columns:1fr 1.4fr 1.2fr;gap:8px;background:var(--surface-1);border:1px solid var(--line-2);border-radius:var(--r-md);padding:8px;position:relative}
+.dob .wheel{position:relative;height:132px;overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;touch-action:pan-y;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 34%,#000 66%,transparent);mask-image:linear-gradient(180deg,transparent,#000 34%,#000 66%,transparent)}
+.dob .wheel::-webkit-scrollbar{display:none}
+.dob .wheel-pad{height:53px}
+.dob .wheel-item{height:26px;line-height:26px;text-align:center;font-size:15px;color:var(--ink-3);scroll-snap-align:center;font-variant-numeric:tabular-nums;transition:color .12s,font-weight .12s,transform .12s;cursor:pointer}
+.dob .wheel-item.sel{color:var(--ink-1);font-weight:800;font-size:16px;transform:scale(1.02)}
+.dob .wheel-band{position:absolute;left:8px;right:8px;top:calc(50% - 15px);height:30px;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);background:rgba(225,29,72,.06);border-radius:8px;pointer-events:none;z-index:1}
+.dob-age{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:13px;color:var(--ink-2)}
+.dob-age b{font-size:15px;color:var(--ink-1);font-weight:800;font-variant-numeric:tabular-nums}
+.field .rk-hint{font-size:11px;color:var(--ink-3);margin-top:6px;text-align:center}
+
+/* ============================================================
+   06 · Report  /  07 · Profile
+   ============================================================ */
+.trend-card{padding:20px 16px 12px}
+.trend-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:4px}
+.trend-head .th{font-size:14px;font-weight:700}
+.trend-head .tsub{font-size:11px;color:var(--ink-3)}
+.trend-callout{display:flex;gap:8px;align-items:center;padding:0 4px;margin:4px 0 12px}
+.chart-svg text{font-family:var(--font)}
+.pdf-card{display:flex;align-items:center;gap:14px}
+.pdf-ic{width:48px;height:48px;border-radius:var(--r-md);background:rgba(225,29,72,.13);display:grid;place-items:center;flex:0 0 auto}
+.pdf-ic svg{width:24px;height:24px;stroke:var(--brand-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pdf-card .pt{font-weight:700;font-size:14px}
+.pdf-card .ps{font-size:12px;color:var(--ink-3)}
+/* empty state */
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 24px}
+.empty .eic{width:64px;height:64px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;margin-bottom:16px}
+.empty .eic svg{width:28px;height:28px;stroke:var(--ink-3);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.empty .et{font-weight:700;font-size:15px}
+.empty .es{font-size:13px;color:var(--ink-3);margin:6px 0 16px;line-height:1.6}
+/* profile */
+.prof-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:24px}
+.prof-head .avatar{width:80px;height:80px;font-size:26px;border-radius:50%;margin-bottom:12px}
+.prof-head .pn{font-size:20px;font-weight:800}
+.prof-head .pe{font-size:13px;color:var(--ink-3)}
+.editrow{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.editrow:last-child{border-bottom:none}
+.editrow .ek{font-size:14px;font-weight:600;color:var(--ink-2);flex:1}
+.editrow .stepper{padding:4px;gap:4px;width:172px}
+.editrow .stepper button{width:38px;height:38px;font-size:17px}
+.editrow .stepper .sval{font-size:16px}
+/* profile numeric input (type, no slider) */
+.numin{display:inline-flex;align-items:center;gap:9px;background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;padding:9px 14px;transition:.16s;cursor:text}
+.numin:hover{background:var(--surface-3)}
+.numin:focus-within{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(225,29,72,.16);background:var(--surface-1)}
+.numin .pen{width:14px;height:14px;stroke:var(--ink-3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;transition:stroke .16s}
+.numin:focus-within .pen{stroke:var(--brand-300)}
+.numin input{width:40px;background:none;border:none;outline:none;color:var(--ink-1);font-size:18px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;padding:0;-moz-appearance:textfield}
+.numin input::-webkit-outer-spin-button,.numin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.numin .u{font-size:12px;color:var(--ink-3);font-weight:600;min-width:20px}
+.toggle{width:52px;height:32px;border-radius:var(--r-pill);background:var(--surface-3);position:relative;transition:.2s;flex:0 0 auto;border:1px solid var(--line-2)}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.toggle.on{background:var(--brand-500);border-color:var(--brand-500)}
+.toggle.on::after{left:23px}
+
+/* ============================================================
+   06+ · Clinical PPG Report (สำหรับบุคลากรทางการแพทย์)
+   ============================================================ */
+.clin-sub{font-size:12px;color:var(--ink-3);margin:-8px 0 18px;line-height:1.5}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-radius:var(--r-md);overflow:hidden;border:1px solid var(--line)}
+.meta-grid .mi{background:var(--surface-1);padding:11px 14px}
+.meta-grid .mi.full{grid-column:1 / -1}
+.meta-grid .mk{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:3px}
+.meta-grid .mv{font-size:13px;font-weight:700;color:var(--ink-1);font-variant-numeric:tabular-nums}
+.meta-grid .mv small{color:var(--ink-3);font-weight:600;font-size:11px}
+
+.ch-note{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px;margin:14px 0 4px;line-height:1.55}
+.ch-note .ci{width:18px;height:18px;border-radius:5px;flex:0 0 auto;margin-top:1px}
+.ch-note b{color:var(--ink-1)}
+
+.wave-block{margin-top:14px}
+.wave-block .wh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.wave-block .wt{font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+.wave-block .wt .dot{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+.wave-block .wtag{font-size:10px;color:var(--ink-3)}
+.wave-plot{position:relative;height:92px;border-radius:var(--r-sm);background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.wave-plot svg{position:absolute;inset:0;width:100%;height:100%}
+.wave-plot .grid line{stroke:rgba(255,255,255,.05);stroke-width:1}
+.wave-yaxis{position:absolute;left:5px;top:5px;bottom:5px;display:flex;flex-direction:column;justify-content:space-between;font-size:8px;color:var(--ink-3);font-variant-numeric:tabular-nums;pointer-events:none;text-shadow:0 1px 2px var(--surface-2)}
+.wave-xaxis{display:flex;justify-content:space-between;font-size:9px;color:var(--ink-3);margin-top:4px;padding:0 2px;font-variant-numeric:tabular-nums}
+
+.sig-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.sig-cell{background:var(--surface-2);border-radius:var(--r-sm);padding:11px 8px;text-align:center}
+.sig-cell .sv{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.sig-cell .sv small{font-size:10px;color:var(--ink-3);font-weight:600;margin-left:1px}
+.sig-cell .sk{font-size:9px;color:var(--ink-3);margin-top:3px;letter-spacing:.02em}
+
+.ctable{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--line)}
+.ctable .cgroup{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-300);background:var(--surface-2);padding:9px 14px;display:flex;align-items:center;gap:7px}
+.ctable .cgroup svg{width:13px;height:13px;stroke:var(--brand-300);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.crow{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--surface-1);border-top:1px solid var(--line)}
+.crow .cflag{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.cflag.ok{background:var(--ok)} .cflag.warn{background:var(--warn)} .cflag.bad{background:var(--bad)} .cflag.mute{background:var(--ink-3)}
+.crow .cn{flex:1;min-width:0}
+.crow .cnt{font-size:13px;font-weight:600;color:var(--ink-1)}
+.crow .cns{font-size:10px;color:var(--ink-3)}
+.crow .cvv{text-align:right;white-space:nowrap}
+.crow .cval{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.crow .cval small{font-size:10px;color:var(--ink-3);font-weight:600;margin-left:1px}
+.crow .cref{font-size:10px;color:var(--ink-3)}
+
+.morph-plot{position:relative;height:158px;border-radius:var(--r-md);background:var(--surface-2);overflow:hidden;border:1px solid var(--line);margin-top:4px}
+.morph-plot svg{position:absolute;inset:0;width:100%;height:100%}
+.morph-plot .mtxt{font-family:var(--font);font-size:9px;fill:var(--ink-2);font-weight:600}
+.morph-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:14px}
+.morph-legend span{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--ink-2);line-height:1.4}
+.morph-legend i{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:3px}
+.morph-legend b{color:var(--ink-1)}
+
+/* ============================================================
+   08 · Chat / 09 · News / 10 · Premium / 11 · Settings
+   ============================================================ */
+.chat-scroll{display:flex;flex-direction:column;gap:10px;flex:1}
+.bub{max-width:82%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.55}
+.bub.bot{background:var(--surface-2);border:1px solid var(--line);border-bottom-left-radius:6px;align-self:flex-start}
+.bub.me{background:var(--grad-brand);color:#fff;border-bottom-right-radius:6px;align-self:flex-end;box-shadow:var(--sh-red)}
+.bub .src{display:block;font-size:11px;color:var(--ink-3);margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.chat-time{font-size:10px;color:var(--ink-3);text-align:center;margin:6px 0}
+.qchips{display:flex;gap:8px;flex-wrap:wrap;align-self:flex-start}
+.qchip{padding:10px 16px;min-height:40px;border-radius:var(--r-pill);border:1px solid rgba(225,29,72,.45);color:var(--brand-300);font-size:13px;font-weight:600;transition:.15s}
+.qchip:hover{background:rgba(225,29,72,.12)}
+.qchip:active{transform:scale(.95)}
+.typing{display:inline-flex;gap:5px;align-items:center;padding:14px 18px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);animation:tblink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+@keyframes tblink{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.chat-inputbar{margin:16px -4px 0;display:flex;gap:8px;align-items:center}
+.chat-inputbar .input{flex:1;border-radius:var(--r-pill);min-height:48px}
+.sendbtn{width:48px;height:48px;border-radius:50%;background:var(--grad-brand);display:grid;place-items:center;box-shadow:var(--sh-red);flex:0 0 auto;transition:.15s}
+.sendbtn:active{transform:scale(.9)}
+.sendbtn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-tag{display:flex;align-items:center;gap:8px;margin-bottom:16px;justify-content:center}
+.ai-tag .aidot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:aipulse 2s infinite}
+@keyframes aipulse{50%{box-shadow:0 0 0 5px rgba(52,208,124,.15)}}
+/* news */
+.news-hero{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid rgba(225,29,72,.3);padding:24px 20px;min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;box-shadow:var(--sh-2);
+  background:
+    radial-gradient(120% 120% at 85% 0%,rgba(240,82,106,.5),transparent 55%),
+    radial-gradient(100% 100% at 0% 100%,rgba(139,0,21,.6),transparent 60%),
+    linear-gradient(160deg,#221317 0%,#141416 70%)}
+.news-hero .nt{font-size:24px;font-weight:800;line-height:1.25}
+.news-hero .ns{font-size:13px;color:var(--ink-2)}
+.news-hero .npro{margin-top:8px}
+.news-card{display:flex;gap:14px;padding:14px;border-radius:var(--r-lg);background:var(--surface-1);border:1px solid var(--line);margin-bottom:12px;transition:.15s;text-align:left;width:100%;box-shadow:var(--sh-1)}
+.news-card:hover{border-color:var(--line-2);background:var(--surface-2)}
+.news-card:active{transform:scale(.98)}
+.news-thumb{width:72px;height:72px;border-radius:var(--r-md);flex:0 0 auto;display:grid;place-items:center}
+.news-thumb svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.news-card .nct{font-size:14px;font-weight:700;line-height:1.4}
+.news-card .ncs{font-size:11px;color:var(--ink-3);margin-top:6px}
+/* premium */
+.plan{position:relative;border-radius:var(--r-lg);border:1px solid var(--line-2);background:var(--surface-1);padding:20px;margin-bottom:12px;text-align:left;width:100%;transition:.16s;box-shadow:var(--sh-1)}
+.plan.on{border-color:var(--brand-500);background:linear-gradient(160deg,rgba(225,29,72,.1),rgba(139,0,21,.03)),var(--surface-1);box-shadow:0 0 0 1px var(--brand-500),var(--sh-2)}
+.plan .best{position:absolute;top:-11px;right:16px}
+.plan-head{display:flex;align-items:center;gap:12px}
+.plan-head .radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);flex:0 0 auto;display:grid;place-items:center;transition:.15s}
+.plan.on .radio{border-color:var(--brand-500)}
+.plan.on .radio::after{content:"";width:11px;height:11px;border-radius:50%;background:var(--grad-brand)}
+.plan-head .pnm{font-size:16px;font-weight:800;flex:1}
+.plan-head .pprice{text-align:right}
+.plan-head .pprice b{font-size:22px;font-weight:800}
+.plan-head .pprice span{font-size:11px;color:var(--ink-3);display:block}
+.plan ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.plan li{display:flex;gap:10px;font-size:13px;color:var(--ink-2);align-items:flex-start}
+.plan li svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.plan li.yes svg{stroke:var(--ok)}
+.plan li.no{color:var(--ink-3)}
+.plan li.no svg{stroke:var(--ink-3)}
+/* settings — watch pairing */
+.watch-pair{display:flex;align-items:center;gap:16px}
+.watch-mini{width:64px;height:78px;border-radius:18px;background:#000;border:2px solid #3a3a41;position:relative;flex:0 0 auto;box-shadow:var(--sh-1)}
+.watch-mini::after{content:"42";position:absolute;inset:0;display:grid;place-items:center;font-size:20px;font-weight:800;color:var(--brand-300)}
+.batt{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+.batt .bico{width:24px;height:12px;border:1px solid var(--line-2);border-radius:3px;padding:2px;position:relative}
+.batt .bico::before{content:"";display:block;height:100%;width:82%;background:var(--ok);border-radius:1px}
+.batt .bico::after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;background:var(--line-2);border-radius:1px}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.15);border-top-color:var(--brand-300);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* PPG line draw loop */
+.ppg-line{stroke-dasharray:820;stroke-dashoffset:820;animation:ppgdraw 3.6s linear infinite}
+@keyframes ppgdraw{0%{stroke-dashoffset:820;opacity:0}6%{opacity:1}86%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+
+/* ============================================================
+   Watch companion (square + round)
+   ============================================================ */
+.watch-col{width:340px;flex:0 0 auto}
+.watch-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.watch-head .wh{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}
+.watch-head .wh svg{width:18px;height:18px;stroke:var(--brand-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wseg{display:flex;gap:4px;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-pill);padding:4px;margin-bottom:28px}
+.wseg button{flex:1;min-height:40px;border-radius:var(--r-pill);font-size:12.5px;font-weight:600;color:var(--ink-2);transition:.16s}
+.wseg button.on{background:var(--grad-brand);color:#fff;font-weight:700;box-shadow:var(--sh-red)}
+.wstack{display:flex;flex-direction:column;gap:44px;align-items:center}
+.wframe{position:relative;background:#000;flex:0 0 auto}
+.wframe.sq{width:204px;height:244px;border-radius:56px;box-shadow:0 0 0 5px #26262b,0 0 0 6px #3c3c43,0 24px 50px rgba(0,0,0,.65)}
+.wframe.sq .wcrown{position:absolute;right:-12px;top:70px;width:7px;height:36px;border-radius:3px;background:linear-gradient(90deg,#4a4a52,#2c2c31)}
+.wframe.sq .wbtn2{position:absolute;right:-10px;top:122px;width:5px;height:30px;border-radius:2px;background:#333338}
+.wframe.rd{width:236px;height:236px;border-radius:50%;box-shadow:0 0 0 7px #26262b,0 0 0 8px #3c3c43,0 24px 50px rgba(0,0,0,.65)}
+.wframe.rd .wcrown{position:absolute;right:2px;top:44px;width:9px;height:26px;border-radius:4px;background:linear-gradient(90deg,#4a4a52,#2c2c31);transform:rotate(35deg)}
+.wface{position:absolute;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#101013 0%,#000 70%)}
+.wframe.sq .wface{inset:5px;border-radius:50px}
+.wframe.rd .wface{inset:6px;border-radius:50%}
+.wscr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px}
+.wscr.on{display:flex}
+.wtime{font-size:13px;font-weight:700;color:var(--ink-2);letter-spacing:.04em}
+.wdate{font-size:10px;color:var(--ink-3);margin-bottom:8px}
+.wring{position:relative;width:118px;height:118px;margin:2px 0}
+.wring svg{position:absolute;inset:0}
+.wring .wrc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.wring .wrn{font-size:38px;font-weight:800;line-height:1}
+.wring .wrl{font-size:8.5px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase;margin-top:2px}
+.wcomp{display:flex;gap:14px;margin-top:8px;align-items:center}
+.wcomp span{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink-2)}
+.wcomp svg{width:12px;height:12px;stroke:var(--brand-300);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* measuring */
+.wpulse{position:relative;width:110px;height:110px;display:grid;place-items:center;margin:4px 0}
+.wpulse .pr{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(225,29,72,.5);animation:wprip 2s ease-out infinite}
+.wpulse .pr:nth-child(2){animation-delay:.66s}
+.wpulse .pr:nth-child(3){animation-delay:1.33s}
+@keyframes wprip{0%{transform:scale(.55);opacity:.9}100%{transform:scale(1.15);opacity:0}}
+.wpulse .ph{width:58px;height:58px;border-radius:50%;background:var(--grad-brand);display:grid;place-items:center;box-shadow:0 0 24px rgba(225,29,72,.55);animation:wbeat 1s ease-in-out infinite}
+@keyframes wbeat{0%,100%{transform:scale(1)}25%{transform:scale(1.09)}45%{transform:scale(.98)}60%{transform:scale(1.06)}}
+.wpulse .ph svg{width:28px;height:28px;stroke:#fff;fill:#fff;stroke-width:1.5;stroke-linejoin:round}
+.wmt{font-size:13px;font-weight:700}
+.wms{font-size:10px;color:var(--ink-3);margin-top:2px;line-height:1.5}
+.wprognum{font-size:15px;font-weight:800;color:var(--brand-300);margin-top:6px}
+/* result */
+.wok{width:34px;height:34px;border-radius:50%;background:var(--ok-bg);display:grid;place-items:center;margin-bottom:4px}
+.wok svg{width:16px;height:16px;stroke:var(--ok);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.wrbig{font-size:46px;font-weight:800;line-height:1}
+.wrlbl{font-size:9px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
+.wbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-pill);background:var(--ok-bg);color:var(--ok);font-size:10.5px;font-weight:700;margin-top:6px}
+.wsync{display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--ink-3);margin-top:8px}
+.wsync svg{width:11px;height:11px;stroke:var(--ink-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wcap-note{color:var(--ink-3);font-size:11px;text-align:center;margin-top:-30px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  /* draw-on animations rely on dashoffset; reveal fully when motion is reduced */
+  .ppg-line{stroke-dashoffset:0!important;opacity:1!important}
+}
+
+/* ============================================================
+   A4 Clinical Report — screen-hidden, print-only (doctor handout)
+   ============================================================ */
+.a4-wrap{position:absolute;left:-9999px;top:0;width:210mm}
+.a4{width:210mm;min-height:297mm;background:#fff;color:#111;padding:14mm 15mm;font-family:var(--font);font-size:10.5px;line-height:1.5;display:flex;flex-direction:column}
+.a4+.a4{margin-top:12px}
+.a4 *{color:inherit}
+.a4-head{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid #C1121F;padding-bottom:10px;margin-bottom:14px}
+.a4-brand{display:flex;align-items:center;gap:10px}
+.a4-logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,#E11D48,#8B0015);display:grid;place-items:center}
+.a4-logo svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.a4-brand .bt{font-size:17px;font-weight:800;letter-spacing:.12em;color:#111}
+.a4-brand .bs{font-size:9px;color:#666;letter-spacing:.02em}
+.a4-rep{text-align:right}
+.a4-rep .rt{font-size:13px;font-weight:800;color:#111}
+.a4-rep .rs{font-size:9px;color:#666}
+.a4-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #ddd;border-radius:6px;overflow:hidden;margin-bottom:14px}
+.a4-meta div{padding:7px 10px;border-right:1px solid #eee}
+.a4-meta div:nth-child(4n){border-right:none}
+.a4-meta div:nth-child(n+5){border-top:1px solid #eee}
+.a4-meta .k{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#999;font-weight:700}
+.a4-meta .v{font-size:11px;font-weight:700;color:#111;font-variant-numeric:tabular-nums}
+.a4-sec{font-size:11px;font-weight:800;color:#C1121F;margin:14px 0 7px;padding-bottom:3px;border-bottom:1px solid #eee;text-transform:uppercase;letter-spacing:.03em}
+.a4-charts{display:block}
+.a4-chart{margin-bottom:8px;break-inside:avoid}
+.a4-chart .ct{font-size:10px;font-weight:700;color:#222;text-align:center;margin-bottom:1px}
+.a4-chart svg{display:block;width:100%;height:auto;border:1px solid #eee;background:#fff}
+.a4-tbl{width:100%;border-collapse:collapse;font-size:9.5px}
+.a4-tbl th{background:#f6f6f6;text-align:left;padding:5px 8px;font-weight:700;color:#444;border:1px solid #e6e6e6;font-size:8.5px;text-transform:uppercase;letter-spacing:.03em}
+.a4-tbl td{padding:5px 8px;border:1px solid #eee;font-variant-numeric:tabular-nums}
+.a4-tbl td.grp{background:#fbeaec;color:#8B0015;font-weight:800;font-size:8.5px;text-transform:uppercase;letter-spacing:.04em}
+.a4-tbl td.val{font-weight:800;text-align:right;white-space:nowrap}
+.a4-tbl td.ref{color:#888;white-space:nowrap}
+.a4-tbl .fl{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.a4-two{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
+.a4-note{font-size:8.5px;color:#666;line-height:1.5}
+.a4-sign{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:22px}
+.a4-sign .sl{border-top:1px solid #999;padding-top:5px;font-size:9px;color:#666}
+.a4-foot{margin-top:auto;padding-top:8px;border-top:1px solid #eee;font-size:8px;color:#999;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.a4-disc{background:#fff7f7;border:1px solid #f2d0d0;border-radius:6px;padding:8px 11px;font-size:8.5px;color:#7a3b3b;line-height:1.55;margin-top:10px}
+
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  /* hide every top-level branch except the A4 report so pagination works in normal flow */
+  body>*{display:none!important}
+  .a4-wrap{display:block!important;position:static!important;left:auto!important;top:auto!important;width:auto!important}
+  .a4{box-shadow:none;margin:0!important;break-after:page;page-break-after:always}
+  .a4:last-child{break-after:auto;page-break-after:auto}
+  .a4-chart,.a4-tbl,.a4-sign,.a4-disc{break-inside:avoid;page-break-inside:avoid}
+}
+/* ---------- caregiver (family) mode — larger type & touch targets for elderly-adjacent UX ---------- */
+.fam-intro{display:flex;gap:10px;align-items:flex-start;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:14px}
+.fam-intro svg{width:20px;height:20px;fill:none;stroke:var(--brand-300);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;margin-top:2px}
+.fam-intro p{font-size:13.5px;color:var(--ink-2);line-height:1.55}
+.fam-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 16px;margin-bottom:12px;min-height:96px;transition:.16s;box-shadow:var(--sh-1)}
+.fam-card:active{transform:scale(.985)}
+.fam-ava{width:52px;height:52px;border-radius:50%;background:var(--surface-3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;flex:0 0 auto}
+.fam-info{flex:1;min-width:0}
+.fam-name{font-size:17px;font-weight:700;color:var(--ink-1)}
+.fam-sub{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.fam-va{text-align:right;white-space:nowrap}
+.fam-va .n{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.fam-va .u{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.fam-alert{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border-radius:var(--r-lg);padding:15px 16px;margin-bottom:10px;border:1px solid}
+.fam-alert svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;margin-top:1px}
+.fam-alert .at{font-size:14px;font-weight:700}
+.fam-alert .as{font-size:12.5px;color:var(--ink-2);margin-top:3px;line-height:1.5}
+/* ---------- easy-read mode (elderly): larger type via zoom + reduced density ---------- */
+/* zoom is supported by Chromium (demo target); mode is chosen at onboarding and in settings */
+.phone-screen.ez .screen{zoom:1.16}
+.phone-screen.ez .hide-ez{display:none!important}
+.phone-screen.ez .otp-box{width:42px;height:52px}
+.phone-screen.ez .sc{min-height:92px}
+.phone-screen.ez .sc span{font-size:14px;font-weight:700}
+.phone-screen.ez .grisk{font-size:46px}
+.mode-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 4px;width:100%}
+.mode-btn{display:flex;flex-direction:column;gap:6px;padding:16px 14px;border-radius:var(--r-lg);background:var(--surface-1);border:1.5px solid var(--line);text-align:left;transition:.16s;min-height:96px}
+.mode-btn.sel{border-color:var(--brand-300);background:rgba(225,29,72,.08)}
+.mode-btn .mb-t{font-size:15px;font-weight:800;color:var(--ink-1)}
+.mode-btn.big .mb-t{font-size:19px}
+.mode-btn .mb-d{font-size:11.5px;color:var(--ink-3);line-height:1.45}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gradGauge" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#8B0015"/><stop offset=".55" stop-color="#E11D48"/><stop offset="1" stop-color="#F0526A"/>
+    </linearGradient>
+  </defs>
+</svg>
+<div class="shell">
+
+  <header class="shell-head">
+    <div class="shell-logo">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
+    </div>
+    <div>
+      <h1>HON</h1>
+      <div class="sub">Hi-Fi Prototype · Production Grade · ความเสี่ยงหลอดเลือด × ประกันสุขภาพ</div>
+    </div>
+  </header>
+
+  <nav class="shell-nav" id="shellNav">
+    <button class="chip-nav" data-go="scr-login">01 เข้าสู่ระบบ</button>
+    <button class="chip-nav" data-go="scr-otp">02 OTP</button>
+    <button class="chip-nav" data-go="scr-intake">03 ข้อมูลสุขภาพ</button>
+    <button class="chip-nav on" data-go="scr-dash">04 Dashboard</button>
+    <button class="chip-nav" data-go="scr-result">05 ผลการวัด</button>
+    <button class="chip-nav" data-go="scr-report">06 รายงาน</button>
+    <button class="chip-nav" data-go="scr-clinical">06+ PPG คลินิก</button>
+    <button class="chip-nav" data-go="scr-profile">07 โปรไฟล์</button>
+    <button class="chip-nav" data-go="scr-chat">08 แชท AI</button>
+    <button class="chip-nav" data-go="scr-news">09 ข่าว/อีเวนต์</button>
+    <button class="chip-nav" data-go="scr-premium">10 Premium</button>
+    <button class="chip-nav" data-go="scr-settings">11 ตั้งค่า</button>
+  </nav>
+
+  <div class="stage">
+
+  <!-- ================= PHONE ================= -->
+  <div>
+  <div class="phone">
+    <div class="phone-screen" id="phoneScreens">
+      <div class="island"></div>
+      <div class="statusbar">
+        <span class="time num">09:41</span>
+        <span class="sicons">
+          <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 12 2.6 6.5a7.6 7.6 0 0 1 10.8 0Z" opacity=".95"/><path d="M8 12 2.6 6.5a7.6 7.6 0 0 1 10.8 0Z" transform="scale(.55) translate(6.5 4.5)" fill="#0A0A0B" opacity="0"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="0" width="21" height="12" rx="3.5" fill="none" stroke="#F5F5F7" stroke-opacity=".4"/><rect x="2" y="2" width="14" height="8" rx="2"/><rect x="22.5" y="4" width="2" height="4" rx="1" opacity=".4"/></svg>
+        </span>
+      </div>
+
+      <!-- ========== 04 · DASHBOARD (HERO) ========== -->
+      <section class="screen active" id="scr-dash">
+        <div class="dash-head">
+          <div class="avatar">กช</div>
+          <div>
+            <div class="hi" style="white-space:nowrap">สวัสดีตอนเช้า <svg viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-1px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19"/></svg></div>
+            <div class="nm">คุณกัญชนา วรากูล</div>
+          </div>
+          <div class="sp"></div>
+          <button class="icon-btn" aria-label="การแจ้งเตือน">
+            <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></svg>
+            <span class="ndot"></span>
+          </button>
+        </div>
+
+        <!-- Hero: Vascular Age gauge -->
+        <button class="hero" id="heroCard" data-go="scr-result" aria-label="ดูรายละเอียดผลวัดระดับความเสี่ยงหลอดเลือด">
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 248 196" id="gaugeMain" aria-hidden="true">
+              <!-- risk zones (green/yellow/red) injected by JS -->
+              <g id="gaugeZones"></g>
+              <!-- ticks injected by JS -->
+              <g id="gaugeTicks"></g>
+              <path id="gaugeArc" d="M 63.2 162.8 A 86 86 0 1 1 184.8 162.8" fill="none" stroke="#34D07C" stroke-width="13" stroke-linecap="round" stroke-dasharray="406" stroke-dashoffset="406" style="transition:stroke-dashoffset 1.1s cubic-bezier(.3,.7,.3,1),stroke .4s ease"/>
+              <circle id="gaugeDot" r="4.5" fill="#fff" cx="63.2" cy="162.8" style="filter:drop-shadow(0 0 6px rgba(255,255,255,.9));transition:cx 1.1s cubic-bezier(.3,.7,.3,1),cy 1.1s cubic-bezier(.3,.7,.3,1)"/>
+            </svg>
+            <div class="gauge-center">
+              <div class="glabel">ความเสี่ยงหลอดเลือด</div>
+              <div class="grisk" id="gaugeRisk">ต่ำ</div>
+              <div class="gagi" id="gaugeHint">แตะเพื่อดูรายละเอียด</div>
+            </div>
+          </div>
+          <div class="hero-delta">
+            <span class="badge b-ok" id="heroRiskBadge"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>เสี่ยงต่ำ</span>
+            <span style="font-size:13px;color:var(--ink-2)" id="heroRiskDesc">หลอดเลือดอายุน้อย · ดีเยี่ยม</span>
+          </div>
+          <div class="hero-foot">
+            <span class="lm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>วัดล่าสุด วันนี้ 07:12 น.</span>
+            <span class="badge b-brand"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>ดูรายละเอียด</span>
+          </div>
+        </button>
+
+        <div class="sec-label hide-ez">ค่าชีพจรและสุขภาพ <button class="more" data-go="scr-result">ทั้งหมด</button></div>
+        <div class="mgrid hide-ez">
+          <button class="mcard" data-go="scr-result">
+            <div class="mk"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>PWV</div>
+            <div class="mv num">7.2<small>m/s</small></div>
+            <div class="md" style="color:var(--ok)"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M17 14l-5 5-5-5M12 19V5"/></svg>−0.3 จากเดือนก่อน</div>
+          </button>
+          <button class="mcard" data-go="scr-result">
+            <div class="mk"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>ชีพจรพัก</div>
+            <div class="mv num">64<small>ครั้ง/นาที</small></div>
+            <div class="md" style="color:var(--ink-3)">คงที่ 7 วัน</div>
+          </button>
+          <button class="mcard" data-go="scr-result">
+            <div class="mk"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8c2.5 0 4-2 7-2s4.5 2 7 2M5 16c2.5 0 4-2 7-2s4.5 2 7 2"/></svg>ความดันอ้างอิง</div>
+            <div class="mv num">118/76<small>mmHg</small></div>
+            <div class="md" style="color:var(--ok)"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></svg>อยู่ในเกณฑ์ดี</div>
+          </button>
+          <button class="mcard" data-go="scr-profile">
+            <div class="mk"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.2 2.4 2 4 2s3-.8 4-2M9 10h.01M15 10h.01"/></svg>BMI</div>
+            <div class="mv num">22.1</div>
+            <div class="md" style="color:var(--ok)"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></svg>สมส่วน</div>
+          </button>
+        </div>
+
+        <div class="sec-label hide-ez">กรมธรรม์ของคุณ</div>
+        <div class="policy hide-ez">
+          <div class="policy-top">
+            <div class="pic"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div>
+              <div class="pt">HON Care Plus</div>
+              <div class="ps">คุ้มครองถึง 14 มี.ค. 2570</div>
+            </div>
+            <div style="margin-left:auto"><span class="badge b-ok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>คุ้มครองอยู่</span></div>
+          </div>
+          <div class="policy-prog">
+            <div class="pp-head"><span>ภารกิจสุขภาพเดือนนี้</span><b class="num">18/24 วัน</b></div>
+            <div class="pbar"><i style="width:75%"></i></div>
+            <div class="hint" style="margin-top:8px">วัดครบ 24 วัน รับส่วนลดเบี้ยปีหน้า <b style="color:var(--brand-300)">12%</b></div>
+          </div>
+        </div>
+
+        <div class="sec-label">ทางลัด</div>
+        <div class="short">
+          <button class="sc" data-go="scr-settings"><svg viewBox="0 0 24 24"><rect x="7" y="5" width="10" height="14" rx="3"/><path d="M9.5 2h5M9.5 22h5"/></svg><span>วัดผล</span></button>
+          <button class="sc" data-go="scr-report"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>รายงาน</span></button>
+          <button class="sc" data-go="scr-chat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>ถาม AI</span></button>
+          <button class="sc" data-go="scr-premium"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/></svg><span>Premium</span></button>
+        </div>
+
+        <div class="sec-label">ครอบครัว <button class="more" data-go="scr-family">โหมดผู้ดูแล</button></div>
+        <button class="fam-card" data-go="scr-family" aria-label="เปิดโหมดผู้ดูแล ดูผลของครอบครัว" style="margin-bottom:4px">
+          <span class="fam-ava" style="border-color:var(--ok);color:var(--ok)">แม่</span>
+          <span class="fam-info">
+            <span class="fam-name" style="display:block">ดูแลอยู่ 2 คน</span>
+            <span class="fam-sub" style="display:block">แม่ เสี่ยงต่ำ · พ่อ เสี่ยงปานกลาง (ไม่ได้วัด 3 วัน)</span>
+          </span>
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--ink-3);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
+        <div class="sec-label hide-ez">กิจกรรมแนะนำ <button class="more" data-go="scr-news">ดูทั้งหมด</button></div>
+        <button class="teaser hide-ez" data-go="scr-news">
+          <span class="badge b-brand" style="align-self:flex-start">อีเวนต์เดือนนี้</span>
+          <div class="tt">วิ่งแลกแว่น 2026 <svg viewBox="0 0 24 24" style="width:15px;height:15px;vertical-align:-2px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="14" cy="5" r="2"/><path d="M11 8l3 2 2 3M8 21l3-5-2-4-4 2M14 13l3 1 2 4"/></svg></div>
+          <div class="ts">สะสม 60 กม. ภายใน ก.ค. แลกคูปองแว่นสายตา มูลค่า 2,000 บาท</div>
+        </button>
+
+        <div class="disclaimer">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg>
+          <p>ค่าที่แสดงเป็นการประเมินเพื่อการดูแลสุขภาพเบื้องต้นเท่านั้น ไม่ใช่เครื่องมือวินิจฉัยทางการแพทย์ หากมีอาการผิดปกติควรปรึกษาแพทย์</p>
+        </div>
+      </section>
+
+      <!-- ========== 04B · FAMILY / CAREGIVER MODE ========== -->
+      <section class="screen" id="scr-family">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-dash" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="ttl">ครอบครัว · โหมดผู้ดูแล</div>
+          <button class="icon-btn" aria-label="เพิ่มสมาชิก"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+
+        <div class="fam-intro">
+          <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          <p>คนที่คุณดูแล <b style="color:var(--ink-1)">แค่ใส่นาฬิกา</b> — ไม่ต้องเปิดแอปเอง ผลวัดและการแจ้งเตือนทั้งหมดมาแสดงที่นี่</p>
+        </div>
+
+        <div class="sec-label">สมาชิก 2 คน</div>
+        <button class="fam-card" data-go="scr-result" aria-label="ดูผลของแม่">
+          <span class="fam-ava" style="border-color:var(--ok);color:var(--ok)">แม่</span>
+          <span class="fam-info">
+            <span class="fam-name" style="display:block">สมศรี (แม่) · อายุ 71</span>
+            <span class="fam-sub" style="display:block">วัดล่าสุด เช้านี้ 06:48 น. · เทรนด์คงที่</span>
+          </span>
+          <span class="fam-va">
+            <span class="n" style="color:var(--ok);display:block;font-size:21px">เสี่ยงต่ำ</span>
+            <span class="u" style="display:block">แตะดูรายละเอียด</span>
+          </span>
+        </button>
+        <button class="fam-card" data-go="scr-result" aria-label="ดูผลของพ่อ">
+          <span class="fam-ava" style="border-color:var(--warn);color:var(--warn)">พ่อ</span>
+          <span class="fam-info">
+            <span class="fam-name" style="display:block">ประวิทย์ (พ่อ) · อายุ 74</span>
+            <span class="fam-sub" style="display:block">วัดล่าสุด 3 วันก่อน · เทรนด์แย่ลง 2 สัปดาห์ติด</span>
+          </span>
+          <span class="fam-va">
+            <span class="n" style="color:var(--warn);display:block;font-size:21px">เสี่ยงปานกลาง</span>
+            <span class="u" style="display:block">แตะดูรายละเอียด</span>
+          </span>
+        </button>
+
+        <div class="sec-label">การแจ้งเตือน</div>
+        <button class="fam-alert" style="border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08);color:var(--warn)">
+          <svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <span>
+            <span class="at" style="display:block">พ่อไม่ได้วัดมา 3 วัน</span>
+            <span class="as" style="display:block">แตะเพื่อส่งการแจ้งเตือนไปที่หน้าปัดนาฬิกาของพ่อ</span>
+          </span>
+        </button>
+        <button class="fam-alert" data-go="scr-report" style="border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08);color:var(--warn)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+          <span>
+            <span class="at" style="display:block">เทรนด์ของพ่อแย่ลงต่อเนื่อง</span>
+            <span class="as" style="display:block">แนะนำนัดแพทย์ พร้อมดาวน์โหลดรายงาน PDF สำหรับแพทย์</span>
+          </span>
+        </button>
+
+        <div class="disclaimer">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg>
+          <p>สมาชิกครอบครัวให้ความยินยอมการแชร์ข้อมูลตาม PDPA แล้ว · ค่าที่แสดงเป็นการประเมินเบื้องต้น ไม่ใช่การวินิจฉัยทางการแพทย์</p>
+        </div>
+      </section>
+
+      <!-- ========== 05 · RESULT DETAIL ========== -->
+      <section class="screen" id="scr-result">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-dash" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="ttl">ผลการวัดล่าสุด</div>
+          <button class="icon-btn" data-go="scr-report" aria-label="แชร์ผล"><svg viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></button>
+        </div>
+
+        <div class="result-sum">
+          <div class="rlabel">ระดับความเสี่ยงหลอดเลือด</div>
+          <div class="rnum" style="color:var(--ok)">ต่ำ</div>
+          <div class="runit">AGI <b class="num" style="color:var(--ok)">−0.72</b> · หลอดเลือดอายุน้อย (เกณฑ์ดีเยี่ยม)</div>
+        </div>
+        <div class="rmeta">
+          <span class="badge b-mute"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>8 ก.ค. 2569 · 07:12 น.</span>
+          <span class="badge b-ok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>คุณภาพสัญญาณ: ดี</span>
+        </div>
+
+        <div class="card ppg-card">
+          <div class="ppg-head">
+            <span class="pt">คลื่นสัญญาณ PPG</span>
+            <span class="pl num">บันทึก 30 วินาที · HON Watch S1</span>
+          </div>
+          <div class="ppg-wave">
+            <svg viewBox="0 0 340 84" preserveAspectRatio="none" aria-hidden="true">
+              <!-- คลื่น PPG จริง: upstroke ชัน -> systolic peak -> dicrotic notch -> diastolic decay (4 จังหวะ) -->
+              <path d="M0 64 C6 64 10 20 18 18 C24 17 28 30 34 40 C37 44 40 44 44 40 C48 36 52 34 56 38 C64 44 74 62 85 64 C91 64 95 20 103 18 C109 17 113 30 119 40 C122 44 125 44 129 40 C133 36 137 34 141 38 C149 44 159 62 170 64 C176 64 180 20 188 18 C194 17 198 30 204 40 C207 44 210 44 214 40 C218 36 222 34 226 38 C234 44 244 62 255 64 C261 64 265 20 273 18 C279 17 283 30 289 40 C292 44 295 44 299 40 C303 36 307 34 311 38 C319 44 329 62 340 64"
+                fill="none" stroke="#E11D48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="ppg-line"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="sec-label">ตัวชี้วัดหลัก</div>
+
+        <div class="card metric-detail">
+          <div class="mdh">
+            <div class="mdi"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></div>
+            <div>
+              <div class="mdt">ความเร็วคลื่นชีพจร</div>
+              <div class="mds">Pulse Wave Velocity (baPWV)</div>
+            </div>
+            <div class="mdv"><div class="v num">7.2</div><div class="u">เมตร/วินาที</div></div>
+          </div>
+          <div class="zone">
+            <div class="zone-track">
+              <i class="z1"></i><i class="z2"></i><i class="z3"></i>
+              <span class="zone-marker" style="left:24%"></span>
+            </div>
+            <div class="zone-labels"><span>ดี &lt; 9.0</span><span>เฝ้าระวัง 9.0–14.0</span><span>สูง &gt; 14.0</span></div>
+          </div>
+          <p class="mexp">คลื่นชีพจรเดินทางช้า แปลว่าผนังหลอดเลือดยังยืดหยุ่นดี ค่าของคุณอยู่ในเกณฑ์ <b style="color:var(--ok)">ดี</b> สำหรับช่วงอายุ 40–49 ปี</p>
+        </div>
+
+        <div class="card metric-detail">
+          <div class="mdh">
+            <div class="mdi"><svg viewBox="0 0 24 24"><path d="M4 20c3-1 4-4 4-8s1.5-8 4-8 4 4 4 8 1 7 4 8"/><path d="M2 20h20"/></svg></div>
+            <div>
+              <div class="mdt">ดัชนีความแข็งหลอดเลือด</div>
+              <div class="mds">Arterial Stiffness Index (SI)</div>
+            </div>
+            <div class="mdv"><div class="v num">6.4</div><div class="u">เมตร/วินาที</div></div>
+          </div>
+          <div class="zone">
+            <div class="zone-track">
+              <i class="z1"></i><i class="z2"></i><i class="z3"></i>
+              <span class="zone-marker" style="left:29%"></span>
+            </div>
+            <div class="zone-labels"><span>ดี &lt; 8.0</span><span>เฝ้าระวัง 8.0–10.0</span><span>สูง &gt; 10.0</span></div>
+          </div>
+          <p class="mexp">คำนวณจากรูปทรงคลื่น PPG สะท้อนความยืดหยุ่นของหลอดเลือดแดงใหญ่ — ยิ่งต่ำยิ่งดี</p>
+        </div>
+
+        <div class="card metric-detail">
+          <div class="mdh">
+            <div class="mdi"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+            <div>
+              <div class="mdt">อัตราการเต้นหัวใจขณะพัก</div>
+              <div class="mds">Resting Heart Rate</div>
+            </div>
+            <div class="mdv"><div class="v num">64</div><div class="u">ครั้ง/นาที</div></div>
+          </div>
+          <div class="zone">
+            <div class="zone-track">
+              <i class="z1"></i><i class="z2"></i><i class="z3"></i>
+              <span class="zone-marker" style="left:16%"></span>
+            </div>
+            <div class="zone-labels"><span>ดี 50–70</span><span>เฝ้าระวัง 71–90</span><span>สูง &gt; 90</span></div>
+          </div>
+          <p class="mexp">ชีพจรพักที่ต่ำและสม่ำเสมอ สัมพันธ์กับสมรรถภาพหัวใจที่ดี</p>
+        </div>
+
+        <div class="sec-label">คำแนะนำสำหรับคุณ</div>
+        <div class="card">
+          <div class="tip-row"><span class="tn">1</span><p><b>คงเส้นคงวาไว้!</b> เดินเร็วหรือวิ่งเบา ๆ 30 นาที สัปดาห์ละ 5 วัน ช่วยรักษาความยืดหยุ่นหลอดเลือด</p></div>
+          <div class="tip-row"><span class="tn">2</span><p>ลดโซเดียมไม่เกิน <b>2,000 มก./วัน</b> — ค่าความดันของคุณจะยิ่งนิ่งขึ้น</p></div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px">
+          <button class="btn btn-secondary" style="flex:1" data-go="scr-settings"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>วัดใหม่</button>
+          <button class="btn btn-primary" style="flex:1.4" data-go="scr-report"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>ดูรายงานฉบับเต็ม</button>
+        </div>
+
+        <div class="disclaimer">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg>
+          <p>ไม่ใช่เครื่องมือวินิจฉัยทางการแพทย์ — ค่าอ้างอิงเกณฑ์เป็นแนวทางทั่วไปตามช่วงอายุ ควรยืนยันกับแพทย์ก่อนตัดสินใจรักษา</p>
+        </div>
+      </section>
+
+      <!-- ========== 01 · LOGIN ========== -->
+      <section class="screen auth" id="scr-login">
+        <div class="auth-logo">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
+        </div>
+        <h2 class="auth-title">ยินดีต้อนรับสู่ HON</h2>
+        <p class="auth-sub">รู้ระดับความเสี่ยงหลอดเลือดของคุณ พร้อมสิทธิประโยชน์<br>จากกรมธรรม์ในแอปเดียว</p>
+
+        <div class="mode-pick" role="group" aria-label="เลือกรูปแบบการแสดงผล">
+          <button class="mode-btn sel" data-ezpick="0">
+            <span class="mb-t">โหมดปกติ</span>
+            <span class="mb-d">ครบทุกฟีเจอร์ เหมาะกับผู้ใช้ทั่วไป</span>
+          </button>
+          <button class="mode-btn big" data-ezpick="1">
+            <span class="mb-t">โหมดอ่านง่าย</span>
+            <span class="mb-d">ตัวหนังสือใหญ่ จอโล่ง เหมาะกับผู้สูงวัย · เปลี่ยนทีหลังได้ในตั้งค่า</span>
+          </button>
+        </div>
+
+        <div class="field">
+          <label for="loginPhone">เบอร์โทรศัพท์มือถือ</label>
+          <input class="input num" id="loginPhone" type="tel" inputmode="numeric" placeholder="08X-XXX-XXXX" value="089-424-5230">
+          <div class="hint">เราจะส่งรหัส OTP 6 หลักไปยังเบอร์นี้ทาง SMS</div>
+        </div>
+        <button class="btn btn-primary btn-block" data-go="scr-otp">
+          ขอรหัส OTP
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+
+        <div class="divider">หรือเข้าสู่ระบบด้วย</div>
+        <div class="sso">
+          <button class="btn btn-secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18M3.5 9h17M3.5 15h17"/></svg>
+            Google
+          </button>
+          <button class="btn btn-secondary">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M16.7 12.9c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.7-3.2.7-.7 0-1.7-.7-2.8-.7-1.4 0-2.7.8-3.5 2.1-1.5 2.5-.4 6.3 1 8.4.7 1 1.5 2.1 2.6 2.1 1 0 1.4-.7 2.7-.7s1.6.7 2.8.7c1.1 0 1.9-1 2.6-2 .8-1.2 1.1-2.3 1.1-2.4-.1 0-2.1-.8-2.1-3.5zM14.6 6.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
+            Apple
+          </button>
+        </div>
+
+        <div class="auth-foot">ยังไม่เคยลงทะเบียน? <a href="#" data-go="scr-otp">สมัครด้วยเบอร์โทรได้เลย</a><br>
+          <span style="font-size:11px;line-height:2.2">การเข้าสู่ระบบถือว่ายอมรับ <a href="#">ข้อตกลงการใช้งาน</a> และ <a href="#">นโยบายความเป็นส่วนตัว (PDPA)</a></span>
+        </div>
+      </section>
+
+      <!-- ========== 02 · OTP ========== -->
+      <section class="screen auth" id="scr-otp">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-login" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        </div>
+        <div class="auth-logo" style="margin-top:8px;background:var(--surface-2);box-shadow:var(--sh-1);border:1px solid var(--line-2)">
+          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--brand-300)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M9 18h6"/><path d="m8.5 9 2.5 2.5L15.5 7"/></svg>
+        </div>
+        <h2 class="auth-title">ยืนยันรหัส OTP</h2>
+        <p class="auth-sub">กรอกรหัส 6 หลักที่ส่งไปยัง <b class="num" style="color:var(--ink-1)">089-424-5230</b><br>รหัสอ้างอิง: <span class="num">RVX7</span></p>
+
+        <div class="otp-row" id="otpRow">
+          <input class="otp-box num filled" maxlength="1" inputmode="numeric" value="4" aria-label="หลักที่ 1">
+          <input class="otp-box num filled" maxlength="1" inputmode="numeric" value="8" aria-label="หลักที่ 2">
+          <input class="otp-box num filled" maxlength="1" inputmode="numeric" value="1" aria-label="หลักที่ 3">
+          <input class="otp-box num" maxlength="1" inputmode="numeric" aria-label="หลักที่ 4">
+          <input class="otp-box num" maxlength="1" inputmode="numeric" aria-label="หลักที่ 5">
+          <input class="otp-box num" maxlength="1" inputmode="numeric" aria-label="หลักที่ 6">
+        </div>
+        <p class="otp-timer">ขอรหัสใหม่ได้ใน <b class="num" id="otpTimer">00:42</b></p>
+
+        <div style="margin-top:32px">
+          <button class="btn btn-primary btn-block" data-go="scr-intake">ยืนยันรหัส</button>
+          <button class="btn btn-ghost btn-block" style="margin-top:12px">ส่งรหัสอีกครั้งทาง SMS</button>
+        </div>
+
+        <div class="auth-foot" style="font-size:12px">ไม่ได้รับรหัส? ตรวจสอบว่าเบอร์ถูกต้อง หรือ <a href="#" data-go="scr-chat">ติดต่อฝ่ายช่วยเหลือ</a></div>
+      </section>
+
+      <!-- ========== 03 · HEALTH INTAKE ========== -->
+      <section class="screen auth" id="scr-intake">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-otp" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i><i></i></div>
+          <span class="stepnum num">3/4</span>
+        </div>
+
+        <h2 class="auth-title" style="text-align:left;font-size:22px">ข้อมูลสุขภาพพื้นฐาน</h2>
+        <p class="auth-sub" style="text-align:left;margin-bottom:24px">ใช้ปรับเกณฑ์ประเมินความเสี่ยงหลอดเลือดให้ตรงกับตัวคุณ<br>แก้ไขภายหลังได้ที่หน้าโปรไฟล์</p>
+
+        <div class="field">
+          <label>วันเกิด</label>
+          <div class="dob" id="dobIntake" data-dob="intake">
+            <div class="wheel-band"></div>
+            <div class="wheel" data-w="d" aria-label="วัน"></div>
+            <div class="wheel" data-w="m" aria-label="เดือน"></div>
+            <div class="wheel" data-w="y" aria-label="ปี พ.ศ."></div>
+          </div>
+          <div class="dob-age">อายุ <b id="ageIntake">45</b> ปี · ใช้ประเมินความเสี่ยงหลอดเลือด</div>
+        </div>
+        <div class="field">
+          <label>น้ำหนักตัว</label>
+          <div class="ruler" id="rkW" tabindex="0" role="slider" aria-label="น้ำหนักตัว (กิโลกรัม)" aria-valuemin="30" aria-valuemax="200" aria-valuenow="57"
+               data-ruler="w" data-min="30" data-max="200" data-step="1" data-val="57" data-unit="กก.">
+            <div class="rk-val"><span class="rk-num">57</span><small>กก.</small></div>
+            <div class="rk-track"><div class="rk-scale"></div></div>
+            <div class="rk-needle"></div>
+          </div>
+          <div class="rk-hint">ปัดซ้าย–ขวาเพื่อเลือก · หรือใช้ปุ่มลูกศร</div>
+        </div>
+        <div class="field">
+          <label>ส่วนสูง</label>
+          <div class="ruler" id="rkH" tabindex="0" role="slider" aria-label="ส่วนสูง (เซนติเมตร)" aria-valuemin="120" aria-valuemax="220" aria-valuenow="161"
+               data-ruler="h" data-min="120" data-max="220" data-step="1" data-val="161" data-unit="ซม.">
+            <div class="rk-val"><span class="rk-num">161</span><small>ซม.</small></div>
+            <div class="rk-track"><div class="rk-scale"></div></div>
+            <div class="rk-needle"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>เพศกำเนิด</label>
+          <div class="choice-grid">
+            <button class="choice" data-pick="sex">ชาย</button>
+            <button class="choice on" data-pick="sex">หญิง</button>
+            <button class="choice" data-pick="sex">ไม่ระบุ</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>การสูบบุหรี่</label>
+          <div class="choice-grid">
+            <button class="choice on" data-pick="smoke">ไม่สูบ</button>
+            <button class="choice" data-pick="smoke">เคยสูบ</button>
+            <button class="choice" data-pick="smoke">สูบอยู่</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>เคยได้รับการวินิจฉัยความดันโลหิตสูงหรือไม่</label>
+          <div class="choice-grid" style="grid-template-columns:1fr 1fr">
+            <button class="choice on" data-pick="bp">ไม่เคย</button>
+            <button class="choice" data-pick="bp">เคย / กำลังรักษา</button>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;padding-top:24px">
+          <button class="btn btn-primary btn-block" data-go="scr-dash">ถัดไป: จับคู่นาฬิกา<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <div class="hint" style="text-align:center;margin-top:12px">ข้อมูลถูกเข้ารหัสและใช้ตามความยินยอม PDPA เท่านั้น</div>
+        </div>
+      </section>
+
+      <!-- ========== 06 · REPORT / PDF ========== -->
+      <section class="screen" id="scr-report">
+        <div class="appbar">
+          <div class="ttl">รายงานสุขภาพ</div>
+          <button class="icon-btn" aria-label="เลือกช่วงเวลา"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></button>
+        </div>
+
+        <div class="seg" style="margin-bottom:20px">
+          <button data-seg="rp">3 เดือน</button>
+          <button class="on" data-seg="rp">6 เดือน</button>
+          <button data-seg="rp">1 ปี</button>
+        </div>
+
+        <div class="card trend-card">
+          <div class="trend-head">
+            <span class="th">เทรนด์ดัชนีอายุหลอดเลือด (AGI)</span>
+            <span class="tsub">ก.พ. – ก.ค. 2569</span>
+          </div>
+          <div class="trend-callout">
+            <span class="badge b-ok"><svg viewBox="0 0 24 24"><path d="M17 14l-5 5-5-5M12 19V5"/></svg>ดีขึ้น 0.42</span>
+            <span style="font-size:12px;color:var(--ink-2)">อยู่ในโซนเสี่ยงต่ำต่อเนื่อง 2 เดือน</span>
+          </div>
+          <svg class="chart-svg" viewBox="0 0 320 196" width="100%" aria-label="กราฟเส้นดัชนี AGI 6 เดือน ดีขึ้นจาก −0.30 เป็น −0.72 (โซนเสี่ยงต่ำ)">
+            <defs>
+              <linearGradient id="gradArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#34D07C" stop-opacity=".26"/>
+                <stop offset="1" stop-color="#34D07C" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- risk zone bands (green best -> red worst) -->
+            <rect x="36" y="16"    width="272" height="46.7" fill="#34D07C" fill-opacity=".07"/>
+            <rect x="36" y="62.7"  width="272" height="46.6" fill="#FFB020" fill-opacity=".07"/>
+            <rect x="36" y="109.3" width="272" height="46.7" fill="#FF4D42" fill-opacity=".07"/>
+            <!-- gridlines (recessive) + y labels (AGI) -->
+            <g stroke="rgba(255,255,255,.06)" stroke-width="1">
+              <line x1="36" y1="16" x2="308" y2="16"/><line x1="36" y1="51" x2="308" y2="51"/>
+              <line x1="36" y1="86" x2="308" y2="86"/><line x1="36" y1="121" x2="308" y2="121"/>
+              <line x1="36" y1="156" x2="308" y2="156"/>
+            </g>
+            <g font-size="9" fill="#8A8A96" text-anchor="end">
+              <text x="28" y="19">−1.0</text><text x="28" y="54">−0.7</text><text x="28" y="89">−0.4</text>
+              <text x="28" y="124">−0.1</text><text x="28" y="159">+0.2</text>
+            </g>
+            <!-- zone boundary labels -->
+            <text x="308" y="60" font-size="8.5" fill="#34D07C" text-anchor="end" opacity=".9">เสี่ยงต่ำ</text>
+            <!-- area + line -->
+            <path d="M48 97.7 L97.6 83.7 L147.2 72.0 L196.8 62.7 L246.4 55.7 L296 48.7 L296 156 L48 156 Z" fill="url(#gradArea)"/>
+            <path d="M48 97.7 L97.6 83.7 L147.2 72.0 L196.8 62.7 L246.4 55.7 L296 48.7" fill="none" stroke="#34D07C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- points -->
+            <g fill="#34D07C">
+              <circle cx="48" cy="97.7" r="3"/><circle cx="97.6" cy="83.7" r="3"/><circle cx="147.2" cy="72.0" r="3"/>
+              <circle cx="196.8" cy="62.7" r="3"/><circle cx="246.4" cy="55.7" r="3"/>
+            </g>
+            <!-- latest point: highlighted -->
+            <circle cx="296" cy="48.7" r="5.5" fill="#34D07C" stroke="#141416" stroke-width="2.5"/>
+            <circle cx="296" cy="48.7" r="9" fill="none" stroke="#34D07C" stroke-opacity=".35" stroke-width="1.5"/>
+            <text x="296" y="36" font-size="11" font-weight="700" fill="#F5F5F7" text-anchor="middle">−0.72</text>
+            <!-- x labels -->
+            <g font-size="9" fill="#8A8A96" text-anchor="middle">
+              <text x="48" y="176">ก.พ.</text><text x="97.6" y="176">มี.ค.</text><text x="147.2" y="176">เม.ย.</text>
+              <text x="196.8" y="176">พ.ค.</text><text x="246.4" y="176">มิ.ย.</text>
+              <text x="296" y="176" fill="#F5F5F7" font-weight="700">ก.ค.</text>
+            </g>
+          </svg>
+        </div>
+
+        <button class="card pdf-card" data-go="scr-clinical" style="width:100%;text-align:left;margin-top:16px;border-color:var(--line-2)">
+          <div class="pdf-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 5 3-10 2 6 2-3h5"/></svg></div>
+          <div style="flex:1">
+            <div class="pt">รายงาน PPG ฉบับเต็ม (เชิงคลินิก)</div>
+            <div class="ps">คลื่นสัญญาณ Raw + Filtered ทุกช่องแสง · ค่าละเอียดสำหรับแพทย์</div>
+          </div>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--brand-300)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
+        <div class="sec-label">สรุปเฉลี่ยเดือนนี้</div>
+        <div class="mgrid">
+          <div class="mcard"><div class="mk"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>PWV เฉลี่ย</div><div class="mv num">7.3<small>m/s</small></div><div class="md" style="color:var(--ok)"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M17 14l-5 5-5-5M12 19V5"/></svg>ดีขึ้น 4%</div></div>
+          <div class="mcard"><div class="mk"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>ชีพจรพักเฉลี่ย</div><div class="mv num">65<small>ครั้ง/นาที</small></div><div class="md" style="color:var(--ink-3)">คงที่</div></div>
+        </div>
+
+        <div class="sec-label">ส่งรายงานให้แพทย์</div>
+        <div class="card pdf-card">
+          <div class="pdf-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <div style="flex:1">
+            <div class="pt">รายงานสุขภาพหลอดเลือด</div>
+            <div class="ps">มิ.ย.–ก.ค. 2569 · PDF · 4 หน้า · ภาษาไทย/อังกฤษ</div>
+          </div>
+          <button class="btn btn-primary btn-sm">ดาวน์โหลด</button>
+        </div>
+        <button class="btn btn-secondary btn-block" style="margin-top:12px">
+          <svg viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+          ส่งให้แพทย์ผ่านอีเมล / LINE
+        </button>
+
+        <div class="sec-label">ประวัติการส่งรายงาน</div>
+        <div class="card empty">
+          <div class="eic"><svg viewBox="0 0 24 24"><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
+          <div class="et">ยังไม่เคยส่งรายงาน</div>
+          <div class="es">เมื่อส่งรายงานให้แพทย์แล้ว ประวัติการส่ง<br>และสถานะการเปิดอ่านจะแสดงที่นี่</div>
+          <button class="btn btn-ghost btn-sm">ส่งรายงานฉบับแรก</button>
+        </div>
+
+        <div class="disclaimer">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg>
+          <p>รายงานนี้สรุปจากการวัดด้วยเซนเซอร์ PPG บนข้อมือ ไม่ใช่เครื่องมือวินิจฉัยทางการแพทย์</p>
+        </div>
+      </section>
+
+      <!-- ========== 06+ · CLINICAL PPG REPORT ========== -->
+      <section class="screen" id="scr-clinical">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-report" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="ttl">รายงาน PPG ฉบับเต็ม</div>
+          <button class="icon-btn" data-print="a4" aria-label="ส่งออก PDF (พิมพ์ A4)"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></button>
+        </div>
+        <p class="clin-sub">ข้อมูลดิบและค่าที่วิเคราะห์ได้ สำหรับบุคลากรทางการแพทย์ · แสดงแยกตามช่องแสงของเซนเซอร์</p>
+
+        <!-- measurement metadata -->
+        <div class="sec-label">ข้อมูลการวัด</div>
+        <div class="meta-grid">
+          <div class="mi"><div class="mk">วันเวลา</div><div class="mv">8 ก.ค. 2569 · 07:12</div></div>
+          <div class="mi"><div class="mk">อุปกรณ์</div><div class="mv">HON Watch S1</div></div>
+          <div class="mi"><div class="mk">อัตราสุ่มตัวอย่าง</div><div class="mv">100 <small>Hz · 24-bit ADC</small></div></div>
+          <div class="mi"><div class="mk">ระยะเวลาบันทึก</div><div class="mv">30 <small>วินาที</small></div></div>
+          <div class="mi full"><div class="mk">เซนเซอร์ / ช่องแสง</div><div class="mv">Reflective PPG · Green 515nm · Red 660nm · IR 940nm</div></div>
+        </div>
+
+        <!-- channel selector -->
+        <div class="sec-label" style="margin-top:22px">คลื่นสัญญาณ PPG แยกช่องแสง <span style="font-weight:400;color:var(--ink-3);letter-spacing:0">· ซูมช่วง 6 วินาที</span></div>
+        <div class="seg" id="chSeg">
+          <button data-ch="green" class="on">Green</button>
+          <button data-ch="red">Red</button>
+          <button data-ch="ir">IR</button>
+        </div>
+
+        <div class="ch-note" id="chNote">
+          <span class="ci" id="chNoteDot"></span>
+          <span id="chNoteText"></span>
+        </div>
+
+        <!-- RAW waveform -->
+        <div class="wave-block">
+          <div class="wh">
+            <span class="wt"><span class="dot" id="rawDot"></span>สัญญาณดิบ (Raw ADC)</span>
+            <span class="wtag" id="rawTag">×10⁵</span>
+          </div>
+          <div class="wave-plot">
+            <div class="wave-yaxis"><span id="rawYtop">2.048</span><span id="rawYbot">2.034</span></div>
+            <svg viewBox="0 0 680 92" preserveAspectRatio="none">
+              <g class="grid"><line x1="0" y1="23" x2="680" y2="23"/><line x1="0" y1="46" x2="680" y2="46"/><line x1="0" y1="69" x2="680" y2="69"/></g>
+              <path id="rawPath" fill="none" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="wave-xaxis"><span>0 วิ</span><span>1.5</span><span>3</span><span>4.5</span><span>6 วิ</span></div>
+        </div>
+
+        <!-- FILTERED waveform -->
+        <div class="wave-block">
+          <div class="wh">
+            <span class="wt"><span class="dot" id="filtDot"></span>หลังกรองสัญญาณ (Chebyshev II band-pass)</span>
+            <span class="wtag">0.5–8 Hz</span>
+          </div>
+          <div class="wave-plot">
+            <div class="wave-yaxis"><span id="filtYtop">a.u.</span><span id="filtYbot">0</span></div>
+            <svg viewBox="0 0 680 92" preserveAspectRatio="none">
+              <g class="grid"><line x1="0" y1="23" x2="680" y2="23"/><line x1="0" y1="46" x2="680" y2="46"/><line x1="0" y1="69" x2="680" y2="69"/></g>
+              <path id="filtPath" fill="none" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="wave-xaxis"><span>0 วิ</span><span>1.5</span><span>3</span><span>4.5</span><span>6 วิ</span></div>
+        </div>
+
+        <!-- per-channel signal quality -->
+        <div class="sig-row">
+          <div class="sig-cell"><div class="sv" id="sigSNR">–</div><div class="sk">SNR (สัญญาณ:รบกวน)</div></div>
+          <div class="sig-cell"><div class="sv" id="sigSQI">–</div><div class="sk">SQI (ดัชนีคุณภาพ)</div></div>
+          <div class="sig-cell"><div class="sv" id="sigPI">–</div><div class="sk">Perfusion Index</div></div>
+        </div>
+
+        <!-- single-beat morphology -->
+        <div class="sec-label" style="margin-top:24px">สัณฐานคลื่น 1 จังหวะ (Pulse Morphology)</div>
+        <div class="morph-plot">
+          <svg viewBox="0 0 340 158" preserveAspectRatio="none">
+            <defs><linearGradient id="morphFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E11D48" stop-opacity=".22"/><stop offset="1" stop-color="#E11D48" stop-opacity="0"/></linearGradient></defs>
+            <path d="M8 132 C40 130 52 120 66 60 C74 30 84 28 96 66 C108 104 116 108 128 96 C140 84 150 92 162 104 C182 122 210 128 250 130 C290 132 316 133 332 133 L332 150 L8 150 Z" fill="url(#morphFill)"/>
+            <path d="M8 132 C40 130 52 120 66 60 C74 30 84 28 96 66 C108 104 116 108 128 96 C140 84 150 92 162 104 C182 122 210 128 250 130 C290 132 316 133 332 133" fill="none" stroke="#E11D48" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- systolic peak P1 -->
+            <circle cx="80" cy="27" r="3.5" fill="#F0526A" stroke="#141416" stroke-width="1.5"/>
+            <line x1="80" y1="31" x2="80" y2="150" stroke="rgba(240,82,106,.4)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text class="mtxt" x="80" y="20" text-anchor="middle">Systolic (P1)</text>
+            <!-- dicrotic notch -->
+            <circle cx="128" cy="96" r="3" fill="#FFB020" stroke="#141416" stroke-width="1.5"/>
+            <text class="mtxt" x="150" y="86" text-anchor="middle" fill="#FFB020">Dicrotic notch</text>
+            <!-- diastolic peak P2 -->
+            <circle cx="162" cy="104" r="3" fill="#4DA6FF" stroke="#141416" stroke-width="1.5"/>
+            <line x1="162" y1="108" x2="162" y2="150" stroke="rgba(77,166,255,.4)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text class="mtxt" x="196" y="99" text-anchor="middle" fill="#4DA6FF">Diastolic (P2)</text>
+            <!-- crest time bracket -->
+            <line x1="8" y1="144" x2="80" y2="144" stroke="var(--ink-3)" stroke-width="1"/>
+            <text class="mtxt" x="44" y="140" text-anchor="middle">Crest 118ms</text>
+            <!-- P1-P2 delta -->
+            <line x1="80" y1="40" x2="162" y2="40" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="2 2"/>
+            <text class="mtxt" x="121" y="37" text-anchor="middle">ΔT 232ms</text>
+          </svg>
+        </div>
+        <div class="morph-legend">
+          <span><i style="background:#F0526A"></i><span><b>Systolic peak (P1)</b> — คลื่นชีพจรขาไป สะท้อนแรงบีบหัวใจ</span></span>
+          <span><i style="background:#FFB020"></i><span><b>Dicrotic notch</b> — ลิ้นหัวใจเอออร์ติกปิด</span></span>
+          <span><i style="background:#4DA6FF"></i><span><b>Diastolic peak (P2)</b> — คลื่นสะท้อนกลับจากหลอดเลือดส่วนปลาย</span></span>
+          <span><i style="background:var(--ink-3)"></i><span><b>ΔT / Crest</b> — ใช้คำนวณ Stiffness &amp; Reflection Index</span></span>
+        </div>
+
+        <!-- clinical metrics table -->
+        <div class="sec-label" style="margin-top:24px">ค่าที่วิเคราะห์ได้ (Derived Clinical Metrics)</div>
+        <div class="ctable">
+          <div class="cgroup"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>หัวใจ &amp; จังหวะ (Cardiac)</div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">อัตราการเต้นหัวใจเฉลี่ย</div><div class="cns">Mean Heart Rate</div></div><div class="cvv"><div class="cval">64<small>bpm</small></div><div class="cref">อ้างอิง 60–100</div></div></div>
+          <div class="crow"><span class="cflag mute"></span><div class="cn"><div class="cnt">ช่วงชีพจร (ต่ำ–สูง)</div><div class="cns">HR range</div></div><div class="cvv"><div class="cval">58–72<small>bpm</small></div><div class="cref">ระหว่างบันทึก</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">ชีพจรขณะพัก</div><div class="cns">Resting HR</div></div><div class="cvv"><div class="cval">61<small>bpm</small></div><div class="cref">อ้างอิง 50–70</div></div></div>
+
+          <div class="cgroup"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>ความแปรปรวนชีพจร (HRV)</div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">SDNN</div><div class="cns">ค่าเบี่ยงเบนช่วง NN</div></div><div class="cvv"><div class="cval">52<small>ms</small></div><div class="cref">ปกติ &gt; 50</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">RMSSD</div><div class="cns">กิจกรรมพาราซิมพาเทติก</div></div><div class="cvv"><div class="cval">38<small>ms</small></div><div class="cref">อ้างอิง 20–50</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">pNN50</div><div class="cns">สัดส่วนช่วงต่าง &gt; 50ms</div></div><div class="cvv"><div class="cval">14<small>%</small></div><div class="cref">ปกติ &gt; 3</div></div></div>
+
+          <div class="cgroup"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>ออกซิเจน &amp; การไหลเวียน</div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">ความอิ่มตัวออกซิเจน (SpO₂)</div><div class="cns">จาก Red/IR · ratio-of-ratios</div></div><div class="cvv"><div class="cval">98<small>%</small></div><div class="cref">ปกติ ≥ 95</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">Perfusion Index (เฉลี่ย)</div><div class="cns">AC/DC ratio</div></div><div class="cvv"><div class="cval">2.9<small>%</small></div><div class="cref">อ้างอิง 0.5–5</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">อัตราการหายใจ</div><div class="cns">Respiratory rate (จาก RSA)</div></div><div class="cvv"><div class="cval">14<small>/min</small></div><div class="cref">อ้างอิง 12–20</div></div></div>
+
+          <div class="cgroup"><svg viewBox="0 0 24 24"><path d="M4 20c3-1 4-4 4-8s1.5-8 4-8 4 4 4 8 1 7 4 8"/><path d="M2 20h20"/></svg>ความยืดหยุ่นหลอดเลือด (Vascular)</div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">ความเร็วคลื่นชีพจร (baPWV)</div><div class="cns">Pulse Wave Velocity</div></div><div class="cvv"><div class="cval">7.2<small>m/s</small></div><div class="cref">ดี &lt; 9.0</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">Augmentation Index @75</div><div class="cns">AIx (ปรับที่ HR 75)</div></div><div class="cvv"><div class="cval">18<small>%</small></div><div class="cref">ดี &lt; 25 (ตามอายุ)</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">Stiffness Index</div><div class="cns">SI = ส่วนสูง / ΔT</div></div><div class="cvv"><div class="cval">6.4<small>m/s</small></div><div class="cref">ดี &lt; 8.0</div></div></div>
+          <div class="crow"><span class="cflag mute"></span><div class="cn"><div class="cnt">Reflection Index</div><div class="cns">RI = P2 / P1</div></div><div class="cvv"><div class="cval">42<small>%</small></div><div class="cref">อ้างอิง 30–50</div></div></div>
+          <div class="crow"><span class="cflag ok"></span><div class="cn"><div class="cnt">ดัชนีอายุหลอดเลือด (AGI)</div><div class="cns">SDPPG Aging Index · จำแนกระดับความเสี่ยง</div></div><div class="cvv"><div class="cval" style="color:var(--ok)">−0.72</div><div class="cref">เสี่ยงต่ำ (&lt; −0.6)</div></div></div>
+        </div>
+
+        <!-- analysis method / provenance -->
+        <div class="sec-label" style="margin-top:24px">วิธีวิเคราะห์สัญญาณ</div>
+        <div class="meta-grid">
+          <div class="mi"><div class="mk">ตัวกรอง (Filter)</div><div class="mv">Chebyshev II <small>อันดับ 4</small></div></div>
+          <div class="mi"><div class="mk">ย่านความถี่</div><div class="mv">0.5–8 <small>Hz</small></div></div>
+          <div class="mi"><div class="mk">ตรวจจับจังหวะ</div><div class="mv">Adaptive + template</div></div>
+          <div class="mi"><div class="mk">จังหวะที่วิเคราะห์</div><div class="mv">32 <small>beats / 30 วิ</small></div></div>
+        </div>
+
+        <button class="btn btn-primary btn-block" style="margin-top:20px" data-print="a4">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          ส่งออกรายงาน A4 สำหรับแพทย์ (พิมพ์ / บันทึก PDF)
+        </button>
+
+        <div class="disclaimer">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg>
+          <p>ค่าทั้งหมดประเมินจากเซนเซอร์ PPG ที่ข้อมือ ความแม่นยำขึ้นกับชนิด/ตำแหน่งเซนเซอร์และการเคลื่อนไหว ไม่ใช่เครื่องมือวินิจฉัยทางการแพทย์ ควรยืนยันด้วยเครื่องมือมาตรฐาน (เช่น cuff-based BP, ECG, pulse oximeter) ก่อนตัดสินใจทางคลินิก</p>
+        </div>
+      </section>
+
+      <!-- ========== 07 · PROFILE ========== -->
+      <section class="screen" id="scr-profile">
+        <div class="appbar">
+          <div class="ttl">โปรไฟล์</div>
+          <button class="icon-btn" data-go="scr-settings" aria-label="ตั้งค่า"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg></button>
+        </div>
+
+        <div class="prof-head">
+          <div class="avatar">กช</div>
+          <div class="pn">กัญชนา วรากูล</div>
+          <div class="pe num">089-424-5230 · สมาชิกตั้งแต่ มี.ค. 2569</div>
+          <div style="margin-top:10px"><span class="badge b-brand"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>HON Care Plus</span></div>
+        </div>
+
+        <div class="sec-label">ข้อมูลร่างกาย <span style="font-size:11px;font-weight:400;color:var(--ink-3)">อัปเดตแล้วมีผลกับเกณฑ์การประเมิน</span></div>
+        <div class="card">
+          <div class="editrow">
+            <span class="ek">น้ำหนักตัว</span>
+            <label class="numin"><svg class="pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><input id="pfWIn" class="numinput num" type="number" inputmode="decimal" min="30" max="200" step="0.1" value="57" aria-label="น้ำหนักตัว (กิโลกรัม)"><span class="u">กก.</span></label>
+          </div>
+          <div class="editrow">
+            <span class="ek">ส่วนสูง</span>
+            <label class="numin"><svg class="pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><input id="pfHIn" class="numinput num" type="number" inputmode="numeric" min="120" max="220" step="1" value="161" aria-label="ส่วนสูง (เซนติเมตร)"><span class="u">ซม.</span></label>
+          </div>
+          <div class="editrow">
+            <span class="ek">BMI (คำนวณอัตโนมัติ)</span>
+            <span class="badge b-ok num" id="pfBMI">22.0 · สมส่วน</span>
+          </div>
+        </div>
+
+        <div class="sec-label">อุปกรณ์และบัญชี</div>
+        <div class="card" style="padding:6px 20px">
+          <button class="lrow" data-go="scr-settings" style="width:100%;text-align:left">
+            <div class="li"><svg viewBox="0 0 24 24"><rect x="7" y="5" width="10" height="14" rx="3"/><path d="M9.5 2h5M9.5 22h5"/></svg></div>
+            <div><div class="lt">HON Watch S1</div><div class="ls">เชื่อมต่อแล้ว · แบตเตอรี่ 82%</div></div>
+            <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+          <button class="lrow" data-go="scr-premium" style="width:100%;text-align:left">
+            <div class="li"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div><div class="lt">กรมธรรม์และสิทธิประโยชน์</div><div class="ls">HON Care Plus · ต่ออายุ มี.ค. 2570</div></div>
+            <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+          <button class="lrow" style="width:100%;text-align:left">
+            <div class="li"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div><div class="lt">ความเป็นส่วนตัว (PDPA)</div><div class="ls">จัดการความยินยอม · ขอสำเนา / ลบข้อมูล</div></div>
+            <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+        </div>
+
+        <button class="btn btn-ghost btn-block" style="margin-top:24px" data-go="scr-login">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          ออกจากระบบ
+        </button>
+      </section>
+
+      <!-- ========== 08 · AI CHATBOT ========== -->
+      <section class="screen" id="scr-chat">
+        <div class="appbar">
+          <div class="ttl">HON Assistant</div>
+          <button class="icon-btn" aria-label="ประวัติการสนทนา"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+        </div>
+        <div class="ai-tag">
+          <span class="aidot"></span>
+          <span style="font-size:12px;color:var(--ink-2)">ผู้ช่วย AI ด้านสุขภาพและกรมธรรม์ · ออนไลน์</span>
+        </div>
+
+        <div class="chat-scroll" id="chatScroll">
+          <div class="chat-time">วันนี้ 09:38 น.</div>
+          <div class="bub bot">สวัสดีค่ะคุณกัญชนา ผลวัดเช้านี้ความเสี่ยงหลอดเลือดอยู่ระดับ “ต่ำ” ค่ะ อยากให้ช่วยวิเคราะห์เชิงลึก แนะนำการดูแล หรือดูสิทธิกรมธรรม์ ถามได้เลยนะคะ</div>
+          <div class="bub me">ความเสี่ยงหลอดเลือดของฉันอยู่ระดับไหน แล้วแปลว่าอะไร?</div>
+          <div class="bub bot">ตอนนี้คุณอยู่ระดับ <b>เสี่ยงต่ำ</b> ค่ะ (ค่า AGI −0.72 — ยิ่งติดลบมากยิ่งดี) แปลว่าผนังหลอดเลือดยังยืดหยุ่นดี “อายุน้อยกว่าวัยจริง”
+            <br><br>ปัจจัยเฉพาะตัวที่ส่งผลบวก: คุณ<b>ไม่สูบบุหรี่</b> ความดัน <b>118/76</b> อยู่ในเกณฑ์ดี BMI <b>22.1</b> สมส่วน และ PWV <b>7.2 m/s</b> ต่ำกว่าค่าเฉลี่ยวัย 45 ปี ทั้งหมดนี้ช่วยให้ความเสี่ยงต่ำค่ะ
+            <br><br>ด้านกรมธรรม์: หากรักษาระดับนี้และวัดครบ 24 วัน (ตอนนี้ 18/24) จะได้<b>ส่วนลดเบี้ยปีถัดไป 12%</b> ของแผน Care Plus ค่ะ
+            <span class="src">อ้างอิง: ผลวัด 8 ก.ค. 2569 · ข้อมูลนี้ช่วยประเมินเบื้องต้น ไม่ใช่การวินิจฉัยทางการแพทย์</span>
+          </div>
+          <div class="qchips">
+            <button class="qchip" data-chat="ทำไมความเสี่ยงของฉันถึงต่ำ">ทำไมถึงเสี่ยงต่ำ?</button>
+            <button class="qchip" data-chat="ลดความเสี่ยงหลอดเลือดยังไง">ลดความเสี่ยงยังไง?</button>
+            <button class="qchip" data-chat="ค่า AGI −0.72 คืออะไร">AGI −0.72 คืออะไร?</button>
+          </div>
+          <div class="bub bot typing" id="chatTyping" style="display:none"><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="chat-inputbar">
+          <input class="input" id="chatInput" placeholder="พิมพ์คำถามของคุณ…" aria-label="พิมพ์ข้อความ">
+          <button class="sendbtn" id="chatSend" aria-label="ส่งข้อความ"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
+        </div>
+      </section>
+
+      <!-- ========== 09 · NEWS / EVENTS ========== -->
+      <section class="screen" id="scr-news">
+        <div class="appbar">
+          <div class="ttl">ข่าวสารและอีเวนต์</div>
+          <button class="icon-btn" aria-label="ค้นหา"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+        </div>
+
+        <div class="news-hero">
+          <span class="badge b-brand" style="align-self:flex-start;background:rgba(255,255,255,.14);color:#fff">อีเวนต์ · 1–31 ก.ค. 2569</span>
+          <div class="nt">วิ่งแลกแว่น 2026</div>
+          <div class="ns">สะสมระยะวิ่ง/เดินเร็ว 60 กม. ภายในเดือนนี้ แลกคูปองตัดแว่นสายตา มูลค่า 2,000 บาท จากพาร์ตเนอร์</div>
+          <div class="npro">
+            <div class="pp-head" style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-bottom:8px"><span>ระยะสะสมของคุณ</span><b class="num" style="color:#fff">36.4 / 60 กม.</b></div>
+            <div class="pbar" style="background:rgba(255,255,255,.14)"><i style="width:61%;background:#fff"></i></div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="align-self:flex-start;margin-top:12px">ดูกติกาและของรางวัล</button>
+        </div>
+
+        <div class="sec-label">บทความแนะนำ</div>
+        <button class="news-card">
+          <div class="news-thumb" style="background:var(--grad-brand)"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z"/><path d="M6 2v3M10 2v3M14 2v3"/></svg></div>
+          <div>
+            <div class="nct">กาแฟวันละกี่แก้ว ไม่กระทบหลอดเลือด? สรุปจากงานวิจัยปี 2025</div>
+            <div class="ncs">โภชนาการ · อ่าน 4 นาที · 6 ก.ค. 2569</div>
+          </div>
+        </button>
+        <button class="news-card">
+          <div class="news-thumb" style="background:linear-gradient(135deg,#3B4C9B,#22285A)"><svg viewBox="0 0 24 24"><path d="M12 21a9 9 0 0 0 8.6-11.7A7 7 0 0 1 11.7 3.4 9 9 0 0 0 12 21z"/></svg></div>
+          <div>
+            <div class="nct">นอนน้อยกว่า 6 ชั่วโมง ทำหลอดเลือด "แก่เร็ว" ขึ้นจริงหรือ</div>
+            <div class="ncs">การนอน · อ่าน 6 นาที · 3 ก.ค. 2569</div>
+          </div>
+        </button>
+        <button class="news-card">
+          <div class="news-thumb" style="background:linear-gradient(135deg,#1F7A4C,#0E4A2B)"><svg viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></div>
+          <div>
+            <div class="nct">5 เมนูโซเดียมต่ำ สั่งได้จริงที่ร้านสะดวกซื้อ</div>
+            <div class="ncs">โภชนาการ · อ่าน 3 นาที · 1 ก.ค. 2569</div>
+          </div>
+        </button>
+
+        <div class="sec-label">สิทธิพิเศษสำหรับสมาชิก</div>
+        <button class="news-card">
+          <div class="news-thumb" style="background:linear-gradient(135deg,#8E6A1F,#5A4010)"><svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7a3 3 0 1 0-3-3c0 1.5 1.5 3 3 3zM12 7a3 3 0 1 1 3-3c0 1.5-1.5 3-3 3z"/></svg></div>
+          <div>
+            <div class="nct">ตรวจสุขภาพประจำปี ลด 50% ที่โรงพยาบาลพันธมิตร 12 แห่ง</div>
+            <div class="ncs">สิทธิ Care Plus · ถึง 30 ก.ย. 2569</div>
+          </div>
+        </button>
+      </section>
+
+      <!-- ========== 10 · PREMIUM ========== -->
+      <section class="screen" id="scr-premium">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-dash" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="ttl">อัปเกรดแผนของคุณ</div>
+        </div>
+
+        <p style="font-size:13px;color:var(--ink-2);margin-bottom:20px;line-height:1.6">ปลดล็อกการวิเคราะห์เชิงลึก รายงานไม่จำกัด และส่วนลดเบี้ยประกันที่มากขึ้น</p>
+
+        <div class="seg" style="margin-bottom:24px">
+          <button class="on" data-seg="bill" id="billMo">รายเดือน</button>
+          <button data-seg="bill" id="billYr">รายปี <span class="badge b-ok" style="margin-left:4px;padding:2px 8px;min-height:0">−20%</span></button>
+        </div>
+
+        <button class="plan" data-plan>
+          <div class="plan-head">
+            <span class="radio"></span>
+            <span class="pnm">HON Free</span>
+            <span class="pprice"><b>ฟรี</b><span>ตลอดชีพ</span></span>
+          </div>
+          <ul>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>วัดความเสี่ยงหลอดเลือด 4 ครั้ง/เดือน</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>เทรนด์ย้อนหลัง 3 เดือน</li>
+            <li class="no"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>รายงาน PDF ส่งแพทย์</li>
+            <li class="no"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>ส่วนลดเบี้ยประกัน</li>
+          </ul>
+        </button>
+
+        <button class="plan on" data-plan>
+          <span class="best badge b-brand" style="background:var(--grad-brand);color:#fff;box-shadow:var(--sh-red)">คุ้มที่สุด</span>
+          <div class="plan-head">
+            <span class="radio"></span>
+            <span class="pnm">Basic</span>
+            <span class="pprice"><b class="num" data-price data-mo="99" data-yr="79">99 ฿</b><span data-per>ต่อเดือน</span></span>
+          </div>
+          <ul>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>วัดไม่จำกัด + แจ้งเตือนค่าผิดปกติ</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>เทรนด์ย้อนหลังไม่จำกัด + รายงาน PDF</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>ส่วนลดเบี้ยประกันสูงสุด 12%/ปี</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>แชท AI + ต่อสายพยาบาลใน 15 นาที</li>
+          </ul>
+        </button>
+
+        <button class="plan" data-plan>
+          <div class="plan-head">
+            <span class="radio"></span>
+            <span class="pnm">Family (สูงสุด 4 คน)</span>
+            <span class="pprice"><b class="num" data-price data-mo="249" data-yr="199">249 ฿</b><span data-per>ต่อเดือน</span></span>
+          </div>
+          <ul>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>ทุกอย่างใน Basic × 4 บัญชี</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>ถูกกว่าซื้อ Basic แยก 3 คน เกือบ 50 ฿/เดือน</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>แดชบอร์ดครอบครัว + แจ้งเตือนผู้ดูแล</li>
+            <li class="yes"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>ส่วนลดตรวจสุขภาพประจำปีทั้งครอบครัว</li>
+          </ul>
+        </button>
+
+        <button class="btn btn-primary btn-block" style="margin-top:12px">เริ่มใช้ Basic · ทดลองฟรี 14 วัน</button>
+        <div class="hint" style="text-align:center;margin-top:12px">ยกเลิกได้ทุกเมื่อ · ราคารวม VAT · เงื่อนไขส่วนลดเบี้ยเป็นไปตามกรมธรรม์</div>
+      </section>
+
+      <!-- ========== 11 · SETTINGS / PAIRING ========== -->
+      <section class="screen" id="scr-settings">
+        <div class="appbar">
+          <button class="icon-btn" data-go="scr-profile" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="ttl">ตั้งค่าและอุปกรณ์</div>
+        </div>
+
+        <div class="sec-label" style="margin-top:0">นาฬิกาของคุณ</div>
+        <div class="card watch-pair">
+          <div class="watch-mini"></div>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:15px">HON Watch S1</div>
+            <div style="font-size:12px;color:var(--ink-3);margin:4px 0 8px" id="syncLabel">ซิงก์ล่าสุด 07:14 น.</div>
+            <div class="batt"><span class="bico"></span>แบตเตอรี่ 82%</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+            <span class="badge b-ok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>เชื่อมต่อ</span>
+            <button class="btn btn-secondary btn-sm" id="syncBtn">ซิงก์เดี๋ยวนี้</button>
+          </div>
+        </div>
+        <div class="sec-label">การแสดงผล</div>
+        <button class="fam-card" data-ezpick="toggle" aria-label="สลับโหมดอ่านง่าย" style="min-height:72px">
+          <span class="fam-info">
+            <span class="fam-name" style="display:block">โหมดอ่านง่าย</span>
+            <span class="fam-sub" style="display:block">ตัวหนังสือใหญ่ขึ้น ลดความแน่นของหน้าจอ สำหรับผู้สูงวัย</span>
+          </span>
+          <span class="badge b-ok" id="ezState">ปิดอยู่</span>
+        </button>
+
+        <button class="btn btn-ghost btn-block btn-sm" style="margin-top:12px;min-height:44px">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>จับคู่นาฬิกาเครื่องใหม่
+        </button>
+
+        <div class="sec-label">การวัดอัตโนมัติ</div>
+        <div class="card" style="padding:6px 20px">
+          <div class="editrow">
+            <div style="flex:1"><div class="ek" style="margin-bottom:2px">วัดอัตโนมัติทุกเช้า</div><div class="ls" style="font-size:11px;color:var(--ink-3)">07:00 น. ขณะสวมนาฬิกาอยู่นิ่ง</div></div>
+            <button class="toggle on" data-toggle aria-label="เปิดปิดการวัดอัตโนมัติ" aria-pressed="true"></button>
+          </div>
+          <div class="editrow">
+            <div style="flex:1"><div class="ek" style="margin-bottom:2px">แจ้งเตือนเมื่อค่าผิดปกติ</div><div class="ls" style="font-size:11px;color:var(--ink-3)">ส่งถึงคุณและผู้ดูแลที่กำหนด</div></div>
+            <button class="toggle on" data-toggle aria-label="เปิดปิดการแจ้งเตือน" aria-pressed="true"></button>
+          </div>
+          <div class="editrow">
+            <div style="flex:1"><div class="ek" style="margin-bottom:2px">แชร์ข้อมูลกับบริษัทประกัน</div><div class="ls" style="font-size:11px;color:var(--ink-3)">เฉพาะค่าสรุปเพื่อคำนวณส่วนลดเบี้ย (ถอนได้)</div></div>
+            <button class="toggle on" data-toggle aria-label="เปิดปิดการแชร์ข้อมูล" aria-pressed="true"></button>
+          </div>
+          <div class="editrow">
+            <div style="flex:1"><div class="ek" style="margin-bottom:2px">โหมดประหยัดแบตนาฬิกา</div><div class="ls" style="font-size:11px;color:var(--ink-3)">ลดความถี่เซนเซอร์เมื่อแบตต่ำกว่า 20%</div></div>
+            <button class="toggle" data-toggle aria-label="เปิดปิดโหมดประหยัดแบต" aria-pressed="false"></button>
+          </div>
+        </div>
+
+        <div class="sec-label">ทั่วไป</div>
+        <div class="card" style="padding:6px 20px">
+          <button class="lrow" style="width:100%;text-align:left">
+            <div class="li"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></svg></div>
+            <div><div class="lt">การแจ้งเตือน</div><div class="ls">สรุปรายวัน · อีเวนต์ · กรมธรรม์</div></div>
+            <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+          <button class="lrow" style="width:100%;text-align:left">
+            <div class="li"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18M3.5 9h17M3.5 15h17"/></svg></div>
+            <div><div class="lt">ภาษา</div><div class="ls">ไทย</div></div>
+            <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+          <button class="lrow" style="width:100%;text-align:left">
+            <div class="li"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+            <div><div class="lt">ศูนย์ช่วยเหลือ</div><div class="ls">คำถามที่พบบ่อย · ติดต่อเจ้าหน้าที่</div></div>
+            <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+        </div>
+        <div class="hint" style="text-align:center;margin-top:20px">HON เวอร์ชัน 2.4.0 (build 118)</div>
+      </section>
+
+      <!-- @SCREENS-END -->
+
+      <!-- ========== TAB BAR ========== -->
+      <nav class="tabbar" id="tabbar">
+        <button class="tab on" data-tab="scr-dash">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg><span>หน้าหลัก</span>
+        </button>
+        <button class="tab" data-tab="scr-report">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>รายงาน</span>
+        </button>
+        <button class="tab" data-tab="scr-chat">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>แชท AI</span>
+        </button>
+        <button class="tab" data-tab="scr-news">
+          <svg viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V7"/><path d="M12 7h6M12 11h6M12 15h6"/></svg><span>ข่าวสาร</span>
+        </button>
+        <button class="tab" data-tab="scr-profile">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg><span>โปรไฟล์</span>
+        </button>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+  </div>
+  <p class="stage-note">iPhone 15 Pro · 390 × 844 · แตะแท็บด้านล่างหรือชิปด้านบนเพื่อสลับหน้าจอ</p>
+  </div>
+
+  <!-- ================= WATCH ================= -->
+  <div class="watch-col">
+    <div class="watch-head">
+      <span class="wh">
+        <svg viewBox="0 0 24 24"><rect x="7" y="5" width="10" height="14" rx="3"/><path d="M9.5 2h5M9.5 22h5"/></svg>
+        HON Watch S1
+      </span>
+      <span class="badge b-ok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>เชื่อมต่อ</span>
+    </div>
+    <div class="wseg" id="wseg">
+      <button class="on" data-w="home">หน้าปัด</button>
+      <button data-w="measure">กำลังวัด</button>
+      <button data-w="result">ผลลัพธ์</button>
+    </div>
+
+    <div class="wstack">
+      <!-- SQUARE -->
+      <div class="wframe sq">
+        <span class="wcrown"></span><span class="wbtn2"></span>
+        <div class="wface">
+          <div class="wscr on" data-w="home" style="background:radial-gradient(85% 60% at 50% 14%,rgba(52,208,124,.18),transparent 72%)">
+            <div class="wtime num">09:41</div>
+            <div class="wdate">อังคาร 8 ก.ค.</div>
+            <div class="wring">
+              <svg viewBox="0 0 118 118">
+                <circle cx="59" cy="59" r="52" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="8"/>
+                <circle cx="59" cy="59" r="52" fill="none" stroke="#34D07C" stroke-width="8" stroke-linecap="round"
+                  stroke-dasharray="326.7" stroke-dashoffset="250.5" transform="rotate(-90 59 59)"/>
+              </svg>
+              <div class="wrc"><div class="wrn" style="color:#34D07C">ต่ำ</div><div class="wrl">ความเสี่ยง</div></div>
+            </div>
+            <div class="wcomp">
+              <span><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="num">64</span></span>
+              <span><svg viewBox="0 0 24 24"><path d="M13 2 4.9 12.6H11L9.5 22l8.6-11.4H12z"/></svg><span class="num">8,240</span></span>
+            </div>
+          </div>
+          <div class="wscr" data-w="measure">
+            <div class="wpulse">
+              <span class="pr"></span><span class="pr"></span><span class="pr"></span>
+              <span class="ph"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
+            </div>
+            <div class="wmt">กำลังวัดสัญญาณ PPG</div>
+            <div class="wms">วางแขนนิ่ง ๆ บนโต๊ะ<br>อีกไม่กี่วินาทีนะคะ</div>
+            <div class="wprognum num"><span class="wprog">0</span>%</div>
+          </div>
+          <div class="wscr" data-w="result" style="background:radial-gradient(85% 60% at 50% 14%,rgba(52,208,124,.18),transparent 72%)">
+            <div class="wok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="wrlbl">ระดับความเสี่ยง</div>
+            <div class="wrbig" style="color:var(--ok)">ต่ำ</div>
+            <span class="wbadge">AGI −0.72 · อายุน้อย</span>
+            <span class="wsync"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>ซิงก์ไปที่มือถือแล้ว</span>
+          </div>
+        </div>
+      </div>
+      <p class="wcap-note">ทรงเหลี่ยม · watchOS style</p>
+
+      <!-- ROUND -->
+      <div class="wframe rd">
+        <span class="wcrown"></span>
+        <div class="wface">
+          <div class="wscr on" data-w="home" style="background:radial-gradient(85% 60% at 50% 14%,rgba(52,208,124,.18),transparent 72%)">
+            <div class="wtime num">09:41</div>
+            <div class="wdate">อังคาร 8 ก.ค.</div>
+            <div class="wring">
+              <svg viewBox="0 0 118 118">
+                <circle cx="59" cy="59" r="52" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="8"/>
+                <circle cx="59" cy="59" r="52" fill="none" stroke="#34D07C" stroke-width="8" stroke-linecap="round"
+                  stroke-dasharray="326.7" stroke-dashoffset="250.5" transform="rotate(-90 59 59)"/>
+              </svg>
+              <div class="wrc"><div class="wrn" style="color:#34D07C">ต่ำ</div><div class="wrl">ความเสี่ยง</div></div>
+            </div>
+            <div class="wcomp">
+              <span><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="num">64</span></span>
+              <span><svg viewBox="0 0 24 24"><path d="M13 2 4.9 12.6H11L9.5 22l8.6-11.4H12z"/></svg><span class="num">8,240</span></span>
+            </div>
+          </div>
+          <div class="wscr" data-w="measure">
+            <div class="wpulse">
+              <span class="pr"></span><span class="pr"></span><span class="pr"></span>
+              <span class="ph"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
+            </div>
+            <div class="wmt">กำลังวัดสัญญาณ PPG</div>
+            <div class="wms">วางแขนนิ่ง ๆ บนโต๊ะ</div>
+            <div class="wprognum num"><span class="wprog">0</span>%</div>
+          </div>
+          <div class="wscr" data-w="result" style="background:radial-gradient(85% 60% at 50% 14%,rgba(52,208,124,.18),transparent 72%)">
+            <div class="wok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="wrlbl">ระดับความเสี่ยง</div>
+            <div class="wrbig" style="color:var(--ok)">ต่ำ</div>
+            <span class="wbadge">AGI −0.72 · อายุน้อย</span>
+            <span class="wsync"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>ซิงก์ไปที่มือถือแล้ว</span>
+          </div>
+        </div>
+      </div>
+      <p class="wcap-note">ทรงกลม · Wear OS style</p>
+    </div>
+  </div>
+
+  </div><!-- /stage -->
+</div><!-- /shell -->
+
+<!-- ================= A4 CLINICAL REPORT (print-only) ================= -->
+<div class="a4-wrap" id="a4report" aria-hidden="true">
+  <div class="a4">
+    <div class="a4-head">
+      <div class="a4-brand">
+        <div class="a4-logo"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-16 2 10 2-4h4"/></svg></div>
+        <div>
+          <div class="bt">HON</div>
+          <div class="bs">Vascular Health · PPG Analysis Report</div>
+        </div>
+      </div>
+      <div class="a4-rep">
+        <div class="rt">รายงานผลตรวจหลอดเลือดด้วยสัญญาณ PPG</div>
+        <div class="rs">Photoplethysmography Clinical Report · เลขที่ RPT-2569-0709-014</div>
+      </div>
+    </div>
+
+    <div class="a4-meta">
+      <div><div class="k">ชื่อผู้รับการตรวจ</div><div class="v">กัญชนา วรากูล</div></div>
+      <div><div class="k">อายุ / เพศ</div><div class="v">45 ปี · หญิง</div></div>
+      <div><div class="k">วันเวลาที่วัด</div><div class="v">8 ก.ค. 2569 · 07:12</div></div>
+      <div><div class="k">อุปกรณ์</div><div class="v">HON Watch S1</div></div>
+      <div><div class="k">อัตราสุ่มตัวอย่าง</div><div class="v">100 Hz · 24-bit</div></div>
+      <div><div class="k">ระยะเวลาบันทึก</div><div class="v">30 วินาที (3,000 ตัวอย่าง)</div></div>
+      <div><div class="k">เซนเซอร์</div><div class="v">Reflective PPG · G/R/IR</div></div>
+      <div><div class="k">ดัชนีอายุหลอดเลือด (AGI)</div><div class="v">−0.72 · เสี่ยงต่ำ (อายุหลอดเลือดประเมิน 54 ปี · อายุจริง 62)</div></div>
+    </div>
+
+    <div class="a4-sec">1 · สัญญาณดิบและสัญญาณหลังกรอง (Raw &amp; Chebyshev II Filtered PPG)</div>
+    <div class="a4-charts" id="a4Charts"><!-- charts injected by JS --></div>
+
+    <div class="a4-foot">
+      <span>HON Health · รายงานเลขที่ RPT-2569-0709-014 · หน้า 1/2 · เอกสารประกอบการปรึกษาแพทย์ · ไม่ใช่ผลวินิจฉัยทางการแพทย์</span>
+    </div>
+  </div>
+
+  <!-- ===== PAGE 2 ===== -->
+  <div class="a4">
+    <div class="a4-head">
+      <div class="a4-brand">
+        <div class="a4-logo"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-16 2 10 2-4h4"/></svg></div>
+        <div>
+          <div class="bt">HON</div>
+          <div class="bs">Vascular Health · PPG Analysis Report (ต่อ)</div>
+        </div>
+      </div>
+      <div class="a4-rep">
+        <div class="rt">กัญชนา วรากูล · 45 ปี · หญิง</div>
+        <div class="rs">วัดเมื่อ 8 ก.ค. 2569 07:12 · RPT-2569-0709-014</div>
+      </div>
+    </div>
+
+    <div class="a4-two">
+      <div>
+        <div class="a4-sec">2 · ค่าที่วิเคราะห์ได้ (Derived Clinical Metrics)</div>
+        <table class="a4-tbl">
+          <thead><tr><th style="width:52%">ตัวชี้วัด</th><th style="text-align:right">ค่า</th><th>ช่วงอ้างอิง</th></tr></thead>
+          <tbody>
+            <tr><td class="grp" colspan="3">หัวใจ &amp; จังหวะ (Cardiac)</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>อัตราการเต้นหัวใจเฉลี่ย (Mean HR)</td><td class="val">64 bpm</td><td class="ref">60–100</td></tr>
+            <tr><td><span class="fl" style="background:#999"></span>ช่วงชีพจร (HR range)</td><td class="val">58–72 bpm</td><td class="ref">—</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>ชีพจรขณะพัก (Resting HR)</td><td class="val">61 bpm</td><td class="ref">50–70</td></tr>
+            <tr><td class="grp" colspan="3">ความแปรปรวนชีพจร (HRV)</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>SDNN</td><td class="val">52 ms</td><td class="ref">&gt; 50</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>RMSSD</td><td class="val">38 ms</td><td class="ref">20–50</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>pNN50</td><td class="val">14 %</td><td class="ref">&gt; 3</td></tr>
+            <tr><td class="grp" colspan="3">ออกซิเจน &amp; การไหลเวียน</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>SpO₂ (Red/IR ratio-of-ratios)</td><td class="val">98 %</td><td class="ref">≥ 95</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>Perfusion Index (เฉลี่ย)</td><td class="val">2.9 %</td><td class="ref">0.5–5</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>อัตราการหายใจ (จาก RSA)</td><td class="val">14 /min</td><td class="ref">12–20</td></tr>
+            <tr><td class="grp" colspan="3">ความยืดหยุ่นหลอดเลือด (Vascular)</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>baPWV (Pulse Wave Velocity)</td><td class="val">7.2 m/s</td><td class="ref">&lt; 9.0</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>Augmentation Index @75</td><td class="val">18 %</td><td class="ref">&lt; 25</td></tr>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>Stiffness Index</td><td class="val">6.4 m/s</td><td class="ref">&lt; 8.0</td></tr>
+            <tr><td><span class="fl" style="background:#999"></span>Reflection Index (P2/P1)</td><td class="val">42 %</td><td class="ref">30–50</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="a4-sec">3 · สัณฐานคลื่น 1 จังหวะ</div>
+        <div id="a4Morph"><!-- morphology chart injected by JS --></div>
+        <div class="a4-note" style="margin-top:8px">
+          <b>P1</b> Systolic peak — แรงบีบหัวใจ · <b>Dicrotic notch</b> ลิ้นเอออร์ติกปิด ·
+          <b>P2</b> Diastolic peak — คลื่นสะท้อนจากหลอดเลือดส่วนปลาย · ΔT ใช้คำนวณ Stiffness &amp; Reflection Index
+        </div>
+        <div class="a4-sec" style="margin-top:14px">4 · คุณภาพสัญญาณต่อช่องแสง</div>
+        <table class="a4-tbl">
+          <thead><tr><th>ช่องแสง</th><th style="text-align:right">SNR</th><th style="text-align:right">SQI</th><th style="text-align:right">PI</th></tr></thead>
+          <tbody>
+            <tr><td><span class="fl" style="background:#2e9e5b"></span>Green 515nm</td><td class="val">24.6 dB</td><td class="val">0.96</td><td class="val">3.1%</td></tr>
+            <tr><td><span class="fl" style="background:#d63a30"></span>Red 660nm</td><td class="val">18.2 dB</td><td class="val">0.88</td><td class="val">1.4%</td></tr>
+            <tr><td><span class="fl" style="background:#9a5cd0"></span>IR 940nm</td><td class="val">20.5 dB</td><td class="val">0.91</td><td class="val">2.6%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="a4-sign">
+      <div class="sl">ผู้อ่านผล / แพทย์ (ลงชื่อ)<br><br>วันที่ ______________________</div>
+      <div class="sl">วิธีวิเคราะห์: Chebyshev II band-pass อันดับ 4 · 0.5–8 Hz · ตรวจจับจังหวะแบบ adaptive + template · วิเคราะห์ 32 จังหวะ</div>
+    </div>
+
+    <div class="a4-disc">
+      <b>ข้อจำกัด:</b> ค่าทั้งหมดประเมินจากเซนเซอร์ PPG ที่ข้อมือ ความแม่นยำขึ้นกับชนิด/ตำแหน่งเซนเซอร์และการเคลื่อนไหว
+      <b>ไม่ใช่เครื่องมือวินิจฉัยทางการแพทย์</b> ควรยืนยันด้วยเครื่องมือมาตรฐาน (cuff-based BP, ECG, pulse oximeter) ก่อนตัดสินใจทางคลินิก
+    </div>
+
+    <div class="a4-foot">
+      <span>HON Health · สร้างรายงานเมื่อ 8 ก.ค. 2569 07:14 น. · หน้า 2/2 · เอกสารนี้สร้างจากแอป HON เพื่อประกอบการปรึกษาแพทย์</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,c){return (c||document).querySelector(s)};
+  var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+
+  /* ---------- screen switching ---------- */
+  var AUTH=["scr-login","scr-otp","scr-intake"];
+  var TABMAP={ "scr-dash":"scr-dash","scr-result":"scr-dash","scr-premium":"scr-dash",
+    "scr-report":"scr-report","scr-chat":"scr-chat","scr-news":"scr-news",
+    "scr-profile":"scr-profile","scr-settings":"scr-profile" };
+  function show(id){
+    var target=document.getElementById(id); if(!target) return;
+    $$(".screen").forEach(function(s){s.classList.remove("active")});
+    target.classList.add("active");
+    target.scrollTop=0;
+    $("#tabbar").classList.toggle("hidden",AUTH.indexOf(id)>=0);
+    $$(".tab").forEach(function(t){t.classList.toggle("on",t.dataset.tab===TABMAP[id])});
+    $$("#shellNav .chip-nav").forEach(function(c){c.classList.toggle("on",c.dataset.go===id)});
+    if(id==="scr-dash") animateGauge();
+    if(id==="scr-intake"){ if(typeof repadRulers==="function")repadRulers(); if(typeof initDob==="function")initDob(); }
+    if(id==="scr-profile"&&typeof repadRulers==="function") repadRulers();
+    if(id==="scr-clinical"&&typeof paintClinical==="function") paintClinical();
+  }
+  document.addEventListener("click",function(e){
+    var go=e.target.closest("[data-go]");
+    if(go){e.preventDefault();show(go.dataset.go);return;}
+    var tab=e.target.closest("[data-tab]");
+    if(tab){show(tab.dataset.tab);}
+  });
+
+  /* ---------- easy-read (elderly) mode ---------- */
+  var EZ_KEY="hon-ez";
+  function isEz(){ var ps=document.getElementById("phoneScreens"); return !!(ps&&ps.classList.contains("ez")); }
+  function setEz(on){
+    var ps=document.getElementById("phoneScreens"); if(!ps) return;
+    ps.classList.toggle("ez",!!on);
+    try{localStorage.setItem(EZ_KEY,on?"1":"0");}catch(e){}
+    document.querySelectorAll("[data-ezpick='0'],[data-ezpick='1']").forEach(function(b){
+      b.classList.toggle("sel",(b.dataset.ezpick==="1")===!!on);
+    });
+    var st=document.getElementById("ezState");
+    if(st){ st.textContent=on?"เปิดอยู่":"ปิดอยู่"; st.className="badge "+(on?"b-ok":"b-warn"); }
+  }
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("[data-ezpick]"); if(!b) return;
+    if(b.dataset.ezpick==="toggle") setEz(!isEz());
+    else setEz(b.dataset.ezpick==="1");
+  });
+  (function(){ var v=null; try{v=localStorage.getItem(EZ_KEY);}catch(e){} setEz(v==="1"); })();
+
+  /* ============================================================
+     Vascular-risk model (AGI -> risk level + color)
+     AGI = ดัชนีอายุหลอดเลือด (second-derivative PPG aging index)
+     ยิ่งค่าติดลบมาก = หลอดเลือดยิ่งอ่อน = เสี่ยงต่ำ
+     ============================================================ */
+  var RISK_BANDS=[
+    {key:"low", lo:-1.0,hi:-0.6, level:"ต่ำ",     risk:"เสี่ยงต่ำ",     grade:"ดีเยี่ยม", desc:"หลอดเลือดอายุน้อย",         color:"#34D07C", glow:"rgba(52,208,124,.22)"},
+    {key:"mid", lo:-0.6,hi:-0.2, level:"ปานกลาง", risk:"เสี่ยงปานกลาง", grade:"ปานกลาง",  desc:"หลอดเลือดอายุค่อนข้างมาก", color:"#FFB020", glow:"rgba(255,176,32,.22)"},
+    {key:"high",lo:-0.2,hi: 0.2, level:"สูง",      risk:"เสี่ยงสูง",     grade:"ต่ำ",       desc:"หลอดเลือดอายุเยอะ",         color:"#FF4D42", glow:"rgba(255,77,66,.24)"}
+  ];
+  var AGI_VALUE=-0.72;                     // ค่าประเมินปัจจุบัน (เดโม = เสี่ยงต่ำ)
+  var AGI_MIN=-1.0, AGI_MAX=0.2;           // โดเมนของเกจ
+  var USER_AGE=62;                         // อายุจริงผู้ใช้เดโม (persona 50+)
+  // vascular age = อายุจริง + ส่วนต่างจาก AGI (AGI กลางช่วง -0.4 = เท่าอายุจริง, ปลายช่วงละ ±15 ปี)
+  function vascularAge(agi){ return Math.round(USER_AGE + ((agi-(-0.4))/0.6)*15); }
+  function vaDeltaText(agi){
+    var d=vascularAge(agi)-USER_AGE;
+    if(d===0) return "เท่ากับอายุจริง";
+    return d<0 ? ("ดีกว่าอายุจริง "+Math.abs(d)+" ปี") : ("แก่กว่าอายุจริง "+d+" ปี");
+  }
+  function bandFor(v){
+    for(var i=0;i<RISK_BANDS.length;i++){ if(v<RISK_BANDS[i].hi) return RISK_BANDS[i]; }
+    return RISK_BANDS[RISK_BANDS.length-1];
+  }
+  function fmtAGI(v){ return (v<0?"−":"+")+Math.abs(v).toFixed(2); }
+  var CUR_BAND=bandFor(AGI_VALUE);
+
+  /* ---------- vascular-risk gauge (AGI domain −1.0 … +0.2) ---------- */
+  var G={min:AGI_MIN,max:AGI_MAX,value:AGI_VALUE,cx:124,cy:102,r:86,arc:406,startDeg:225,sweepDeg:270};
+  var NS="http://www.w3.org/2000/svg";
+  function gaugePoint(frac,rad){
+    var a=(G.startDeg-frac*G.sweepDeg)*Math.PI/180;
+    return [G.cx+rad*Math.cos(a),G.cy-rad*Math.sin(a)];
+  }
+  function fracOf(v){ return (v-G.min)/(G.max-G.min); }
+  (function buildZones(){
+    var g=$("#gaugeZones"); if(!g) return;
+    RISK_BANDS.forEach(function(b){
+      var f0=fracOf(Math.max(b.lo,G.min)), f1=fracOf(Math.min(b.hi,G.max));
+      var p0=gaugePoint(f0,G.r), p1=gaugePoint(f1,G.r);
+      var large=(f1-f0)*G.sweepDeg>180?1:0;
+      var path=document.createElementNS(NS,"path");
+      path.setAttribute("d","M "+p0[0].toFixed(1)+" "+p0[1].toFixed(1)+" A "+G.r+" "+G.r+" 0 "+large+" 1 "+p1[0].toFixed(1)+" "+p1[1].toFixed(1));
+      path.setAttribute("fill","none");
+      path.setAttribute("stroke",b.color);
+      path.setAttribute("stroke-opacity",b.key===CUR_BAND.key?".42":".18");
+      path.setAttribute("stroke-width","13");
+      path.setAttribute("stroke-linecap","round");
+      g.appendChild(path);
+    });
+  })();
+  (function buildTicks(){
+    var g=$("#gaugeTicks"); if(!g) return;
+    for(var i=0;i<=24;i++){
+      var frac=i/24, major=(i%6===0);
+      var p1=gaugePoint(frac,major?68:71), p2=gaugePoint(frac,76);
+      var l=document.createElementNS(NS,"line");
+      l.setAttribute("x1",p1[0].toFixed(1)); l.setAttribute("y1",p1[1].toFixed(1));
+      l.setAttribute("x2",p2[0].toFixed(1)); l.setAttribute("y2",p2[1].toFixed(1));
+      l.setAttribute("stroke",major?"rgba(255,255,255,.35)":"rgba(255,255,255,.14)");
+      l.setAttribute("stroke-width",major?"1.6":"1");
+      l.setAttribute("stroke-linecap","round");
+      g.appendChild(l);
+    }
+  })();
+  (function paintRisk(){
+    var b=CUR_BAND;
+    var rk=$("#gaugeRisk"); if(rk){ rk.textContent=b.level; rk.style.color=b.color; rk.style.fontSize=b.level.length>3?"30px":"40px"; }
+    var arc=$("#gaugeArc"); if(arc) arc.setAttribute("stroke",b.color);
+    var badge=$("#heroRiskBadge");
+    if(badge){ badge.className="badge "+(b.key==="low"?"b-ok":b.key==="mid"?"b-warn":"b-bad");
+      badge.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>'+b.risk; }
+    var desc=$("#heroRiskDesc"); if(desc) desc.textContent=b.desc+" · "+b.grade;
+    var hero=$("#heroCard");
+    if(hero){ // ambient glow ตามความเสี่ยง (คงเปลือกดำ)
+      hero.style.background="radial-gradient(130% 90% at 50% -10%,"+b.glow+",transparent 55%),linear-gradient(180deg,#17171A 0%,#111113 100%)";
+      hero.style.borderColor=b.glow;
+    }
+  })();
+  var gaugeAnimated=false;
+  function animateGauge(){
+    var arc=$("#gaugeArc"),dot=$("#gaugeDot"); if(!arc) return;
+    var frac=fracOf(G.value);
+    var p=gaugePoint(frac,G.r);
+    if(gaugeAnimated){ // re-entering: set instantly
+      arc.style.transition="none"; dot.style.transition="none";
+    }
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      arc.style.strokeDashoffset=(G.arc*(1-frac)).toFixed(1);
+      dot.setAttribute("cx",p[0].toFixed(1)); dot.setAttribute("cy",p[1].toFixed(1));
+    })});
+    gaugeAnimated=true;
+  }
+  animateGauge();
+
+  /* ---------- OTP boxes + resend timer ---------- */
+  var otp=$$("#otpRow .otp-box");
+  otp.forEach(function(box,i){
+    box.addEventListener("input",function(){
+      box.value=box.value.replace(/\D/g,"").slice(-1);
+      box.classList.toggle("filled",!!box.value);
+      if(box.value&&otp[i+1]) otp[i+1].focus();
+    });
+    box.addEventListener("keydown",function(e){
+      if(e.key==="Backspace"&&!box.value&&otp[i-1]) otp[i-1].focus();
+    });
+  });
+  var otpLeft=42;
+  setInterval(function(){
+    var el=$("#otpTimer"); if(!el) return;
+    otpLeft=otpLeft>0?otpLeft-1:59;
+    el.textContent="00:"+String(otpLeft).padStart(2,"0");
+  },1000);
+
+  /* ---------- ruler sliders (weight/height) + live BMI ---------- */
+  var body={w:57,h:161,pw:57,ph:161};
+  function paintBMI(){
+    var el=$("#pfBMI"); if(!el) return;
+    var bmi=body.pw/Math.pow(body.ph/100,2);
+    var cls="b-ok",lbl="สมส่วน";
+    if(bmi<18.5){cls="b-warn";lbl="น้ำหนักน้อย"}
+    else if(bmi>=25){cls="b-warn";lbl="เกินเกณฑ์"}
+    if(bmi>=30){cls="b-bad";lbl="อ้วน"}
+    el.className="badge "+cls+" num";
+    el.textContent=bmi.toFixed(1)+" · "+lbl;
+  }
+  /* profile: typed weight/height inputs (no slider) */
+  (function(){
+    var wIn=$("#pfWIn"), hIn=$("#pfHIn");
+    if(!wIn||!hIn) return;
+    function readW(){var v=parseFloat(wIn.value);if(!isNaN(v)){body.pw=Math.min(200,Math.max(30,v));paintBMI();}}
+    function readH(){var v=parseFloat(hIn.value);if(!isNaN(v)){body.ph=Math.min(220,Math.max(120,v));paintBMI();}}
+    wIn.addEventListener("input",readW); hIn.addEventListener("input",readH);
+    wIn.addEventListener("blur",function(){wIn.value=body.pw;});
+    hIn.addEventListener("blur",function(){hIn.value=body.ph;});
+    paintBMI();
+  })();
+  var rulers={};
+  function makeRuler(el){
+    var min=+el.dataset.min, max=+el.dataset.max, step=+el.dataset.step||1;
+    var key=el.dataset.ruler, val=+el.dataset.val;
+    var scale=$(".rk-scale",el), track=$(".rk-track",el), numEl=$(".rk-num",el);
+    var units=Math.round((max-min)/step);
+    // build: leading spacer, ticks (each snap-aligned centre), trailing spacer
+    var html='<span class="rk-spacer"></span>';
+    for(var i=0;i<=units;i++){
+      var v=min+i*step, cls="rk-tick", r=Math.round(v);
+      if(r%10===0){cls+=" maj"} else if(r%5===0){cls+=" mid"}
+      html+='<span class="'+cls+'">'+(r%10===0?'<i>'+r+'</i>':'')+'</span>';
+    }
+    html+='<span class="rk-spacer"></span>';
+    scale.innerHTML=html;
+    var spacers=scale.querySelectorAll(".rk-spacer");
+    var tick0=scale.querySelector(".rk-tick");
+    function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+    function stepPx(){                                   // real px between adjacent ticks (measured, robust)
+      var t=scale.querySelectorAll(".rk-tick");
+      if(t.length<2) return 14;
+      var d=t[1].getBoundingClientRect().left-t[0].getBoundingClientRect().left;
+      return d||14;
+    }
+    function idxOf(v){return Math.round((v-min)/step);}
+    // scroll so that value v's tick sits under the centre needle
+    function scrollToVal(v,smooth){track.scrollTo({left:idxOf(v)*stepPx(),behavior:smooth?"smooth":"auto"});}
+    function valFromScroll(){return clamp(Math.round(track.scrollLeft/stepPx())*step+min,min,max);}
+    function paint(v){numEl.textContent=v;el.setAttribute("aria-valuenow",v);}
+    function commit(v){if(v===val){paint(v);return;}val=v;paint(v);body[key]=v;if(key==="pw"||key==="ph")paintBMI();}
+    // spacer = half the track so the first/last tick can reach the centre
+    var sized=false;
+    function setPad(){
+      if(!track.clientWidth) return false;
+      var c=track.clientWidth/2-stepPx()/2;
+      if(c<=0) return false;
+      spacers[0].style.width=c+"px"; spacers[1].style.width=c+"px";
+      sized=true;
+      scrollToVal(val,false);
+      return true;
+    }
+    // keep retrying until the track has a real width (screen may still be hidden at init)
+    function poll(n){ if(sized||setPad()||n<=0) return; setTimeout(function(){poll(n-1);},50); }
+    function ensure(){ if(!sized) setPad(); }
+    paint(val);
+    // live update while scrolling (touch / trackpad / drag)
+    track.addEventListener("scroll",function(){ if(!sized){setPad();return;} commit(valFromScroll()); });
+    // pointer drag-to-scroll (desktop mouse)
+    var down=false,sx=0,sl=0;
+    track.addEventListener("pointerdown",function(e){
+      ensure();down=true;sx=e.clientX;sl=track.scrollLeft;track.classList.add("grabbing");
+      track.setPointerCapture&&track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener("pointermove",function(e){ if(down) track.scrollLeft=sl-(e.clientX-sx); });
+    function up(){ if(!down)return; down=false;track.classList.remove("grabbing"); scrollToVal(val,true); }
+    track.addEventListener("pointerup",up); track.addEventListener("pointercancel",up);
+    // keyboard
+    el.addEventListener("keydown",function(e){
+      var d=0;
+      if(e.key==="ArrowLeft"||e.key==="ArrowDown")d=-step;
+      else if(e.key==="ArrowRight"||e.key==="ArrowUp")d=step;
+      else if(e.key==="PageDown")d=-step*5;else if(e.key==="PageUp")d=step*5;
+      else if(e.key==="Home")d=min-val;else if(e.key==="End")d=max-val;
+      else return;
+      e.preventDefault();ensure();var v=clamp(val+d,min,max);if(v!==val){commit(v);scrollToVal(v,true);}
+    });
+    // vertical wheel -> step
+    el.addEventListener("wheel",function(e){
+      e.preventDefault();ensure();var d=(e.deltaY||e.deltaX)>0?-step:step;
+      var v=clamp(val+d,min,max);if(v!==val){commit(v);scrollToVal(v,true);}
+    },{passive:false});
+    // size the spacers as soon as the track gets a real width (screen shown / resized)
+    if(window.ResizeObserver){ new ResizeObserver(function(){ if(!down) setPad(); }).observe(track); }
+    poll(20);
+    rulers[key]={setPad:setPad,ensure:ensure};
+  }
+  $$(".ruler").forEach(makeRuler);
+  // size spacers + position once the screen is actually laid out (screens start display:none, width 0)
+  function repadRulers(){
+    Object.keys(rulers).forEach(function(k){rulers[k].ensure();});
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      Object.keys(rulers).forEach(function(k){rulers[k].setPad();});
+    });});
+  }
+
+  /* ---------- date-of-birth wheel picker ---------- */
+  var TH_MONTHS=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  var NOW={y:2026,m:6,d:9}; // fixed "today" for the prototype (2026-07-09)
+  function makeDob(root){
+    var ROW=26, state={d:15,m:5,y:1981}; // default -> age 45
+    var wheels={};
+    function buildWheel(w,type){
+      var items=[],min,max;
+      if(type==="d"){min=1;max=31;for(var i=1;i<=31;i++)items.push([i,i]);}
+      else if(type==="m"){for(var j=0;j<12;j++)items.push([j,TH_MONTHS[j]]);min=0;max=11;}
+      else{min=1930;max=2020;for(var y=min;y<=max;y++)items.push([y,y+543]);}
+      var html='<div class="wheel-pad"></div>';
+      items.forEach(function(it){html+='<div class="wheel-item" data-v="'+it[0]+'">'+it[1]+'</div>';});
+      html+='<div class="wheel-pad"></div>';
+      w.innerHTML=html;
+      wheels[type]={el:w,items:[].slice.call(w.querySelectorAll(".wheel-item")),min:min};
+    }
+    function idxOf(type,val){
+      if(type==="m")return val;
+      if(type==="d")return val-1;
+      return val-wheels.y.min;
+    }
+    function scrollToVal(type,val,smooth){
+      var w=wheels[type];w.el.scrollTo({top:idxOf(type,val)*ROW,behavior:smooth?"smooth":"auto"});
+      markSel(type);
+    }
+    function markSel(type){
+      var w=wheels[type],idx=Math.round(w.el.scrollTop/ROW);
+      w.items.forEach(function(it,i){it.classList.toggle("sel",i===idx);});
+    }
+    function valFromScroll(type){
+      var w=wheels[type],idx=Math.max(0,Math.min(w.items.length-1,Math.round(w.el.scrollTop/ROW)));
+      return +w.items[idx].dataset.v;
+    }
+    function ageFrom(y,m,d){
+      var a=NOW.y-y;if(NOW.m<m||(NOW.m===m&&NOW.d<d))a--;return a;
+    }
+    function updateAge(){
+      var a=ageFrom(state.y,state.m,state.d);
+      var out=$("#age"+cap(root.dataset.dob));if(out)out.textContent=a;
+      window.HON_AGE=a;
+    }
+    function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+    ["d","m","y"].forEach(function(type){
+      var w=$('.wheel[data-w="'+type+'"]',root);
+      buildWheel(w,type);
+      var t;
+      w.addEventListener("scroll",function(){
+        markSel(type);
+        clearTimeout(t);
+        t=setTimeout(function(){
+          var v=valFromScroll(type);state[type]=v;
+          // clamp day to valid days in month/year
+          if(type!=="d"){var dim=daysInMonth(state.m,state.y);if(state.d>dim){state.d=dim;scrollToVal("d",dim,true);}}
+          w.scrollTo({top:idxOf(type,v)*ROW,behavior:"smooth"});
+          updateAge();
+        },90);
+      });
+      w.addEventListener("click",function(e){
+        var it=e.target.closest(".wheel-item");if(!it)return;
+        var v=+it.dataset.v;state[type]=v;scrollToVal(type,v,true);updateAge();
+      });
+    });
+    function daysInMonth(m,y){return [31,((y%4===0&&y%100!==0)||y%400===0)?29:28,31,30,31,30,31,31,30,31,30,31][m];}
+    wheels._init=function(){["d","m","y"].forEach(function(type){scrollToVal(type,state[type],false);});updateAge();};
+    root._dob=wheels;
+  }
+  $$("[data-dob]").forEach(makeDob);
+  function initDob(){$$("[data-dob]").forEach(function(r){r._dob&&r._dob._init();});}
+
+  /* ============================================================
+     Clinical PPG — realistic waveform synthesis + charts + A4
+     ============================================================ */
+  var PPG=(function(){
+    var HR=64, DUR=30, FS=100, N=DUR*FS; // 3000 samples
+    // deterministic PRNG so waveforms are stable across visits
+    function rng(seed){var s=seed>>>0;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+    // one cardiac cycle, phase 0..1 -> normalised 0..1 (systolic + dicrotic + diastolic)
+    function beat(ph){
+      var sys=Math.exp(-Math.pow((ph-0.16)/0.075,2));
+      var dic=0.30*Math.exp(-Math.pow((ph-0.46)/0.10,2));
+      var dia=0.20*Math.exp(-Math.pow((ph-0.58)/0.14,2));
+      return sys+dic+dia;
+    }
+    var CH={
+      green:{col:"#34D07C",dark:"#2e9e5b",label:"Green 515nm",noise:0.010,drift:0.05,
+        snr:"24.6",sqi:"0.96",pi:"3.1",seed:7,rawLo:203500,rawHi:204900,
+        note:"ช่องแสงเขียว (515nm) — สัญญาณ AC/DC ชัดที่สุด เหมาะกับวัดชีพจรและ HRV"},
+      red:{col:"#FF4D42",dark:"#d63a30",label:"Red 660nm",noise:0.045,drift:0.16,
+        snr:"18.2",sqi:"0.88",pi:"1.4",seed:13,rawLo:203500,rawHi:204700,
+        note:"ช่องแสงแดง (660nm) — ใช้คู่กับ IR คำนวณความอิ่มตัวออกซิเจน (SpO₂)"},
+      ir:{col:"#B98BE8",dark:"#9a5cd0",label:"IR 940nm",noise:0.028,drift:0.12,
+        snr:"20.5",sqi:"0.91",pi:"2.6",seed:29,rawLo:203000,rawHi:206200,
+        note:"ช่องแสงอินฟราเรด (940nm) — ทะลุเนื้อเยื่อลึก เสถียรต่อการเคลื่อนไหว"}
+    };
+    var cache={};
+    function series(chName){
+      if(cache[chName]) return cache[chName];
+      var c=CH[chName], rnd=rng(c.seed), raw=[], filt=[];
+      var f=HR/60/FS; // cycles per sample
+      var ph=rnd()*0.3;
+      for(var i=0;i<N;i++){
+        var b=beat(ph%1); ph+=f;
+        // baseline wander: respiration (~0.25Hz) + slow drift
+        var t=i/FS;
+        var wander=Math.sin(2*Math.PI*0.25*t)*0.55 + Math.sin(2*Math.PI*0.05*t+1)*0.35;
+        var n1=(rnd()-0.5), n2=(rnd()-0.5);
+        filt.push(b + n1*c.noise*0.5);              // clean band-passed morphology
+        raw.push(b*(1-c.drift) + wander*c.drift + (n1+n2)*c.noise); // raw = pulsatile + drift + noise
+      }
+      cache[chName]={raw:raw,filt:filt,c:c};
+      return cache[chName];
+    }
+    function extent(a){var lo=Infinity,hi=-Infinity;for(var i=0;i<a.length;i++){if(a[i]<lo)lo=a[i];if(a[i]>hi)hi=a[i];}return[lo,hi];}
+    // build an SVG path across a viewBox, y inverted, with vertical padding
+    function pathD(arr,W,H,padY,step){
+      var ex=extent(arr),lo=ex[0],hi=ex[1],rng=(hi-lo)||1,d="";
+      step=step||1;
+      for(var i=0;i<arr.length;i+=step){
+        var x=(i/(arr.length-1))*W;
+        var y=H-padY-((arr[i]-lo)/rng)*(H-2*padY);
+        d+=(i===0?"M":"L")+x.toFixed(1)+" "+y.toFixed(1);
+      }
+      return d;
+    }
+    return {series:series,pathD:pathD,extent:extent,CH:CH,N:N,DUR:DUR,HR:HR};
+  })();
+
+  /* ---------- render in-app clinical screen ---------- */
+  var curCh="green";
+  function paintClinical(){
+    var d=PPG.series(curCh), c=d.c;
+    var raw=$("#rawPath"), filt=$("#filtPath");
+    if(!raw) return;
+    // in-app small charts: ซูมช่วง 6 วินาที (600 ตัวอย่าง) ให้เห็นรูปคลื่นชัด ไม่ถี่เกินไป
+    // (รายงาน A4 คลินิกยังแสดงครบ 30 วินาทีตามเดิม)
+    var WIN=600;
+    raw.setAttribute("d",PPG.pathD(d.raw.slice(0,WIN),680,92,8,2));
+    raw.setAttribute("stroke",c.col);
+    filt.setAttribute("d",PPG.pathD(d.filt.slice(0,WIN),680,92,8,2));
+    filt.setAttribute("stroke",c.col);
+    // dots + tags
+    setDot("#rawDot",c.col); setDot("#filtDot",c.col); setDot("#chNoteDot",c.col);
+    var rex=PPG.extent(d.raw);
+    var rawLo=c.rawLo, rawHi=c.rawHi;
+    var yt=$("#rawYtop"), yb=$("#rawYbot"), tag=$("#rawTag");
+    if(yt) yt.textContent=(rawHi/1e5).toFixed(3);
+    if(yb) yb.textContent=(rawLo/1e5).toFixed(3);
+    if(tag) tag.textContent="×10⁵ ADC";
+    // signal-quality cells
+    setTxt("#sigSNR",c.snr+'<small>dB</small>');
+    setTxt("#sigSQI",c.sqi);
+    setTxt("#sigPI",c.pi+'<small>%</small>');
+    var note=$("#chNoteText"); if(note) note.innerHTML="<b>"+c.label+"</b> — "+c.note.split("— ")[1];
+    // active seg state
+    $$("#chSeg button").forEach(function(b){b.classList.toggle("on",b.dataset.ch===curCh);});
+  }
+  function setDot(sel,col){var e=$(sel);if(e)e.style.background=col;}
+  function setTxt(sel,html){var e=$(sel);if(e)e.innerHTML=html;}
+  // channel selector
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("#chSeg button"); if(!b) return;
+    curCh=b.dataset.ch; paintClinical();
+  });
+
+  /* ---------- build A4 report charts (E32-style, white) ---------- */
+  function a4Chart(title,color,arr,isRaw){
+    var W=760,H=150,L=64,R=14,T=20,B=26; // margins
+    var ex=PPG.extent(arr),lo=ex[0],hi=ex[1],span=(hi-lo)||1;
+    // pad range 8%
+    lo-=span*0.08; hi+=span*0.08; span=hi-lo;
+    function fmt(v){ return isRaw ? (v/1e5).toFixed(3) : Math.round(v); }
+    // y ticks (5)
+    var yt="",gl="";
+    for(var k=0;k<=4;k++){
+      var yv=lo+span*k/4, yy=H-B-(k/4)*(H-T-B);
+      yt+='<text x="'+(L-8)+'" y="'+(yy+3)+'" text-anchor="end" font-size="9" fill="#555">'+fmt(yv)+'</text>';
+      gl+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#eee" stroke-width="1"/>';
+    }
+    // x ticks: sample number 0..3000
+    var xt="";
+    for(var s=0;s<=3000;s+=500){
+      var xx=L+(s/3000)*(W-L-R);
+      xt+='<text x="'+xx+'" y="'+(H-9)+'" text-anchor="middle" font-size="9" fill="#555">'+s+'</text>';
+      xt+='<line x1="'+xx+'" y1="'+T+'" x2="'+xx+'" y2="'+(H-B)+'" stroke="#f4f4f4" stroke-width="1"/>';
+    }
+    // path within plot area
+    var d="",step=2;
+    for(var i=0;i<arr.length;i+=step){
+      var x=L+(i/(arr.length-1))*(W-L-R);
+      var y=H-B-((arr[i]-lo)/span)*(H-T-B);
+      d+=(i===0?"M":"L")+x.toFixed(1)+" "+y.toFixed(1);
+    }
+    var powLbl=isRaw?'<text x="'+L+'" y="'+(T-7)+'" font-size="8" fill="#888">×10⁵</text>':'';
+    return '<div class="a4-chart"><div class="ct">'+title+'</div>'+
+      '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
+      gl+xt+
+      '<line x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+(H-B)+'" stroke="#bbb" stroke-width="1"/>'+
+      '<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="#bbb" stroke-width="1"/>'+
+      yt+powLbl+
+      '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="1" stroke-linejoin="round"/>'+
+      '<text x="14" y="'+(H/2)+'" font-size="9" fill="#666" transform="rotate(-90 14 '+(H/2)+')" text-anchor="middle">ADC Value</text>'+
+      '<text x="'+((L+W-R)/2)+'" y="'+H+'" font-size="9" fill="#666" text-anchor="middle">Sample Number</text>'+
+      '</svg></div>';
+  }
+  function a4Morph(){
+    return '<svg viewBox="0 0 300 150" style="width:100%;height:auto;border:1px solid #eee;background:#fff">'+
+      '<defs><linearGradient id="a4mf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C1121F" stop-opacity=".14"/><stop offset="1" stop-color="#C1121F" stop-opacity="0"/></linearGradient></defs>'+
+      '<path d="M8 126 C36 124 48 116 60 58 C68 30 78 28 90 64 C102 100 110 104 122 92 C134 80 144 88 156 100 C176 118 204 124 244 126 C280 128 292 129 292 129 L292 142 L8 142 Z" fill="url(#a4mf)"/>'+
+      '<path d="M8 126 C36 124 48 116 60 58 C68 30 78 28 90 64 C102 100 110 104 122 92 C134 80 144 88 156 100 C176 118 204 124 244 126 C280 128 292 129 292 129" fill="none" stroke="#C1121F" stroke-width="1.8"/>'+
+      '<circle cx="74" cy="27" r="3" fill="#C1121F"/><text x="74" y="18" font-size="8" fill="#333" text-anchor="middle">P1</text>'+
+      '<circle cx="122" cy="92" r="2.6" fill="#E0940A"/><text x="140" y="84" font-size="8" fill="#b3760a">notch</text>'+
+      '<circle cx="156" cy="100" r="2.6" fill="#3a7bd0"/><text x="182" y="96" font-size="8" fill="#3a7bd0" text-anchor="middle">P2</text>'+
+      '<line x1="74" y1="40" x2="156" y2="40" stroke="#999" stroke-width="1" stroke-dasharray="2 2"/><text x="115" y="37" font-size="8" fill="#666" text-anchor="middle">ΔT 232ms</text>'+
+      '</svg>';
+  }
+  // map a normalised array into an ADC count range [lo,hi]
+  function scaleTo(arr,lo,hi){
+    var ex=PPG.extent(arr),mn=ex[0],rg=(ex[1]-ex[0])||1,out=[];
+    for(var i=0;i<arr.length;i++) out.push(lo+((arr[i]-mn)/rg)*(hi-lo));
+    return out;
+  }
+  var a4built=false;
+  function buildA4(){
+    if(a4built) return;
+    var host=$("#a4Charts"); if(!host) return;
+    var red=PPG.series("red"), ir=PPG.series("ir");
+    // raw -> real ADC counts (x10^5); filtered -> band-passed ADC (~1600-2600) like the E32 reference
+    host.innerHTML=
+      a4Chart("PPG Red Channel — Raw Data","#d63a30",scaleTo(red.raw,203500,204700),true)+
+      a4Chart("Chebyshev II Filtered PPG — Red Channel","#d63a30",scaleTo(red.filt,1660,2520),false)+
+      a4Chart("PPG IR Channel — Raw Data","#9a5cd0",scaleTo(ir.raw,203000,206200),true)+
+      a4Chart("Chebyshev II Filtered PPG — IR Channel","#9a5cd0",scaleTo(ir.filt,1280,3080),false);
+    var m=$("#a4Morph"); if(m) m.innerHTML=a4Morph();
+    a4built=true;
+  }
+  // print / export
+  document.addEventListener("click",function(e){
+    var p=e.target.closest('[data-print="a4"]'); if(!p) return;
+    e.preventDefault(); buildA4();
+    setTimeout(function(){ window.print(); },60);
+  });
+
+  /* ---------- choice pills / toggles / segmented ---------- */
+  document.addEventListener("click",function(e){
+    var c=e.target.closest("[data-pick]");
+    if(c){$$("[data-pick='"+c.dataset.pick+"']",c.closest(".choice-grid")).forEach(function(x){x.classList.remove("on")});c.classList.add("on");return;}
+    var t=e.target.closest("[data-toggle]");
+    if(t){t.classList.toggle("on");t.setAttribute("aria-pressed",t.classList.contains("on"));return;}
+    var s=e.target.closest("[data-seg]");
+    if(s){$$("[data-seg='"+s.dataset.seg+"']",s.parentElement).forEach(function(x){x.classList.remove("on")});s.classList.add("on");
+      if(s.dataset.seg==="bill") paintBilling();return;}
+    var p=e.target.closest("[data-plan]");
+    if(p){$$("[data-plan]").forEach(function(x){x.classList.remove("on")});p.classList.add("on");}
+  });
+
+  /* ---------- premium billing toggle ---------- */
+  function paintBilling(){
+    var yearly=$("#billYr").classList.contains("on");
+    $$("[data-price]").forEach(function(el){
+      el.textContent=(yearly?el.dataset.yr:el.dataset.mo)+" ฿";
+    });
+    $$("[data-per]").forEach(function(el){
+      el.textContent=yearly?"ต่อเดือน (เรียกเก็บรายปี)":"ต่อเดือน";
+    });
+  }
+
+  /* ---------- chat (send + typing/loading + canned reply) ---------- */
+  var replies={
+    why:  "ที่ความเสี่ยงคุณอยู่ระดับต่ำ (AGI −0.72) มาจากหลายปัจจัยเฉพาะตัวค่ะ: คุณไม่สูบบุหรี่ ความดัน 118/76 อยู่ในเกณฑ์ดี BMI 22.1 สมส่วน และค่า PWV 7.2 m/s บ่งชี้ว่าผนังหลอดเลือดยังยืดหยุ่นดีกว่าค่าเฉลี่ยของวัย 45 ปี เมื่อรวมกันจึงจัดอยู่ในโซนเขียว (เสี่ยงต่ำ) ค่ะ — ข้อมูลนี้ช่วยประเมินเบื้องต้น ไม่ใช่การวินิจฉัยทางการแพทย์นะคะ",
+    lower:"ถึงจะเสี่ยงต่ำอยู่แล้ว ก็รักษาให้ดีต่อได้ค่ะ เฉพาะสำหรับคุณ: คงคาร์ดิโอโซน 2 ราว 150 นาที/สัปดาห์ (เดินเร็ว/ปั่นจักรยาน), คุมโซเดียมให้ต่ำกว่า 2,000 มก./วัน เพื่อพยุงความดัน 118/76 ให้นิ่ง, และนอน 7–8 ชม. หากทำต่อเนื่อง ค่า AGI มักติดลบมากขึ้น (ดีขึ้น) ใน 2–3 เดือนค่ะ",
+    agi:  "AGI (ดัชนีอายุหลอดเลือด) คำนวณจากรูปคลื่น PPG อนุพันธ์อันดับสอง สะท้อนความยืดหยุ่นของหลอดเลือดค่ะ สเกล: −1.0 ถึง −0.6 = เสี่ยงต่ำ, −0.6 ถึง −0.2 = ปานกลาง, −0.2 ถึง +0.2 = สูง ยิ่งค่าติดลบมากยิ่งดี ค่าของคุณ −0.72 จึงอยู่โซนเสี่ยงต่ำค่ะ — เป็นค่าประเมิน ไม่ใช่ผลวินิจฉัยทางการแพทย์",
+    prem: "ด้านกรมธรรม์ค่ะ: การคงความเสี่ยงระดับต่ำและวัดครบ 24 วัน/เดือน (ตอนนี้ 18/24) ทำให้คุณได้ส่วนลดเบี้ยปีถัดไป 12% ของแผน Care Plus ยิ่งความเสี่ยงต่ำต่อเนื่อง สิทธิส่วนลดยิ่งมีเสถียรภาพค่ะ",
+    claim:"สำหรับการเคลม: เปิดเมนูกรมธรรม์ แล้วเลือก “ยื่นเคลม” แนบใบเสร็จและใบรับรองแพทย์ ระบบจะแจ้งผลภายใน 3 วันทำการค่ะ ให้ช่วยเปิดแบบฟอร์มเลยไหมคะ?",
+    benefit:"สมาชิก Care Plus มีสิทธิตรวจสุขภาพประจำปีลด 50% ที่โรงพยาบาลพันธมิตร 12 แห่งค่ะ ดูรายชื่อได้ที่หน้า “ข่าวสาร” หรือให้จองคิวให้เลยก็ได้ค่ะ"
+  };
+  function pickReply(t){
+    if(/เคลม|claim/i.test(t)) return replies.claim;
+    if(/สิทธิ|ตรวจสุขภาพ|โรงพยาบาล/i.test(t)) return replies.benefit;
+    if(/เบี้ย|ประกัน|กรมธรรม์|ส่วนลด|premium/i.test(t)) return replies.prem;
+    if(/agi|ดัชนี|ค่า.*หลอดเลือด|−0\.72|-0\.72/i.test(t)) return replies.agi;
+    if(/ลด|ดีขึ้น|ปรับปรุง|ออกกำลัง|ดูแล/i.test(t)) return replies.lower;
+    if(/ทำไม|เสี่ยง|ระดับ|แปลว่า|หมายถึง/i.test(t)) return replies.why;
+    return replies.why;
+  }
+  function chatSend(text){
+    text=(text||"").trim(); if(!text) return;
+    var scroll=$("#chatScroll"),typing=$("#chatTyping");
+    var me=document.createElement("div");
+    me.className="bub me"; me.textContent=text;
+    scroll.insertBefore(me,typing);
+    $("#chatInput").value="";
+    typing.style.display="inline-flex";
+    scroll.parentElement.scrollTop=scroll.parentElement.scrollHeight;
+    setTimeout(function(){
+      typing.style.display="none";
+      var bot=document.createElement("div");
+      bot.className="bub bot"; bot.textContent=pickReply(text);
+      scroll.insertBefore(bot,typing);
+      scroll.parentElement.scrollTop=scroll.parentElement.scrollHeight;
+    },1600);
+  }
+  $("#chatSend").addEventListener("click",function(){chatSend($("#chatInput").value)});
+  $("#chatInput").addEventListener("keydown",function(e){if(e.key==="Enter")chatSend(this.value)});
+  document.addEventListener("click",function(e){
+    var q=e.target.closest("[data-chat]"); if(q) chatSend(q.dataset.chat);
+  });
+
+  /* ---------- watch sync (loading state) ---------- */
+  $("#syncBtn").addEventListener("click",function(){
+    var btn=this,label=$("#syncLabel");
+    btn.disabled=true;
+    btn.innerHTML='<span class="spin"></span>&nbsp;กำลังซิงก์…';
+    setTimeout(function(){
+      btn.disabled=false; btn.textContent="ซิงก์เดี๋ยวนี้";
+      label.textContent="ซิงก์ล่าสุด เมื่อสักครู่";
+    },2200);
+  });
+
+  /* ---------- watch flow (home, measuring, result) ---------- */
+  var wTimer=null;
+  function wShow(name){
+    $$(".wscr").forEach(function(s){s.classList.toggle("on",s.dataset.w===name)});
+    $$("#wseg button").forEach(function(b){b.classList.toggle("on",b.dataset.w===name)});
+    clearInterval(wTimer);
+    if(name==="measure"){
+      var t0=Date.now(),DUR=3500;
+      $$(".wprog").forEach(function(el){el.textContent="0"});
+      wTimer=setInterval(function(){
+        var p=Math.min(100,Math.round((Date.now()-t0)/DUR*100));
+        $$(".wprog").forEach(function(el){el.textContent=p});
+        if(p>=100){clearInterval(wTimer);setTimeout(function(){wShow("result")},400);}
+      },80);
+    }
+  }
+  $$("#wseg button").forEach(function(b){
+    b.addEventListener("click",function(){wShow(b.dataset.w)});
+  });
+})();
+
+// Fallback for in-app browsers (QR scanners, LINE) that occasionally swallow
+// the click synthesized from a tap. If no click follows a clean tap on an
+// interactive element within 350 ms, fire it manually. Scrolling taps ignored.
+(function () {
+  var sx = 0, sy = 0, timer = null;
+  document.addEventListener('touchstart', function (e) {
+    var t = e.touches[0]; sx = t.clientX; sy = t.clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    var el = e.target && e.target.closest ? e.target.closest('button, a[href], [data-go], [data-tab], [data-ezpick]') : null;
+    if (!el) return;
+    var t = e.changedTouches[0];
+    if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) return;
+    clearTimeout(timer);
+    timer = setTimeout(function () { el.click(); }, 350);
+  }, { passive: true });
+  document.addEventListener('click', function () { clearTimeout(timer); }, true);
+})();
+</script>
+</body>
+</html>
