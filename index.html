@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HON · ดูแลผู้สูงอายุจากที่ไกล</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f1ea;--paper:#fffdf9;--ink:#1d2a2e;--mute:#5d6b6f;--line:#e6ddd1;--teal:#0f4c5c;--teal2:#e3eef0;--coral:#e8664a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "IBM Plex Sans Thai",system-ui,sans-serif}
+main{max-width:880px;margin:0 auto;padding:32px 18px 60px}
+h1{font-size:44px;line-height:1.1;margin:0 0 6px;color:var(--teal)}
+h1 b{color:var(--coral)}
+h2{font-size:21px;margin:0 0 4px}
+.lead{color:var(--mute);margin:0 0 22px;max-width:640px}
+.lang{float:right;border:1px solid var(--line);background:var(--paper);border-radius:12px;min-height:40px;padding:0 14px;font:inherit;font-weight:600;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.tag{display:inline-block;font-size:13px;font-weight:700;color:var(--coral);letter-spacing:.03em}
+.card p{margin:0;color:var(--mute);font-size:15px}
+a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:14px;min-height:50px;padding:0 16px;font-weight:600;background:var(--teal);color:#fff}
+a.btn.alt{background:var(--teal2);color:var(--ink)}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;list-style:none;padding:0;margin:22px 0}
+.flow li{background:var(--teal2);border-radius:14px;padding:10px 12px;font-size:14px}
+.flow b{display:block;font-size:15px}
+.more{margin-top:22px;font-size:15px}.more a{color:var(--teal);margin-right:14px}
+.note{font-size:13px;color:var(--mute);margin-top:18px}
+:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<button class="lang" id="lang">EN</button>
+<h1><b>HON</b> Family</h1>
+<p class="lead" id="lead"></p>
+<ol class="flow" id="flow"></ol>
+<div class="grid" id="grid"></div>
+<div class="more" id="more"></div>
+<p class="note" id="note"></p>
+</main>
+<script>
+{
+let lang="th";try{lang=localStorage.getItem("hc-lang")||"th"}catch(e){}
+const tx=(a,b)=>lang==="th"?a:b,$=s=>document.querySelector(s);
+function render(){document.documentElement.lang=lang;$("#lang").textContent=lang==="th"?"EN":"ไทย";
+ $("#lead").textContent=tx("ผู้สูงอายุวัดสุขภาพด้วยมือถือ 30 วินาที ผู้ดูแลเห็นผลทันทีพร้อม AI ที่บอกว่าต้องทำอะไรต่อ และได้รับแจ้งเมื่อมีเหตุฉุกเฉิน","Older adults measure with their phone in 30 seconds; the caregiver sees it at once, with AI that says what to do next, and is alerted when something is wrong");
+ $("#flow").innerHTML=[[tx("1 วัด","1 Measure"),tx("กล้องมือถือผู้สูงอายุ","Elder's phone camera")],[tx("2 ส่ง","2 Send"),tx("ค่าจริงถึงแอปผู้ดูแล","Live reading to the caregiver app")],[tx("3 AI สรุป","3 AI brief"),tx("ทำอะไรวันนี้","What to do today")],[tx("4 แจ้งเหตุ","4 Alert"),tx("SOS / ล้ม / ชีพจรผิดปกติ","SOS / fall / abnormal HR")],[tx("5 ส่งหมอ","5 Doctor"),tx("สรุป 30 วินาที","30-second summary")]].map(f=>`<li><b>${f[0]}</b>${f[1]}</li>`).join("");
+ $("#grid").innerHTML=`<div class="card"><span class="tag">${tx("ผู้สูงอายุ","OLDER ADULT")}</span><h2>${tx("ฝั่งผู้สูงอายุ","Older-adult side")}</h2><p>${tx("ตัวหนังสือใหญ่ ปุ่มน้อย ไม่ต้องคุยกับ AI แค่วัดและกด SOS เมื่อต้องการ","Large text, few buttons, no chatting with AI — just measure, and SOS when needed")}</p>
+<a class="btn" href="app.html?role=eld">${tx("เปิดฝั่งผู้สูงอายุ","Open the older-adult side")}</a></div>
+<div class="card"><span class="tag">${tx("ผู้ดูแล","CAREGIVER")}</span><h2>${tx("ฝั่งผู้ดูแล","Caregiver side")}</h2><p>${tx("เห็นค่าที่ผู้สูงอายุวัดจริง AI สรุปเช้า บันทึกอาการ ถาม-ตอบ สรุปส่งหมอ และเตือนภัยพร้อมพิกัด","See real readings from the older adult, AI morning brief, care log, Q&A, doctor summary and alerts with location")}</p>
+<a class="btn" href="app.html?role=fam">${tx("เปิดฝั่งผู้ดูแล","Open the caregiver side")}</a></div>`;
+ $("#more").innerHTML=`<span class="tag" style="margin-right:10px">${tx("หน้าแยกรุ่นก่อน","EARLIER PAGES")}</span><a href="hon-care.html">HON Care</a><a href="hon-safety.html">HON Safety</a><a href="hon-measure.html">${tx("HON วัดชีพจร","HON Measure")}</a>`;
+ $("#note").textContent=tx("ต้นแบบสำหรับเดโม ข้อมูลผู้ป่วยเป็นข้อมูลจำลอง ไม่ใช่อุปกรณ์การแพทย์","Demo prototype with sample patient data. Not a medical device.")}
+$("#lang").onclick=()=>{lang=lang==="th"?"en":"th";try{localStorage.setItem("hc-lang",lang)}catch(e){}render()};
+render();
+}
+</script>
+</body>
+</html>
