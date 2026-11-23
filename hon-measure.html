@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HON วัดชีพจร · ส่งให้ลูกหลาน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f1ea;--paper:#fffdf9;--ink:#1d2a2e;--mute:#5d6b6f;--line:#e6ddd1;--teal:#0f4c5c;--teal2:#e3eef0;--coral:#e8664a;--r:#c0322a;--rbg:#fbe6e3;--g:#1f8a4c;--gbg:#e5f4e9;--y:#a36a00;--ybg:#fdf1d8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 "IBM Plex Sans Thai",system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 18px 60px}
+h1{font-size:28px;margin:0}h2{font-size:20px;margin:0 0 8px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px}
+.top a{color:var(--teal);font-size:15px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:16px}
+.mini{font-size:14px;color:var(--mute)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.btn{border:0;border-radius:16px;min-height:54px;padding:0 18px;font-weight:600;background:var(--teal);color:#fff;width:100%}
+.btn.alt{background:var(--teal2);color:var(--ink)}.btn.g{background:var(--g)}
+.btn:disabled{opacity:.5;cursor:default}
+canvas{width:100%;height:130px;background:var(--teal2);border-radius:14px;display:block;margin:10px 0}
+video{position:fixed;left:-9999px;top:0;width:1px;height:1px}
+.big{font-size:64px;font-weight:700;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.big small{font-size:18px;font-weight:600;color:var(--mute)}
+.meter{height:12px;background:var(--teal2);border-radius:999px;overflow:hidden;margin-top:10px}.meter i{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
+.status{font-size:16px;padding:10px 12px;border-radius:12px;background:var(--teal2);margin-top:10px;text-align:center}
+.status.ok{background:var(--gbg);color:var(--g)}.status.warn{background:var(--ybg);color:var(--y)}.status.bad{background:var(--rbg);color:var(--r)}
+ol{padding-left:22px;margin:6px 0}
+label{font-size:15px;font-weight:600;display:block;margin:10px 0 4px}
+input{font:inherit;width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px;background:#fff}
+code{background:var(--teal2);padding:1px 6px;border-radius:6px;font-size:15px;word-break:break-all}
+details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.note{font-size:14px;color:var(--mute);border-left:3px solid var(--coral);padding:6px 10px;margin:0}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><div><h1>HON วัดชีพจร</h1><div class="mini" id="who">ผู้ใช้: —</div></div><a href="index.html">หน้าแรก</a></div>
+
+  <div class="card">
+    <h2>วิธีวัด 30 วินาที</h2>
+    <ol class="mini">
+      <li>กด "เริ่มวัด" แล้วอนุญาตให้ใช้กล้อง</li>
+      <li>วางปลายนิ้วชี้ปิดกล้องหลังและไฟแฟลชให้มิด อย่ากดแรง</li>
+      <li>นั่งนิ่งๆ จนครบเวลา ผลจะส่งให้ลูกหลานเอง</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="big" id="hr">—<small> ครั้ง/นาที</small></div>
+    <canvas id="wave" width="900" height="260" aria-label="คลื่นชีพจร"></canvas>
+    <div class="meter" aria-hidden="true"><i id="bar"></i></div>
+    <div class="status" id="st">พร้อมวัด</div>
+    <button class="btn" id="go" style="margin-top:14px">เริ่มวัด</button>
+  </div>
+
+  <div class="card" id="resCard" hidden>
+    <h2>ผลการวัด</h2>
+    <p id="resTxt" style="margin:0 0 10px"></p>
+    <div class="status" id="sendSt"></div>
+    <button class="btn alt" id="again" style="margin-top:12px">วัดอีกครั้ง</button>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>ตั้งค่าการเชื่อมต่อ (สำหรับผู้ดูแล)</summary>
+      <label for="name">ชื่อผู้สูงอายุ</label><input id="name" placeholder="เช่น พ่อประวิทย์">
+      <label for="topic">รหัสห้องแจ้งเตือน (ใช้รหัสเดียวกับ HON Safety)</label><input id="topic" autocomplete="off" spellcheck="false">
+      <button class="btn alt" id="save" style="margin-top:12px">บันทึก</button>
+      <p class="mini">ใส่รหัสห้องนี้ในแอป HON Care ของลูกหลาน ผลวัดจะขึ้นในแอปทันที: <code id="topicShow"></code></p>
+    </details>
+  </div>
+
+  <p class="note">ไม่ใช่อุปกรณ์การแพทย์ ค่าที่ได้เป็นการประมาณจากกล้องมือถือ ใช้ดูแนวโน้มและคุยกับหมอ หน้านี้วัดชีพจรจริง ส่วนค่า AGI ในต้นแบบ HON Care ยังเป็นข้อมูลจำลอง</p>
+</main>
+<script>
+{
+const $=s=>document.querySelector(s);
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const rnd=()=>{const a=new Uint8Array(10);crypto.getRandomValues(a);return "hon-care-"+[...a].map(x=>x.toString(36).padStart(2,"0")).join("").slice(0,16)};
+let cfg={name:ls.get("hs-name")||"ผู้สูงอายุ",topic:ls.get("hs-topic")||rnd()};ls.set("hs-topic",cfg.topic);
+function showCfg(){$("#who").textContent="ผู้ใช้: "+cfg.name;$("#name").value=cfg.name==="ผู้สูงอายุ"?"":cfg.name;$("#topic").value=cfg.topic;$("#topicShow").textContent=cfg.topic}
+showCfg();
+$("#save").onclick=()=>{cfg.name=$("#name").value.trim()||"ผู้สูงอายุ";const tp=$("#topic").value.trim().replace(/[^A-Za-z0-9_-]/g,"");cfg.topic=tp.length>=12?tp:rnd();ls.set("hs-name",cfg.name);ls.set("hs-topic",cfg.topic);showCfg();$("#save").textContent="บันทึกแล้ว";setTimeout(()=>$("#save").textContent="บันทึก",1500)};
+
+const DUR=30,FS=30;
+const vid=document.createElement("video");vid.setAttribute("playsinline","");vid.muted=true;document.body.appendChild(vid);
+const work=document.createElement("canvas");work.width=48;work.height=48;const wctx=work.getContext("2d",{willReadFrequently:true});
+const cv=$("#wave"),cx=cv.getContext("2d");
+let stream=null,timer=null,T=[],V=[],t0=0,noFinger=0;
+
+function setSt(el,txt,cls){el.textContent=txt;el.className="status"+(cls?" "+cls:"")}
+function movAvg(a,w){const o=new Array(a.length);let s=0,q=[];for(let i=0;i<a.length;i++){q.push(a[i]);s+=a[i];if(q.length>w)s-=q.shift();o[i]=s/q.length}return o}
+function centred(a,w){const h=Math.floor(w/2),o=new Array(a.length);for(let i=0;i<a.length;i++){let s=0,n=0;for(let j=Math.max(0,i-h);j<=Math.min(a.length-1,i+h);j++){s+=a[j];n++}o[i]=s/n}return o}
+function pulse(v){const base=centred(v,FS*2),d=v.map((x,i)=>base[i]-x);return movAvg(d,4)}
+function beats(t,s){if(s.length<FS*4)return null;const m=s.reduce((a,b)=>a+b,0)/s.length,sd=Math.sqrt(s.reduce((a,b)=>a+(b-m)*(b-m),0)/s.length);if(!sd)return null;
+ const pk=[];for(let i=2;i<s.length-2;i++){if(s[i]>m+0.3*sd&&s[i]>=s[i-1]&&s[i]>=s[i-2]&&s[i]>s[i+1]&&s[i]>s[i+2]){if(pk.length&&t[i]-t[pk[pk.length-1]]<0.4){if(s[i]>s[pk[pk.length-1]])pk[pk.length-1]=i}else pk.push(i)}}
+ const ibi=[];for(let i=1;i<pk.length;i++)ibi.push(t[pk[i]]-t[pk[i-1]]);if(ibi.length<4)return null;
+ const so=[...ibi].sort((a,b)=>a-b),med=so[Math.floor(so.length/2)],good=ibi.filter(x=>Math.abs(x-med)/med<0.25),mean=good.reduce((a,b)=>a+b,0)/good.length;
+ const cv2=Math.sqrt(good.reduce((a,b)=>a+(b-mean)*(b-mean),0)/good.length)/mean;
+ return {hr:Math.round(60/med),n:pk.length,cv:cv2,frac:good.length/ibi.length}}
+function quality(b){if(!b)return {k:"bad",t:"ไม่ชัด"};if(b.frac>0.8&&b.cv<0.12)return {k:"good",t:"ดี"};if(b.frac>0.6&&b.cv<0.2)return {k:"fair",t:"พอใช้"};return {k:"bad",t:"ไม่ชัด"}}
+function draw(s){const w=cv.width,h=cv.height;cx.clearRect(0,0,w,h);const n=Math.min(s.length,FS*6),a=s.slice(s.length-n);if(a.length<3)return;
+ const lo=Math.min(...a),hi=Math.max(...a),rg=(hi-lo)||1;cx.beginPath();a.forEach((y,i)=>{const X=i/(FS*6-1)*w,Y=h-12-(y-lo)/rg*(h-24);i?cx.lineTo(X,Y):cx.moveTo(X,Y)});cx.strokeStyle="#e8664a";cx.lineWidth=5;cx.lineJoin="round";cx.stroke()}
+
+function sample(){if(!stream||vid.readyState<2)return;wctx.drawImage(vid,0,0,48,48);const d=wctx.getImageData(12,12,24,24).data;let r=0,g=0;const n=d.length/4;for(let i=0;i<d.length;i+=4){r+=d[i];g+=d[i+1]}r/=n;g/=n;
+ const t=performance.now()/1000,el=t-t0,finger=r>60&&r>g*1.5;
+ if(!finger){noFinger++;if(noFinger>FS*2){T=[];V=[];t0=t;setSt($("#st"),"ไม่พบนิ้ว วางปลายนิ้วปิดกล้องให้มิด","warn")}$("#bar").style.width="0%";return}
+ noFinger=0;T.push(t);V.push(r);const s=pulse(V);draw(s);$("#bar").style.width=Math.min(100,el/DUR*100)+"%";
+ if(T.length%15===0){const tail=T.length-FS*10>0?T.length-FS*10:0,b=beats(T.slice(tail),s.slice(tail));if(b&&b.hr>35&&b.hr<200)$("#hr").innerHTML=b.hr+"<small> ครั้ง/นาที</small>";setSt($("#st"),`กำลังวัด... เหลือ ${Math.max(0,Math.ceil(DUR-el))} วินาที`)}
+ if(el>=DUR)finish()}
+
+async function start(){$("#resCard").hidden=true;T=[];V=[];noFinger=0;$("#hr").innerHTML="—<small> ครั้ง/นาที</small>";
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment",width:{ideal:320},height:{ideal:240}},audio:false})}catch(e){setSt($("#st"),"เปิดกล้องไม่ได้: อนุญาตกล้อง และเปิดหน้านี้ผ่าน https","bad");return}
+ vid.srcObject=stream;await vid.play().catch(()=>{});const tr=stream.getVideoTracks()[0];
+ try{if(tr.getCapabilities&&tr.getCapabilities().torch)await tr.applyConstraints({advanced:[{torch:true}]})}catch(e){}
+ t0=performance.now()/1000;$("#go").textContent="หยุด";setSt($("#st"),"วางปลายนิ้วปิดกล้อง");timer=setInterval(sample,1000/FS)}
+function stop(){clearInterval(timer);timer=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("#go").textContent="เริ่มวัด"}
+
+async function finish(){const s=pulse(V),b=beats(T,s),q=quality(b);stop();$("#bar").style.width="100%";$("#resCard").hidden=false;
+ if(!b||q.k==="bad"||b.hr<35||b.hr>200){$("#hr").innerHTML="—<small> ครั้ง/นาที</small>";setSt($("#st"),"สัญญาณไม่ชัด ลองวัดใหม่","warn");$("#resTxt").textContent="ยังไม่ได้ส่งผล เพราะสัญญาณไม่ชัดพอ ลองนั่งนิ่งๆ และวางนิ้วให้มิดกล้อง";setSt($("#sendSt"),"ไม่ได้ส่ง","warn");return}
+ $("#hr").innerHTML=b.hr+"<small> ครั้ง/นาที</small>";setSt($("#st"),"วัดเสร็จแล้ว","ok");
+ const now=new Date(),hhmm=now.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
+ $("#resTxt").textContent=`ชีพจร ${b.hr} ครั้ง/นาที · สัญญาณ${q.t} · นับได้ ${b.n} จังหวะใน ${DUR} วินาที`;
+ const rec={hr:b.hr,q:q.k,n:b.n,name:cfg.name,at:now.getTime()};ls.set("hon-last-reading",JSON.stringify(rec));
+ setSt($("#sendSt"),"กำลังส่งให้ลูกหลาน...");
+ const body={topic:cfg.topic,title:`HON: ${cfg.name} วัดชีพจรแล้ว`,message:`ชีพจร ${b.hr} ครั้ง/นาที · สัญญาณ${q.t} · เวลา ${hhmm}`,priority:3,tags:["heart","hon_reading","hr_"+b.hr,"q_"+q.k]};
+ let ok=false;try{const r=await fetch("https://ntfy.sh/",{method:"POST",body:JSON.stringify(body)});ok=r.ok}catch(e){}
+ setSt($("#sendSt"),ok?"ส่งให้ลูกหลานแล้ว ผลขึ้นในแอป HON Care":"ส่งไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วกดวัดอีกครั้ง",ok?"ok":"bad")}
+
+$("#go").onclick=()=>{timer?stop():start()};
+$("#again").onclick=()=>start();
+}
+</script>
+</body>
+</html>
