@@ -7,12 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f1ea;--paper:#fffdf9;--ink:#1d2a2e;--mute:#5d6b6f;--line:#e6ddd1;--teal:#0f4c5c;--teal2:#e3eef0;--coral:#e8664a;--crimson:#e11d48}
+:root{--bg:#f6f1ea;--paper:#fffdf9;--ink:#1d2a2e;--mute:#5d6b6f;--line:#e6ddd1;--teal:#0f4c5c;--teal2:#e3eef0;--coral:#e8664a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "IBM Plex Sans Thai",system-ui,sans-serif}
 main{max-width:880px;margin:0 auto;padding:32px 18px 60px}
 h1{font-size:44px;line-height:1.1;margin:0 0 6px;color:var(--teal)}
-h1 b{color:var(--crimson)}
+h1 b{color:var(--coral)}
 h2{font-size:21px;margin:0 0 4px}
 .lead{color:var(--mute);margin:0 0 22px;max-width:640px}
 .lang{float:right;border:1px solid var(--line);background:var(--paper);border-radius:12px;min-height:40px;padding:0 14px;font:inherit;font-weight:600;cursor:pointer}
@@ -48,10 +48,10 @@ function render(){document.documentElement.lang=lang;$("#lang").textContent=lang
  $("#lead").textContent=tx("พ่อแม่วัดสุขภาพด้วยมือถือ 30 วินาที ลูกหลานเห็นผลทันทีพร้อม AI ที่บอกว่าต้องทำอะไรต่อ และได้รับแจ้งเมื่อมีเหตุฉุกเฉิน","Parents measure with their phone in 30 seconds; the family sees it at once, with AI that says what to do next and alerts when something is wrong");
  $("#flow").innerHTML=[[tx("1 วัด","1 Measure"),tx("กล้องมือถือผู้สูงอายุ","Elder's phone camera")],[tx("2 ส่ง","2 Send"),tx("ค่าจริงถึงแอปลูกหลาน","Live reading to the family app")],[tx("3 AI สรุป","3 AI brief"),tx("ทำอะไรวันนี้","What to do today")],[tx("4 แจ้งเหตุ","4 Alert"),tx("SOS / ล้ม / ชีพจรผิดปกติ","SOS / fall / abnormal HR")],[tx("5 ส่งหมอ","5 Doctor"),tx("สรุป 30 วินาที","30-second summary")]].map(f=>`<li><b>${f[0]}</b>${f[1]}</li>`).join("");
  $("#grid").innerHTML=`<div class="card"><span class="tag">${tx("ผู้สูงอายุ","OLDER PERSON")}</span><h2>${tx("ฝั่งพ่อแม่","For parents")}</h2><p>${tx("ตัวหนังสือใหญ่ ปุ่มน้อย ไม่ต้องคุยกับ AI แค่วัดและกด SOS เมื่อต้องการ","Large text, few buttons, no chatting with AI — just measure, and SOS when needed")}</p>
-<a class="btn" href="hon-measure.html">${tx("HON วัดชีพจร","HON Measure")}</a><a class="btn alt" href="hon-safety.html">${tx("HON Safety · SOS และตรวจล้ม","HON Safety · SOS and fall detection")}</a></div>
+<a class="btn" href="app.html?role=eld">${tx("เปิดฝั่งพ่อแม่","Open the parent side")}</a></div>
 <div class="card"><span class="tag">${tx("ลูกหลาน","FAMILY")}</span><h2>${tx("ฝั่งลูกหลานผู้ดูแล","For the family caregiver")}</h2><p>${tx("เห็นค่าที่พ่อแม่วัดจริง AI สรุปเช้า บันทึกอาการ ถาม-ตอบ สรุปส่งหมอ และเตือนภัยพร้อมพิกัด","See your parents' real readings, AI morning brief, care log, Q&A, doctor summary and alerts with location")}</p>
-<a class="btn" href="hon-care.html">HON Care</a></div>`;
- $("#more").innerHTML=`<span class="tag" style="margin-right:10px">${tx("แนวคิด HON เดิม","ORIGINAL HON")}</span><a href="hon-hifi-pro.html">${tx("แอป HON (นาฬิกา + ประกัน)","HON app (watch + insurance)")}</a><a href="hon-design-system.html">Design system</a>`;
+<a class="btn" href="app.html?role=fam">${tx("เปิดฝั่งลูกหลาน","Open the family side")}</a></div>`;
+ $("#more").innerHTML=`<span class="tag" style="margin-right:10px">${tx("หน้าแยกรุ่นก่อน","EARLIER PAGES")}</span><a href="hon-care.html">HON Care</a><a href="hon-safety.html">HON Safety</a><a href="hon-measure.html">${tx("HON วัดชีพจร","HON Measure")}</a><a href="hon-hifi-pro.html">${tx("แอป HON เดิม (นาฬิกา + ประกัน)","Original HON app (watch + insurance)")}</a>`;
  $("#note").textContent=tx("ต้นแบบสำหรับเดโม ข้อมูลผู้ป่วยเป็นข้อมูลจำลอง ไม่ใช่อุปกรณ์การแพทย์","Demo prototype with sample patient data. Not a medical device.")}
 $("#lang").onclick=()=>{lang=lang==="th"?"en":"th";try{localStorage.setItem("hc-lang",lang)}catch(e){}render()};
 render();
