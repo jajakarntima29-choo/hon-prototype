@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HON Family · Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--g:#2a4b38;--gd:#102813;--gold:#cca65c;--goldT:#a8823a;--cream:#fefafb;--bg:#f4efe5;--line:#eadcc6;--ink:#1d2a22;--mute:#5d6a60}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{font:16px/1.5 "IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+body{font:16px/1.5 "IBM Plex Sans Thai Looped","IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 header{display:flex;align-items:center;gap:20px;padding:14px 28px;background:var(--cream);border-bottom:1px solid var(--line)}
 .logo{font-weight:700;font-size:26px;color:var(--g);letter-spacing:.01em}.logo b{color:var(--gold)}
 .story{font-size:15px;color:var(--mute)}.story b{color:var(--ink)}
@@ -30,7 +30,7 @@ header{display:flex;align-items:center;gap:20px;padding:14px 28px;background:var
 .stage{flex:1;display:flex;justify-content:center;align-items:flex-start;gap:48px;padding:14px 28px 18px;min-height:0}
 .ph{display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .2s}
 .ph h2{margin:0;font-size:16px;color:var(--g)}.ph h2 span{color:var(--mute);font-weight:400}
-.ph.dim{opacity:.45}
+.ph.dim h2{color:var(--mute)}
 .frame{width:calc(390px * var(--k));height:calc(820px * var(--k));border-radius:calc(40px * var(--k));background:var(--gd);padding:calc(10px * var(--k));box-shadow:0 18px 40px -18px rgba(16,40,19,.55);transition:box-shadow .2s}
 .ph.on .frame{box-shadow:0 0 0 4px var(--gold),0 18px 40px -18px rgba(16,40,19,.55)}
 .screen{width:370px;height:800px;border-radius:30px;overflow:hidden;transform:scale(var(--k));transform-origin:0 0;background:#fff}
@@ -65,15 +65,16 @@ const S=[
 ];
 let mode=new URLSearchParams(location.search).get("mode")==="sum"?"sum":"agent",cur=0;
 const $=s=>document.querySelector(s),fE=$("#fE"),fF=$("#fF");
-const fit=()=>{const h=innerHeight-$("header").offsetHeight-$("#flow").offsetHeight-$("#say").offsetHeight-90,w=(innerWidth-160)/2;document.documentElement.style.setProperty("--k",Math.max(.45,Math.min(1,h/840,w/410)).toFixed(3))};
+const fit=()=>{const h=innerHeight-$("header").offsetHeight-$("#flow").offsetHeight-$("#say").offsetHeight-56,w=(innerWidth-160)/2;document.documentElement.style.setProperty("--k",Math.max(.45,Math.min(1.25,h/840,w/410)).toFixed(3))};
 const doc=f=>{try{return f.contentDocument}catch(e){return null}};
 const pickDad=()=>{const d=doc(fF),b=d&&d.querySelector('#who [data-ei="1"]');if(b&&b.getAttribute("aria-pressed")!=="true")b.click()};
 function famTab(i,card){const d=doc(fF);if(!d)return;pickDad();const t=d.querySelector(`[data-tab="${i}"]`);if(t)t.click();if(card)setTimeout(()=>{const c=d.querySelector(".card.agent");if(c)c.scrollIntoView({behavior:"smooth",block:"start"})},150);else d.scrollingElement.scrollTo({top:0,behavior:"smooth"})}
 function famShow(sel){famTab(0,false);setTimeout(()=>{const d=doc(fF);if(!d)return;let el=d.querySelector(sel);if(el&&!el.offsetParent){const f=d.querySelector('[data-view="full"]');if(f)f.click();el=d.querySelector(sel)}if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),100)},200)}
 function eldShow(sel){const d=doc(fE);if(!d)return;const el=d.querySelector(sel);if(el)el.scrollIntoView({behavior:"smooth",block:"center"})}
+const tidy=f=>{const d=doc(f);if(d&&!d.getElementById("demoCss")){const st=d.createElement("style");st.id="demoCss";st.textContent="html,main,*{scrollbar-width:none}*::-webkit-scrollbar{display:none}";d.head.appendChild(st)}};
 const setLang=f=>{const d=doc(f),b=d&&d.querySelector("#lang");if(b&&(d.documentElement.lang||"th")!==lang)b.click()};
-function loadE(){fE.src="app.html?role=eld";fE.onload=()=>setTimeout(()=>setLang(fE),200)}
-function loadF(){fF.src="app.html?role=fam&view=simple&mode="+mode;fF.onload=()=>setTimeout(()=>{setLang(fF);pickDad();S[cur].go()},300)}
+function loadE(){fE.src="app.html?role=eld";fE.onload=()=>{tidy(fE);setTimeout(()=>setLang(fE),200)}}
+function loadF(){fF.src="app.html?role=fam&view=simple&mode="+mode;fF.onload=()=>setTimeout(()=>{tidy(fF);setLang(fF);pickDad();S[cur].go()},300)}
 function chrome(){document.documentElement.lang=lang;
  $("#story").innerHTML=tx("เดโม: <b>ผู้สูงอายุ (คุณประวิทย์ 74 ปี) ไม่ได้วัดมา 3 วัน</b>","Demo: <b>an older adult (Mr Prawit, 74) has not measured for 3 days</b>");
  $("#mode").setAttribute("aria-label",tx("โหมด AI","AI mode"));
