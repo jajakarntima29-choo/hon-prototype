@@ -101,6 +101,8 @@ td.c,th.c{text-align:center}
 .toast{position:absolute;left:12px;right:12px;bottom:84px;z-index:5;background:var(--r);color:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 12px 30px -8px rgba(0,0,0,.4);display:flex;gap:12px;align-items:center}
 .toast b{display:block}.toast button{background:#fff;color:var(--r);border:0;border-radius:12px;min-height:44px;padding:0 14px;font-weight:700;flex:none}
 .aibox{white-space:pre-wrap;background:var(--paper);border-radius:12px;padding:12px;margin:12px 0 8px;font-size:15px}.aibox:empty{display:none}
+.agent{border:2px solid var(--teal)}.agent .task{border-top:1px solid var(--line);padding:12px 0 4px}.agent .task:first-of-type{border-top:0}.draft{background:var(--teal2);border-radius:12px;padding:10px 12px;white-space:pre-wrap;font-size:14px;margin:8px 0}.obs{margin:6px 0 10px;padding-left:18px}.obs li{margin:2px 0}
+.nudge{background:var(--coral);color:#fff;border-radius:22px;padding:18px;margin-bottom:14px}.nudge b{font-size:22px;display:block;line-height:1.35}
 .ailab{display:inline-flex;gap:4px;align-items:center;font-size:12px;font-weight:700;color:var(--coral);letter-spacing:.02em}
 .wf{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:0 0 14px;list-style:none;padding:0}
 .wf li{background:var(--teal2);border-radius:12px;padding:8px 6px;text-align:center;font-size:12px;line-height:1.3;position:relative}
@@ -215,6 +217,7 @@ const hhmm=ms=>new Date(ms).toLocaleTimeString(lang==="th"?"th-TH":"en-GB",{hour
 function applyLive(){if(!live)return;const e=E[linkEi];e.hr=live.hr;e.last=[`วัดจริง ${hhmm(live.at)}`,`Live ${hhmm(live.at)}`]}
 applyLive();
 function onMsg(m){if(m.event!=="message"||seen.has(m.id))return;seen.add(m.id);const tags=m.tags||[],at=m.time*1000,fresh=Date.now()-at<300000&&at>+(lsg("hc-ev-at")||0),e=E[linkEi];
+ if(role==="eld"){if(tags.includes("hon_nudge")&&Date.now()-at<1800000&&at>+(lsg("hf-nudge-at")||0)&&(!nudge||at>nudge.at)){const n=(tags.find(t=>t.startsWith("n_"))||"").slice(2),i=+((tags.find(t=>t.startsWith("m_"))||"m_-1").slice(2)),md=me().meds[i];nudge={at,n,m:md?md[1]:""};try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(x){}render(true)}return}
  if(tags.includes("hon_reading")){const hr=+((tags.find(t=>t.startsWith("hr_"))||"").slice(3)),q=(tags.find(t=>t.startsWith("q_"))||"q_fair").slice(2);if(!hr)return;
   if(live&&live.at>=at)return;live={hr,q,at};lss("hc-live",JSON.stringify(live));applyLive();
   addLog(["ระบบ HON","HON system"],[`รับค่าชีพจรจริงของ${e.name[0]}: ${hr} ครั้ง/นาที`,`Got ${e.name[1]}'s live heart rate: ${hr} bpm`]);
@@ -292,10 +295,64 @@ async function mkBrief(){const box=$("#briefBox"),e=el();const fb=e.id==="s"?tx(
  if(sample){try{const logs=clog[ei].map(x=>x.t+" "+x.sum).join("; ")||"none";
   const r=await sample(SYS()+`\n\nWrite the caregiver's morning brief from today's readings and these care-log notes: ${logs}. Exactly 3 lines, plain text: "${tx("สถานะ:","Status:")} ...", "${tx("ทำวันนี้:","Today:")} 1) 2) 3)", "${tx("เฝ้าดู:","Watch for:")} ...". Max 60 words.`,{modelTier:"quick",onText:({text})=>{if(box)box.textContent=text}});brief[ei]=r.text}catch(x){brief[ei]=fb}}else brief[ei]=fb;
  render(true)}
+let aiLive=false,agentAi={},agentBusy=false,agentSt={};try{agentSt=JSON.parse(lsg("hf-agent")||"{}")}catch(e){}
+function agentObs(){const e=el(),L=lang==="th"?0:1,mine=ei===linkEi,o=[],now=new Date();
+ if(ev&&!ev.ack&&ev.e===ei)return {red:true,o:[[tx("มีเหตุฉุกเฉินที่ยังไม่มีใครรับทราบ","An emergency alert has not been acknowledged yet")]]};
+ if(mine&&live&&(live.hr<45||live.hr>120))return {red:true,o:[[tx(`ชีพจรล่าสุด ${live.hr} ครั้ง/นาที ผิดปกติมาก`,`Latest heart rate ${live.hr} bpm is far out of range`)]]};
+ let med=-1;e.meds.forEach((m,i)=>{const [h,mi]=m[0].split(":").map(Number),due=new Date(now);due.setHours(h,mi+30,0,0);const k=dayKey(Date.now())+"|"+ei+"|"+i;if(due<=now&&!medOk[k])med=i});
+ if(med>=0)o.push(["med",tx(`ยังไม่ได้กด "กินแล้ว" ยา ${e.meds[med][1]} (เวลา ${e.meds[med][0]})`,`${e.meds[med][1]} (${e.meds[med][0]}) not marked as taken`),med]);
+ if(e.id==="p"&&!(mine&&live&&dayKey(live.at)===dayKey(Date.now())))o.push(["measure",tx(`${e.name[0]}ไม่ได้วัดมา 3 วัน`,`${e.name[1]} has not measured for 3 days`)]);
+ if(e.id==="p")o.push(["agi",tx(`ค่า AGI ${e.agi} แย่ลงต่อเนื่อง 2 สัปดาห์ (ควรเฝ้าระวัง)`,`AGI ${e.agi}, worse for 2 weeks (keep watch)`)]);
+ if(e.id==="s")o.push(["sugar",tx("น้ำตาลลดลง 4 วันติด เช้านี้ 68","Glucose down 4 days in a row, 68 this morning")]);
+ if(mine&&live&&dayKey(live.at)===dayKey(Date.now()))o.push(["live",tx(`วัดจริงวันนี้ ${hhmm(live.at)} ชีพจร ${live.hr} ครั้ง/นาที`,`Measured today ${hhmm(live.at)}: ${live.hr} bpm`)]);
+ return {red:false,o}}
+function agentTasks(ob){const e=el(),L=lang==="th"?0:1,t=[],has=k=>ob.o.find(x=>x[0]===k);
+ const m=has("med");if(m)t.push({id:"remind_med",i:m[2],t:tx(`ส่งเตือนกินยา ${e.meds[m[2]][1]} ไปที่มือถือ${e.name[0]}`,`Send a ${e.meds[m[2]][1]} reminder to ${e.name[1]}'s phone`),why:tx("ยามื้อนี้เลยเวลามาแล้วกว่า 30 นาที","This dose is more than 30 minutes late")});
+ if(has("measure"))t.push({id:"ask_measure",t:tx(`ชวน${e.name[0]}วัดชีพจรวันนี้ (ส่งไปที่มือถือ)`,`Ask ${e.name[1]} to measure today (sent to the phone)`),why:tx("ไม่มีค่าใหม่ 3 วัน ทำให้ดูแนวโน้มไม่ได้","No new reading for 3 days, so the trend can't be checked")});
+ if(has("agi")||has("sugar"))t.push({id:"doctor_msg",t:tx("ร่างข้อความถึงคุณหมอ พร้อมรายงาน PDF","Draft a message to the doctor with the PDF report"),why:has("sugar")?tx("น้ำตาลต่ำหลายวัน หมอควรรู้ก่อนนัดครั้งหน้า","Several low-sugar days; the doctor should know before the next visit"):tx("ค่าแย่ลงต่อเนื่อง ควรให้หมอดูแนวโน้ม","The trend keeps worsening; worth showing the doctor")});
+ t.push({id:"family_update",t:tx("ส่งสรุปวันนี้ให้คนอื่นในครอบครัว","Send today's update to the rest of the family"),why:tx("ทุกคนเห็นข้อมูลชุดเดียวกัน ไม่ต้องโทรถามซ้ำ","Everyone sees the same facts without calling around")});
+ return t}
+function agentDrafts(ob){const e=el(),lines=ob.o.map(x=>"- "+x[1]).join("\n");
+ return {family:tx(`อัปเดต${e.name[0]}วันนี้\n${lines}\nใครสะดวกช่วยโทรหาวันนี้ด้วยนะ`,`Update on ${e.name[1]} today\n${lines}\nIf you can, give them a call today.`),
+  doctor:tx(`เรียนคุณหมอ ขอแจ้งข้อมูลของ${e.name[0]} อายุ ${e.age} ปี จากแอป HON\n${lines}\nรบกวนแนะนำว่าควรนัดตรวจหรือดูแลอย่างไรต่อ แนบรายงาน HON มาด้วย`,`Dear doctor, an update on ${e.name[1]}, ${e.age}, from the HON app\n${lines}\nPlease advise whether we should book a visit or change how we care for them. The HON report is attached.`)}}
+const agKey=id=>ei+"|"+id+"|"+dayKey(Date.now());
+async function agentPlan(sig,ob,tasks){agentBusy=true;const e=el();
+ try{const v=await sample.json(SYS()+`\n\nYou are HON Agent, acting for the caregiver of ${e.name[1]}. You only coordinate; you never decide medical care. What the app observed today:\n${ob.o.map(x=>"- "+x[1]).join("\n")}\nTasks the app can do after the caregiver approves (fixed ids): ${tasks.map(t=>t.id).join(", ")}.\nReturn JSON only: {"headline": one short sentence in ${lang==="th"?"Thai":"English"} saying what matters most today, "order": the task ids above, most useful first, "why": {"<task id>": one short reason in ${lang==="th"?"Thai":"English"}}, "family": a short LINE-style update for the rest of the family in ${lang==="th"?"Thai":"English"}, 2-3 lines, facts only, "doctor": a short message to the doctor's clinic in ${lang==="th"?"Thai":"English"}, 3-4 lines, the readings and a request for advice, no diagnosis, no dose suggestions}`);
+  if(v&&typeof v==="object"){const ids=tasks.map(t=>t.id),ord=(Array.isArray(v.order)?v.order:[]).filter(x=>ids.includes(x));ids.forEach(x=>{if(!ord.includes(x))ord.push(x)});
+   agentAi[sig]={headline:String(v.headline||""),order:ord,why:v.why&&typeof v.why==="object"?v.why:{},family:String(v.family||""),doctor:String(v.doctor||"")}}else agentAi[sig]={fail:true}}catch(e){agentAi[sig]={fail:true}}
+ agentBusy=false;render(true)}
+function agentCard(){const e=el(),ob=agentObs();
+ if(ob.red)return `<div class="card alert r fade agent"><span class="ailab">HON AGENT</span><h3 style="margin:6px 0">${tx("เหตุฉุกเฉิน: Agent หยุดงานอื่นทั้งหมด","Emergency: the agent has stopped everything else")}</h3><p style="margin:0 0 10px">${esc(ob.o[0][0])}</p><div class="btns"><a class="btn red" href="tel:1669">${tx("โทร 1669","Call 1669")}</a><button class="btn" data-tab="1">${tx("ดูพิกัดและรับทราบ","See location and respond")}</button></div></div>`;
+ const tasks=agentTasks(ob),sig=ei+"|"+lang+"|"+ob.o.map(x=>x[0]+(x[2]??"")).join(","),ai=agentAi[sig];
+ if(sample&&!ai&&!agentBusy)setTimeout(()=>agentPlan(sig,ob,tasks),0);
+ const good=ai&&!ai.fail,dr=agentDrafts(ob),draft={family:good&&ai.family?ai.family:dr.family,doctor:good&&ai.doctor?ai.doctor:dr.doctor};
+ const ord=good?ai.order.map(id=>tasks.find(t=>t.id===id)).filter(Boolean):tasks;
+ const head=good&&ai.headline?ai.headline:(ob.o[0]?ob.o[0][1]:tx("วันนี้ไม่มีเรื่องเร่งด่วน","Nothing urgent today"));
+ const src=sample?(aiLive?"Claude Haiku 5.5":"Claude"):tx("กฎ + ข้อความที่เตรียมไว้","rules + prepared text");
+ return `<div class="card agent fade"><div class="row" style="justify-content:space-between"><span class="ailab">HON AGENT</span><span class="mini">${sample&&!ai?tx("AI กำลังวางแผน...","AI is planning..."):esc(src)}</span></div>
+<h3 style="margin:6px 0 2px">${esc(head)}</h3><p class="mini" style="margin:6px 0 0">${tx("Agent เห็นจากข้อมูลวันนี้","What the agent noticed today")}</p><ul class="obs mini">${ob.o.map(x=>`<li>${esc(x[1])}</li>`).join("")}</ul>
+${ord.map(t=>{const st=agentSt[agKey(t.id)],why=good&&ai.why[t.id]?String(ai.why[t.id]):t.why,dt=t.id==="family_update"?draft.family:t.id==="doctor_msg"?draft.doctor:"";
+ return `<div class="task"><b>${esc(t.t)}</b><p class="mini" style="margin:2px 0 0">${esc(why)}</p>${dt&&!st?`<div class="draft">${esc(dt)}</div>`:""}${st?`<p class="mini" style="color:var(--g);font-weight:600;margin:6px 0 0">${st.skip?tx("ข้ามแล้ว","Skipped"):tx(`ทำแล้ว ${st.t}`,`Done ${st.t}`)+(st.note?" · "+esc(st.note):"")}</p>`:`<div class="btns" style="margin-top:8px"><button class="btn" data-agok="${t.id}">${tx("อนุมัติ","Approve")}</button><button class="btn alt" data-agno="${t.id}">${tx("ข้าม","Skip")}</button></div>`}</div>`}).join("")}
+<p class="mini" style="margin:10px 0 0">${tx("Agent ทำเฉพาะงานประสานงาน ไม่วินิจฉัย ไม่ปรับยา ทุกอย่างรอคุณกดอนุมัติ","The agent only coordinates: no diagnosis, no medicine changes, nothing happens until you approve")}</p></div>`}
+async function agentDo(id,b){const e=el(),ob=agentObs(),tasks=agentTasks(ob),t=tasks.find(x=>x.id===id);if(!t)return;b.disabled=true;
+ const sig=ei+"|"+lang+"|"+ob.o.map(x=>x[0]+(x[2]??"")).join(","),ai=agentAi[sig],dr=agentDrafts(ob),good=ai&&!ai.fail;
+ const linked=ei===linkEi&&!!topic;let note="";
+ if(id==="remind_med"||id==="ask_measure"){
+  if(linked){const ok=await post(id==="remind_med"?{title:"HON: ผู้ดูแลเตือนกินยา",message:`ถึงเวลากินยา ${e.meds[t.i][1]}`,priority:4,tags:["bell","hon_nudge","n_med","m_"+t.i]}:{title:"HON: ผู้ดูแลชวนวัดชีพจร",message:"วัดชีพจร 30 วินาทีวันนี้นะ",priority:3,tags:["bell","hon_nudge","n_measure"]});note=ok?tx("ส่งถึงมือถือแล้ว","sent to the phone"):tx("ส่งไม่สำเร็จ","could not send")}
+  else note=tx("เดโม: ยังไม่ได้เชื่อมมือถือคนนี้","demo: this person's phone is not linked")}
+ if(id==="family_update"){const txt=good&&ai.family?ai.family:dr.family;try{await navigator.clipboard.writeText(txt)}catch(x){}
+  if(linked){await post({title:`HON: อัปเดต${e.name[0]}`,message:txt.slice(0,900),priority:2,tags:["family","hon_family"]});note=tx("ส่งเข้าห้อง ntfy ของครอบครัว และคัดลอกไว้วางใน LINE","sent to the family ntfy room and copied for LINE")}else note=tx("คัดลอกแล้ว วางใน LINE ได้เลย","copied, paste it into LINE")}
+ if(id==="doctor_msg"){const txt=good&&ai.doctor?ai.doctor:dr.doctor;try{await navigator.clipboard.writeText(txt)}catch(x){}printReport();note=tx("คัดลอกข้อความ และเปิดรายงาน PDF แล้ว","message copied, PDF report opened")}
+ agentSt[agKey(id)]={t:new Date().toTimeString().slice(0,5),note};lss("hf-agent",JSON.stringify(agentSt));
+ addLog(["HON Agent (คุณอนุมัติ)","HON Agent (you approved)"],[t.t+(note?" · "+note:""),t.t+(note?" · "+note:"")]);render(true)}
+let nudge=null;
+function nudgeCard(){if(!nudge)return "";const t=nudge.n==="med"?tx(`ผู้ดูแลเตือน: ถึงเวลากินยา ${nudge.m}`,`Your caregiver: time to take ${nudge.m}`):tx("ผู้ดูแลชวนวัดชีพจรวันนี้","Your caregiver asks you to check your pulse today");
+ return `<div class="nudge fade" role="status"><b>${esc(t)}</b><span>${tx("ส่งมาเมื่อ","Sent at")} ${hhmm(nudge.at)}</span><div class="btns" style="margin-top:12px"><button class="btn xl" id="nuGo" style="background:#fff;color:var(--ink)">${nudge.n==="med"?tx("ไปที่ยาวันนี้","Open medicines"):tx("ไปวัดชีพจร","Measure now")}</button><button class="btn alt" id="nuOk">${tx("รับทราบ","OK")}</button></div></div>`}
+function nudgeDone(){if(nudge)lss("hf-nudge-at",String(nudge.at));nudge=null}
 function home(){const e=el(),lv=agiLv(e.agi),diff=0;
  const top=e.id==="s"?`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${tx("น้ำตาลเช้านี้ 68 mg/dL ต่ำกว่าปกติ","Morning glucose 68 mg/dL is low")}</h3><p style="margin:0 0 12px">${tx("ต่ำกว่า 70 คือน้ำตาลต่ำ และลดลงติดกัน 4 วัน ถ้าแม่รู้ตัวและกลืนได้ ทำตามคู่มือตอนนี้ แล้วแจ้งหมอเรื่องยาเบาหวาน","Below 70 is low, and it has fallen 4 days running. If she's awake and can swallow, follow the guide now, then tell her doctor about her diabetes medicine.")}</p><button class="btn full" data-guide="hypo">${tx("เปิดคู่มือน้ำตาลต่ำ","Open low-sugar guide")}</button>${briefBox()}</div>`
  :`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${live&&linkEi===1?tx(`พ่อวัดแล้ว ${hhmm(live.at)} ชีพจร ${live.hr} ครั้ง/นาที แต่ค่า AGI ยังแย่ลง 2 สัปดาห์`,`Dad measured at ${hhmm(live.at)}, HR ${live.hr} bpm, but his AGI has worsened for 2 weeks`):tx("พ่อไม่ได้วัดมา 3 วัน และค่า AGI แย่ลง 2 สัปดาห์","Dad hasn't measured for 3 days and his AGI has worsened for 2 weeks")}</h3><p style="margin:0 0 12px">${tx("ชวนพ่อเปิดเว็บ HON วัดด้วยมือถือเช้านี้ เช็กว่ากินยาความดันครบ แล้วส่งรายงานให้หมอ","Get Dad to measure with HON on his phone this morning, check his BP medicine, then send the report to his doctor.")}</p><div class="btns"><button class="btn" id="nudge">${tx("ส่งเตือนไปมือถือพ่อ","Nudge Dad's phone")}</button><button class="btn alt" data-guide="vasc">${tx("ดูวิธีช่วย","What to do")}</button></div>${briefBox()}</div>`;
- return `${workflow()}${linkCard()}${top}${careLog()}
+ return `${workflow()}${agentCard()}${linkCard()}${top}${careLog()}
 <div class="card"><div class="row" style="justify-content:space-between"><h3>${tx("ดัชนีหลอดเลือด AGI","Arterial index AGI")}</h3><span class="tag ${lv}"><span class="dot"></span>${{g:tx("เสี่ยงต่ำ","Low risk"),y:tx("ควรเฝ้าระวัง","Keep watch")}[lv]}</span></div>
 <div class="va">${ring(e)}<div><p style="margin:0;font-weight:600">${e.agi<-0.6?tx("อยู่ในเกณฑ์เสี่ยงต่ำ และดีขึ้นต่อเนื่อง 6 เดือน","In the low-risk zone and improving for 6 months"):tx("สูงกว่าเกณฑ์เสี่ยงต่ำ และแย่ลงต่อเนื่อง 2 สัปดาห์","Above the low-risk zone and worsening for 2 weeks")}</p>
 <p class="mini" style="margin:2px 0 0">${tx("เกณฑ์ HON: ต่ำกว่า −0.6 = เสี่ยงต่ำ ยิ่งติดลบยิ่งดี","HON scale: below −0.6 = low risk; more negative is better")}<br>${tx("จากคลื่นชีพจร (PPG) ที่ HON วัดด้วยกล้องมือถือ","From the pulse wave (PPG) HON reads with the phone camera")}</p></div></div>
@@ -480,7 +537,7 @@ function render(keep){document.documentElement.lang=lang;$("#lang").textContent=
  const nAlert=ev&&!ev.ack?1:0;
  const T=R?ETABS():TABS();$("#tabs").style.gridTemplateColumns=`repeat(${T.length},1fr)`;
  $("#tabs").innerHTML=T.map((n,i)=>`<button role="tab" aria-selected="${R?i===etab:!showSec&&i===tab}" ${R?`data-etab="${i}"`:`data-tab="${i}"`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">${ic[n[0]]}</svg>${n[1]}${!R&&i===1&&nAlert?`<span class="badge">1</span>`:""}</button>`).join("");
- const v=$("#view"),sy=v.scrollTop;v.innerHTML=R?[eMeasure,eSafety,eMeds][etab]():(showSec?security():[home,alerts,ask,tri,guides][tab]())+`<p class="mini" style="text-align:center;margin:18px 0 4px">${tx("ต้นแบบ ไม่ใช่อุปกรณ์การแพทย์ · ข้อมูลจำลอง","Prototype, not a medical device · sample data")}</p>`;kin.forEach(([id,val,c])=>{const x=document.getElementById(id);if(x){x.value=val;x.focus();try{x.setSelectionRange(c,c)}catch(e){}}});ro.disconnect();const f=$("#fig");if(f)ro.observe(f);v.scrollTop=keep?sy:0;renderToast()}
+ const v=$("#view"),sy=v.scrollTop;v.innerHTML=R?nudgeCard()+[eMeasure,eSafety,eMeds][etab]():(showSec?security():[home,alerts,ask,tri,guides][tab]())+`<p class="mini" style="text-align:center;margin:18px 0 4px">${tx("ต้นแบบ ไม่ใช่อุปกรณ์การแพทย์ · ข้อมูลจำลอง","Prototype, not a medical device · sample data")}</p>`;kin.forEach(([id,val,c])=>{const x=document.getElementById(id);if(x){x.value=val;x.focus();try{x.setSelectionRange(c,c)}catch(e){}}});ro.disconnect();const f=$("#fig");if(f)ro.observe(f);v.scrollTop=keep?sy:0;renderToast()}
 function renderToast(){const t=$("#toast");if(role==="eld"||!ev||ev.ack||(tab===1&&!showSec&&ev.e===ei)){t.innerHTML="";return}const e=E[ev.e];
  t.innerHTML=`<div class="toast fade"><div style="flex:1"><b>${SIM[ev.k].t[lang==="th"?0:1]} · ${e.name[lang==="th"?0:1]}</b><span style="font-size:14px">${tx("แตะเพื่อดูพิกัดและรับทราบ","Tap to see location and respond")}</span></div><button id="goEv">${tx("เปิด","Open")}</button></div>`}
 function startSim(k){ev={k,e:k==="zone"?0:ei,at:Date.now(),ack:false};if(k==="zone")ei=0;
@@ -499,6 +556,7 @@ const SYS=()=>`You are HON Care, a warm assistant for a Thai family caregiver (n
 Rules: Answer in ${lang==="th"?"Thai":"English"}. Short: one-sentence answer, then up to 4 numbered steps. Use the elder's data. AGI is a phone-camera estimate, not a diagnosis. Never state or estimate a vascular age in years; talk only about the AGI value, its zone and trend. Never diagnose or change doses; say ask the doctor/pharmacist. Emergency signs (stroke signs, chest pain, breathing trouble, can't wake, glucose <54) → call 1669 first. Plain text.`;
 async function aiAsk(q){const c=chat[ei];c.push({r:"user",c:q},{r:"assistant",c:tx("กำลังคิด...","Thinking...")});render();const i=c.length-1;
  const upd=()=>{const b=document.querySelectorAll("#chat .msg");if(b[i])b[i].textContent=c[i].c;b[i]?.scrollIntoView({block:"nearest"})};
+ {const rid=ruleIds(q);if(rid.length&&ruleLv(rid)==="r"){c[i].c=fallback(q)+"\n\n— "+tx("ตอบด้วยกฎความปลอดภัย ไม่ผ่าน AI","Answered by the safety rule, not by AI");upd();return}}
  if(sample){try{const msgs=c.slice(0,-1).map(m=>({role:m.r,content:m.c}));msgs[0]={role:"user",content:SYS()+"\n\nQuestion: "+msgs[0].content};
   const r=await sample(msgs,{cache:false,modelTier:"quick",onText:({text})=>{c[i].c=text;upd()}});c[i].c=r.text;upd();return}catch(e){}}
  c[i].c=fallback(q)+"\n\n— "+tx("คำตอบตัวอย่างที่เตรียมไว้สำหรับเดโม","Prepared demo answer");upd()}
@@ -521,6 +579,10 @@ Arterial index AGI (HON): ${e.agi} · PWV ${e.pwv} m/s · 6-month trend ${e.agiT
 Morning BP, 7 days: mean systolic ${avg(e.sys)} (max ${Math.max(...e.sys)})${e.glu?`\nFasting glucose, 7 days: ${e.glu.join(", ")} — falling, 68 today`:""}
 Caregiver observed: ${sy}${clog[ei].length?"\nCaregiver log:\n"+clog[ei].map(x=>"- "+x.t+" "+x.sum).join("\n"):""}`)}
 document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data-st]");if(!b)return;const d=b.dataset;
+ if(d.agok){agentDo(d.agok,b);return}
+ if(d.agno){agentSt[agKey(d.agno)]={skip:true};lss("hf-agent",JSON.stringify(agentSt));render(true);return}
+ if(b.id==="nuGo"){etab=nudge&&nudge.n==="med"?2:0;nudgeDone();render();return}
+ if(b.id==="nuOk"){nudgeDone();render(true);return}
  if(b.id==="lang"){lang=lang==="th"?"en":"th";try{localStorage.setItem("hc-lang",lang)}catch(x){}render(true);return}
  if(b.id==="sec"){showSec=true;addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],["เปิดหน้าความปลอดภัย","Opened security settings"]);render();return}
  if(b.id==="secBack"){showSec=false;render();return}
@@ -539,7 +601,7 @@ document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data
  if(b.id==="endEv"){ev=null;clearInterval(simI);addLog(["ระบบ HON","HON system"],["ปิดเหตุการณ์ — พิกัดจะปิดใน 60 นาที","Event closed — location locks in 60 min"]);render(true);return}
  if(d.rule){rules[d.rule]=!rules[d.rule];b.setAttribute("aria-checked",!!rules[d.rule]);return}
  if(d.loc){locMode=d.loc;addLog([el().name[0]+" (เจ้าของข้อมูล)",el().name[1]+" (data owner)"],[`ตั้งการแชร์ตำแหน่ง: ${d.loc==="emer"?"เฉพาะฉุกเฉิน":d.loc==="always"?"ตลอดเวลา":"ปิด"}`,`Location sharing set to ${d.loc}`]);render(true);return}
- if(d.role){if(d.role===role)return;role=d.role;lss("hf-role",role);showSec=false;if(role==="fam"){mStop();startPoll()}else{clearInterval(pollT)}render();return}
+ if(d.role){if(d.role===role)return;role=d.role;lss("hf-role",role);showSec=false;if(role==="fam")mStop();else ensureTopic();startPoll();render();return}
  if(d.etab!==undefined){etab=+d.etab;if(etab!==0&&mBusy){mStop();mStTxt=null}render();return}
  if(b.id==="mGo"){mBusy?(mStop(),mSet(tx("หยุดแล้ว","Stopped")),render(true)):mStart();return}
  if(b.id==="sosB"){confirmThen("sos");return}
@@ -563,7 +625,12 @@ document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data
 document.addEventListener("keydown",k=>{if(k.key==="Enter"&&k.target.dataset&&k.target.dataset.st!==undefined){k.preventDefault();k.target.click()}});
 document.addEventListener("submit",s=>{s.preventDefault();const qi=$("#q"),q=qi.value.trim();qi.value="";qi.blur();if(q)aiAsk(q)});
 render();
-if(role==="fam")startPoll();
+if(role==="eld")ensureTopic();startPoll();
+(async()=>{if(!/^(localhost|127\.0\.0\.1)$/.test(location.hostname))return;try{const r=await fetch("/api/health");if(!r.ok)return;const h=await r.json();if(!h.ok)return;
+ const call=async body=>{const r=await fetch("/api/sample",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("ai "+r.status);return r.json()};
+ const s=async(p,o={})=>{const d=await call(typeof p==="string"?{prompt:p}:{messages:p.map(m=>({role:m.role,content:String(m.content)}))});if(o.onText)o.onText({text:d.text});return {text:d.text}};
+ s.json=async p=>(await call({prompt:p,json:true})).json;
+ if(!sample){sample=s;aiLive=true;render(true)}}catch(e){}})();
 if(window.claude&&claude.use){claude.use("sample").then(s=>{sample=s}).catch(()=>{});
  claude.use("dictation").then(d=>{if(!d)return;dict=d;d.onFinal(({text})=>{const t=$("#logIn");if(t)t.value=(t.value?t.value+" ":"")+text});d.onState(({state})=>{listening=state==="listening";const m=$("#mic");if(m)m.textContent=listening?tx("หยุดฟัง","Stop"):tx("พูด","Speak")});if(tab===0&&!showSec)render(true)}).catch(()=>{})}
 }
