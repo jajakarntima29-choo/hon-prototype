@@ -13,8 +13,8 @@
    COLOUR and TYPE: deep clinic teal, warm paper, coral accent; triage green/amber/red only for status. IBM Plex Sans Thai.
    LAYOUT: one phone-width column, sticky bottom tabs; on wide screens a centred device with a side note */
 :root{color-scheme:light;
---bg:light-dark(#f6f1ea,#12191b);--paper:light-dark(#fffdf9,#1b2427);--ink:light-dark(#1d2a2e,#eef2f1);--mute:light-dark(#5d6b6f,#a3b1b4);
---line:light-dark(#e6ddd1,#2c393d);--teal:light-dark(#0f4c5c,#0d3a46);--tealT:light-dark(#0f4c5c,#8fd0de);--teal2:light-dark(#e3eef0,#173238);--coral:#e8664a;
+--bg:light-dark(#f4efe5,#111813);--paper:light-dark(#fffdfa,#1a221c);--ink:light-dark(#1d2a2e,#eef2f1);--mute:light-dark(#5d6b6f,#a3b1b4);
+--line:light-dark(#eadcc6,#2e3a31);--teal:light-dark(#2a4b38,#1f3a2a);--tealT:light-dark(#2a4b38,#a9cdb3);--teal2:light-dark(#e6ede7,#1b2b21);--coral:#a8823a;--gold:#cca65c;
 --g:light-dark(#1f8a4c,#4cc47f);--gbg:light-dark(#e5f4e9,#16301f);--y:light-dark(#a36a00,#f2b544);--ybg:light-dark(#fdf1d8,#33290f);--r:light-dark(#c0322a,#ff7a70);--rbg:light-dark(#fbe6e3,#3a1a17);
 --map:light-dark(#eae4da,#1e2a2d);--road:light-dark(#fffdf9,#33444a)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
@@ -95,7 +95,7 @@ pre.sum{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:14p
 .set{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.set:last-child{border:0}.set div{flex:1}
 .seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--teal2);border-radius:14px;padding:4px;gap:4px}
 .seg button{border:0;background:none;border-radius:10px;min-height:44px;font-size:14px}
-.seg button[aria-pressed=true]{background:var(--paper);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg.mode{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:14px}.seg button[aria-pressed=true]{background:var(--paper);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--mute);font-weight:600}
 td.c,th.c{text-align:center}
 .toast{position:absolute;left:12px;right:12px;bottom:84px;z-index:5;background:var(--r);color:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 12px 30px -8px rgba(0,0,0,.4);display:flex;gap:12px;align-items:center}
@@ -142,7 +142,7 @@ code.code{display:block;background:var(--teal2);padding:10px 12px;border-radius:
     <div id="toast"></div>
     <header class="top">
       <div class="row">
-        <div class="brand">HON <span style="color:#f4a48f">Family</span><small id="tagline"></small></div>
+        <div class="brand">HON <span style="color:var(--gold)">Family</span><small id="tagline"></small></div>
         <button class="hb" id="sec" aria-label="Security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></button>
         <button class="hb" id="lang" aria-label="Switch language">EN</button>
       </div>
@@ -295,7 +295,7 @@ async function mkBrief(){const box=$("#briefBox"),e=el();const fb=e.id==="s"?tx(
  if(sample){try{const logs=clog[ei].map(x=>x.t+" "+x.sum).join("; ")||"none";
   const r=await sample(SYS()+`\n\nWrite the caregiver's morning brief from today's readings and these care-log notes: ${logs}. Exactly 3 lines, plain text: "${tx("สถานะ:","Status:")} ...", "${tx("ทำวันนี้:","Today:")} 1) 2) 3)", "${tx("เฝ้าดู:","Watch for:")} ...". Max 60 words.`,{modelTier:"quick",onText:({text})=>{if(box)box.textContent=text}});brief[ei]=r.text}catch(x){brief[ei]=fb}}else brief[ei]=fb;
  render(true)}
-let aiLive=false,agentAi={},agentBusy=false,agentSt={};try{agentSt=JSON.parse(lsg("hf-agent")||"{}")}catch(e){}
+let aiLive=false,agentAi={},agentBusy=false,agentSt={},insAi={},insBusy=false,mode=(()=>{const q=new URLSearchParams(location.search).get("mode");return q==="sum"||q==="agent"?q:lsg("hf-mode")||"agent"})();try{agentSt=JSON.parse(lsg("hf-agent")||"{}")}catch(e){}
 function agentObs(){const e=el(),L=lang==="th"?0:1,mine=ei===linkEi,o=[],now=new Date();
  if(ev&&!ev.ack&&ev.e===ei)return {red:true,o:[[tx("มีเหตุฉุกเฉินที่ยังไม่มีใครรับทราบ","An emergency alert has not been acknowledged yet")]]};
  if(mine&&live&&(live.hr<45||live.hr>120))return {red:true,o:[[tx(`ชีพจรล่าสุด ${live.hr} ครั้ง/นาที ผิดปกติมาก`,`Latest heart rate ${live.hr} bpm is far out of range`)]]};
@@ -345,6 +345,31 @@ async function agentDo(id,b){const e=el(),ob=agentObs(),tasks=agentTasks(ob),t=t
  if(id==="doctor_msg"){const txt=good&&ai.doctor?ai.doctor:dr.doctor;try{await navigator.clipboard.writeText(txt)}catch(x){}printReport();note=tx("คัดลอกข้อความ และเปิดรายงาน PDF แล้ว","message copied, PDF report opened")}
  agentSt[agKey(id)]={t:new Date().toTimeString().slice(0,5),note};lss("hf-agent",JSON.stringify(agentSt));
  addLog(["HON Agent (คุณอนุมัติ)","HON Agent (you approved)"],[t.t+(note?" · "+note:""),t.t+(note?" · "+note:"")]);render(true)}
+const insSig=ob=>ei+"|"+lang+"|"+ob.o.map(x=>x[0]+(x[2]??"")).join(",");
+function insIdeas(ob){const e=el(),t=[],has=k=>ob.o.find(x=>x[0]===k),m=has("med");
+ if(m)t.push(tx(`โทรหรือทักไปเตือน${e.name[0]}กินยา ${e.meds[m[2]][1]}`,`Call or text ${e.name[1]} about ${e.meds[m[2]][1]}`));
+ if(has("measure"))t.push(tx(`ชวน${e.name[0]}วัดชีพจรด้วย HON วันนี้`,`Ask ${e.name[1]} to measure with HON today`));
+ if(has("agi")||has("sugar"))t.push(tx("แจ้งคุณหมอ พร้อมแนบรายงาน PDF","Tell the doctor and attach the PDF report"));
+ t.push(tx("เล่าให้คนอื่นในครอบครัวรู้","Let the rest of the family know"));return t}
+async function insightPlan(sig,ob){insBusy=true;const e=el(),L=lang==="th"?"Thai":"English";
+ try{const v=await sample.json(SYS()+`\n\nYou help the caregiver of ${e.name[1]} understand today's data. You only summarise and draft; you never act, never send anything, never diagnose and never suggest medicine changes. What the app observed today:\n${ob.o.map(x=>"- "+x[1]).join("\n")}\nReturn JSON only: {"headline": one short sentence in ${L} saying what matters most today, "trend": one or two short sentences in ${L} explaining the trend in plain words, "ideas": up to 3 short things the family could choose to do today, in ${L}, no medical decisions, "family": a short LINE-style update for the rest of the family in ${L}, 2-3 lines, facts only, "doctor": a short message to the doctor's clinic in ${L}, 3-4 lines, the readings and a request for advice, no diagnosis, no dose suggestions}`);
+  if(v&&typeof v==="object")insAi[sig]={headline:String(v.headline||""),trend:String(v.trend||""),ideas:Array.isArray(v.ideas)?v.ideas.slice(0,3).map(String):[],family:String(v.family||""),doctor:String(v.doctor||"")};else insAi[sig]={fail:true}}catch(x){insAi[sig]={fail:true}}
+ insBusy=false;render(true)}
+function insText(k){const ob=agentObs(),ai=insAi[insSig(ob)],dr=agentDrafts(ob);return ai&&!ai.fail&&ai[k]?ai[k]:dr[k]}
+function insightCard(){const e=el(),ob=agentObs();
+ if(ob.red)return `<div class="card alert r fade agent"><span class="ailab">HON AI</span><h3 style="margin:6px 0">${tx("เหตุฉุกเฉิน: ใช้กฎความปลอดภัยทันที ไม่รอ AI","Emergency: safety rules apply now, no waiting for AI")}</h3><p style="margin:0 0 10px">${esc(ob.o[0][0])}</p><div class="btns"><a class="btn red" href="tel:1669">${tx("โทร 1669","Call 1669")}</a><button class="btn" data-tab="1">${tx("ดูพิกัดและรับทราบ","See location and respond")}</button></div></div>`;
+ const sig=insSig(ob),ai=insAi[sig];
+ if(sample&&!ai&&!insBusy)setTimeout(()=>insightPlan(sig,ob),0);
+ const good=ai&&!ai.fail,ideas=good&&ai.ideas.length?ai.ideas:insIdeas(ob);
+ const head=good&&ai.headline?ai.headline:(ob.o[0]?ob.o[0][1]:tx("วันนี้ไม่มีเรื่องเร่งด่วน","Nothing urgent today"));
+ const src=sample?(aiLive?"Claude Haiku 5.5":"Claude"):tx("กฎ + ข้อความที่เตรียมไว้","rules + prepared text");
+ const box=(k,label,btn)=>`<div class="task"><b>${label}</b><div class="draft">${esc(insText(k))}</div><div class="btns" style="margin-top:8px"><button class="btn alt" data-cp="${k}">${btn}</button></div></div>`;
+ return `<div class="card agent fade"><div class="row" style="justify-content:space-between"><span class="ailab">${tx("AI สรุปวันนี้","AI DAILY SUMMARY")}</span><span class="mini">${sample&&!ai?tx("AI กำลังสรุป...","AI is summarising..."):esc(src)}</span></div>
+<h3 style="margin:6px 0 2px">${esc(head)}</h3>${good&&ai.trend?`<p style="margin:6px 0 0">${esc(ai.trend)}</p>`:""}<p class="mini" style="margin:6px 0 0">${tx("AI เห็นจากข้อมูลวันนี้","What AI noticed in today's data")}</p><ul class="obs mini">${ob.o.map(x=>`<li>${esc(x[1])}</li>`).join("")}</ul>
+<div class="task"><b>${tx("ครอบครัวอาจเลือกทำ","Things the family could do")}</b><ul class="obs mini">${ideas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+${box("family",tx("ร่างข้อความถึงครอบครัว","Draft for the family"),tx("คัดลอกไปวางใน LINE","Copy for LINE"))}${box("doctor",tx("ร่างข้อความถึงคุณหมอ","Draft for the doctor"),tx("คัดลอก + เปิดรายงาน PDF","Copy + open PDF report"))}
+<p class="mini" style="margin:10px 0 0">${tx("AI สรุปและร่างข้อความเท่านั้น ไม่ส่งอะไรเอง ไม่วินิจฉัย ไม่ปรับยา คุณเป็นคนตัดสินใจและกดส่งเอง","AI only summarises and drafts: it sends nothing, gives no diagnosis and changes no medicine. You decide and send.")}</p></div>`}
+const modeSeg=()=>`<div class="seg mode" role="group" aria-label="${tx("โหมด AI","AI mode")}">${[["agent",tx("Agent ทำให้","Agent acts")],["sum",tx("AI สรุป คุณทำเอง","AI summary, you act")]].map(m=>`<button aria-pressed="${mode===m[0]}" data-mode="${m[0]}">${m[1]}</button>`).join("")}</div>`;
 let nudge=null;
 function nudgeCard(){if(!nudge)return "";const t=nudge.n==="med"?tx(`ผู้ดูแลเตือน: ถึงเวลากินยา ${nudge.m}`,`Your caregiver: time to take ${nudge.m}`):tx("ผู้ดูแลชวนวัดชีพจรวันนี้","Your caregiver asks you to check your pulse today");
  return `<div class="nudge fade" role="status"><b>${esc(t)}</b><span>${tx("ส่งมาเมื่อ","Sent at")} ${hhmm(nudge.at)}</span><div class="btns" style="margin-top:12px"><button class="btn xl" id="nuGo" style="background:#fff;color:var(--ink)">${nudge.n==="med"?tx("ไปที่ยาวันนี้","Open medicines"):tx("ไปวัดชีพจร","Measure now")}</button><button class="btn alt" id="nuOk">${tx("รับทราบ","OK")}</button></div></div>`}
@@ -352,7 +377,7 @@ function nudgeDone(){if(nudge)lss("hf-nudge-at",String(nudge.at));nudge=null}
 function home(){const e=el(),lv=agiLv(e.agi),diff=0;
  const top=e.id==="s"?`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${tx("น้ำตาลเช้านี้ 68 mg/dL ต่ำกว่าปกติ","Morning glucose 68 mg/dL is low")}</h3><p style="margin:0 0 12px">${tx("ต่ำกว่า 70 คือน้ำตาลต่ำ และลดลงติดกัน 4 วัน ถ้าแม่รู้ตัวและกลืนได้ ทำตามคู่มือตอนนี้ แล้วแจ้งหมอเรื่องยาเบาหวาน","Below 70 is low, and it has fallen 4 days running. If she's awake and can swallow, follow the guide now, then tell her doctor about her diabetes medicine.")}</p><button class="btn full" data-guide="hypo">${tx("เปิดคู่มือน้ำตาลต่ำ","Open low-sugar guide")}</button>${briefBox()}</div>`
  :`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${live&&linkEi===1?tx(`พ่อวัดแล้ว ${hhmm(live.at)} ชีพจร ${live.hr} ครั้ง/นาที แต่ค่า AGI ยังแย่ลง 2 สัปดาห์`,`Dad measured at ${hhmm(live.at)}, HR ${live.hr} bpm, but his AGI has worsened for 2 weeks`):tx("พ่อไม่ได้วัดมา 3 วัน และค่า AGI แย่ลง 2 สัปดาห์","Dad hasn't measured for 3 days and his AGI has worsened for 2 weeks")}</h3><p style="margin:0 0 12px">${tx("ชวนพ่อเปิดเว็บ HON วัดด้วยมือถือเช้านี้ เช็กว่ากินยาความดันครบ แล้วส่งรายงานให้หมอ","Get Dad to measure with HON on his phone this morning, check his BP medicine, then send the report to his doctor.")}</p><div class="btns"><button class="btn" id="nudge">${tx("ส่งเตือนไปมือถือพ่อ","Nudge Dad's phone")}</button><button class="btn alt" data-guide="vasc">${tx("ดูวิธีช่วย","What to do")}</button></div>${briefBox()}</div>`;
- return `${workflow()}${agentCard()}${linkCard()}${top}${careLog()}
+ return `${workflow()}${modeSeg()}${mode==="sum"?insightCard():agentCard()}${linkCard()}${top}${careLog()}
 <div class="card"><div class="row" style="justify-content:space-between"><h3>${tx("ดัชนีหลอดเลือด AGI","Arterial index AGI")}</h3><span class="tag ${lv}"><span class="dot"></span>${{g:tx("เสี่ยงต่ำ","Low risk"),y:tx("ควรเฝ้าระวัง","Keep watch")}[lv]}</span></div>
 <div class="va">${ring(e)}<div><p style="margin:0;font-weight:600">${e.agi<-0.6?tx("อยู่ในเกณฑ์เสี่ยงต่ำ และดีขึ้นต่อเนื่อง 6 เดือน","In the low-risk zone and improving for 6 months"):tx("สูงกว่าเกณฑ์เสี่ยงต่ำ และแย่ลงต่อเนื่อง 2 สัปดาห์","Above the low-risk zone and worsening for 2 weeks")}</p>
 <p class="mini" style="margin:2px 0 0">${tx("เกณฑ์ HON: ต่ำกว่า −0.6 = เสี่ยงต่ำ ยิ่งติดลบยิ่งดี","HON scale: below −0.6 = low risk; more negative is better")}<br>${tx("จากคลื่นชีพจร (PPG) ที่ HON วัดด้วยกล้องมือถือ","From the pulse wave (PPG) HON reads with the phone camera")}</p></div></div>
@@ -521,7 +546,7 @@ async function setFall(v){
  const sw=$("#fallSw");if(sw)sw.setAttribute("aria-checked",fallOn)}
 document.addEventListener("visibilitychange",async()=>{if(fallOn&&document.visibilityState==="visible"){try{wake=await navigator.wakeLock.request("screen")}catch(e){}}});
 function printReport(){const e=el(),L=lang==="th"?0:1,w=window.open("","_blank");if(!w)return;
- w.document.write(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><title>HON ${tx("รายงานสำหรับแพทย์","Doctor report")} · ${e.name[L]}</title><style>body{font:15px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif;color:#1d2a2e;max-width:760px;margin:32px auto;padding:0 24px}h1{color:#0f4c5c;margin:0}h1 b{color:#e8664a}.m{color:#5d6b6f;font-size:13px}pre{white-space:pre-wrap;font:inherit;background:#f6f1ea;border-radius:12px;padding:16px}table{border-collapse:collapse;width:100%;margin:12px 0}td{border-bottom:1px solid #e6ddd1;padding:6px 4px}</style></head><body>
+ w.document.write(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><title>HON ${tx("รายงานสำหรับแพทย์","Doctor report")} · ${e.name[L]}</title><style>body{font:15px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif;color:#1d2a2e;max-width:760px;margin:32px auto;padding:0 24px}h1{color:#2a4b38;margin:0}h1 b{color:#a8823a}.m{color:#5d6b6f;font-size:13px}pre{white-space:pre-wrap;font:inherit;background:#f4efe5;border-radius:12px;padding:16px}table{border-collapse:collapse;width:100%;margin:12px 0}td{border-bottom:1px solid #e6ddd1;padding:6px 4px}</style></head><body>
 <h1><b>HON</b> ${tx("รายงานสำหรับแพทย์","Report for the doctor")}</h1><p class="m">${tx("สร้างเมื่อ","Created")} ${new Date().toLocaleString(lang==="th"?"th-TH":"en-GB")}</p>
 <table><tr><td>${tx("ผู้สูงอายุ","Patient")}</td><td>${e.name[L]} · ${e.age}</td></tr><tr><td>${tx("โรคประจำตัว","Conditions")}</td><td>${e.cond[L]}</td></tr><tr><td>AGI (HON)</td><td>${e.agi} (${tx("6 เดือน","6 months")}: ${e.agiT.join(" → ")})</td></tr><tr><td>PWV</td><td>${e.pwv} m/s</td></tr><tr><td>${tx("ความดันล่าสุด","Latest BP")}</td><td>${e.bp} mmHg</td></tr>${live&&ei===linkEi?`<tr><td>${tx("ชีพจรจริงล่าสุด","Latest live pulse")}</td><td>${live.hr} bpm · ${hhmm(live.at)}</td></tr>`:""}</table>
 <pre>${esc(summary())}</pre><p class="m">${tx("ข้อมูลจากแอป HON ใช้ประกอบการตัดสินใจของแพทย์ ไม่ใช่ผลการวินิจฉัย ไม่ใช่อุปกรณ์การแพทย์ · ต้นแบบ ข้อมูลจำลอง","From the HON app to support the doctor's judgement; not a diagnosis, not a medical device · prototype with sample data")}</p></body></html>`);
@@ -580,6 +605,8 @@ Morning BP, 7 days: mean systolic ${avg(e.sys)} (max ${Math.max(...e.sys)})${e.g
 Caregiver observed: ${sy}${clog[ei].length?"\nCaregiver log:\n"+clog[ei].map(x=>"- "+x.t+" "+x.sum).join("\n"):""}`)}
 document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data-st]");if(!b)return;const d=b.dataset;
  if(d.agok){agentDo(d.agok,b);return}
+ if(d.mode){if(d.mode===mode)return;mode=d.mode;lss("hf-mode",mode);render(true);return}
+ if(d.cp){const t=insText(d.cp);if(navigator.clipboard)navigator.clipboard.writeText(t).catch(()=>{});b.textContent=tx("คัดลอกแล้ว","Copied");addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],d.cp==="doctor"?["คัดลอกข้อความถึงคุณหมอ","Copied the doctor message"]:["คัดลอกสรุปให้ครอบครัว","Copied the family update"]);if(d.cp==="doctor")printReport();return}
  if(d.agno){agentSt[agKey(d.agno)]={skip:true};lss("hf-agent",JSON.stringify(agentSt));render(true);return}
  if(b.id==="nuGo"){etab=nudge&&nudge.n==="med"?2:0;nudgeDone();render();return}
  if(b.id==="nuOk"){nudgeDone();render(true);return}
