@@ -57,11 +57,11 @@ header{display:flex;align-items:center;gap:20px;padding:14px 28px;background:var
 let lang=localStorage.getItem("hf-lang")==="en"?"en":"th";
 const tx=(th,en)=>lang==="th"?th:en;
 const S=[
- {t:()=>tx("พ่อวัด","Dad measures"),d:()=>tx("30 วินาที ด้วยกล้องมือถือ","30 seconds with the phone camera"),p:"E",say:()=>tx("พ่อไม่ได้วัดมา 3 วัน วันนี้แค่วางนิ้วบนกล้องมือถือ 30 วินาที ไม่ต้องซื้อเครื่องเพิ่ม","Dad has not measured for 3 days. Today he rests a finger on the phone camera for 30 seconds. No extra device to buy."),go:()=>{}},
- {t:()=>tx("ลูกเห็น","Family sees it"),d:()=>tx("ค่าขึ้นที่มือถือลูกทันที","The reading reaches the child's phone"),p:"F",say:()=>tx("ลูกที่อยู่ไกลเห็นค่าของพ่อทันที ไม่ต้องโทรถาม ทุกคนในบ้านเห็นข้อมูลชุดเดียวกัน","A child far away sees Dad's reading at once, no phone call needed. Everyone in the family sees the same data."),go:()=>famTab(0,false)},
- {t:()=>tx("AI ช่วยคิด","AI helps"),d:()=>tx("ดูแนวโน้ม เตรียมงานให้","Reads the trend, prepares the work"),p:"F",say:()=>mode==="sum"?tx("AI สรุปให้ว่าวันนี้เรื่องไหนสำคัญ แนวโน้มเป็นอย่างไร และร่างข้อความไว้ให้ ลูกเป็นคนตัดสินใจและกดส่งเอง","AI sums up what matters today and the trend, and drafts the messages. The child decides and sends."):tx("HON Agent เห็นว่าพ่อไม่ได้วัด 3 วันและค่า AGI แย่ลง เตรียมงานให้: ชวนพ่อวัด ร่างข้อความถึงหมอ สรุปให้พี่น้อง ทุกงานรอลูกกดอนุมัติ","HON Agent sees 3 days without a reading and a worsening AGI, and prepares the work: ask Dad to measure, draft a note to the doctor, update the siblings. Every task waits for the child's approval."),go:()=>famTab(0,true)},
+ {t:()=>tx("ผู้สูงอายุวัด","Older adult measures"),d:()=>tx("30 วินาที ด้วยกล้องมือถือ","30 seconds with the phone camera"),p:"E",say:()=>tx("คุณประวิทย์ไม่ได้วัดมา 3 วัน วันนี้แค่วางนิ้วบนกล้องมือถือ 30 วินาที ไม่ต้องซื้อเครื่องเพิ่ม","Mr Prawit has not measured for 3 days. Today he rests a finger on the phone camera for 30 seconds. No extra device to buy."),go:()=>{}},
+ {t:()=>tx("ผู้ดูแลเห็น","Caregiver sees it"),d:()=>tx("ค่าขึ้นที่มือถือผู้ดูแลทันที","The reading reaches the caregiver's phone"),p:"F",say:()=>tx("ผู้ดูแลที่อยู่ไกลเห็นค่าทันที ไม่ต้องโทรถาม ผู้ดูแลทุกคนเห็นข้อมูลชุดเดียวกัน","A caregiver far away sees the reading at once, no phone call needed. Every caregiver sees the same data."),go:()=>famTab(0,false)},
+ {t:()=>tx("AI ช่วยคิด","AI helps"),d:()=>tx("ดูแนวโน้ม เตรียมงานให้","Reads the trend, prepares the work"),p:"F",say:()=>mode==="sum"?tx("AI สรุปให้ว่าวันนี้เรื่องไหนสำคัญ แนวโน้มเป็นอย่างไร และร่างข้อความไว้ให้ ผู้ดูแลเป็นคนตัดสินใจและกดส่งเอง","AI sums up what matters today and the trend, and drafts the messages. The caregiver decides and sends."):tx("HON Agent เห็นว่าไม่ได้วัด 3 วันและค่า AGI แย่ลง เตรียมงานให้: ชวนผู้สูงอายุวัด ร่างข้อความถึงหมอ สรุปให้ผู้ดูแลคนอื่น ทุกงานรอผู้ดูแลกดอนุมัติ","HON Agent sees 3 days without a reading and a worsening AGI, and prepares the work: ask the older adult to measure, draft a note to the doctor, update the other caregivers. Every task waits for the caregiver's approval."),go:()=>famTab(0,true)},
  {t:()=>tx("ส่งหมอ","To the doctor"),d:()=>tx("ร่างข้อความ + รายงาน PDF","Draft message + PDF report"),p:"F",say:()=>tx("AI ร่างข้อความถึงคุณหมอพร้อมรายงาน PDF ไม่วินิจฉัย ไม่ปรับยา หมอเป็นคนตัดสิน","AI drafts a note to the doctor with a PDF report. No diagnosis, no medicine changes: the doctor decides."),go:()=>famShow("[data-cp=doctor],[data-agok=doctor_msg]")},
- {t:()=>"SOS",d:()=>tx("เหตุฉุกเฉิน → 1669","Emergency → 1669"),p:"E",sos:1,say:()=>tx("ถ้าพ่อล้มหรือกด SOS กฎความปลอดภัยทำงานทันที ไม่รอ AI ลูกเห็นการ์ดแดง พิกัด และปุ่มโทร 1669","If Dad falls or presses SOS, the safety rules act at once without waiting for AI. The child sees a red card, the location and a button to call 1669."),go:()=>eldShow("#sosB")}
+ {t:()=>"SOS",d:()=>tx("เหตุฉุกเฉิน → 1669","Emergency → 1669"),p:"E",sos:1,say:()=>tx("ถ้าผู้สูงอายุล้มหรือกด SOS กฎความปลอดภัยทำงานทันที ไม่รอ AI ผู้ดูแลเห็นการ์ดแดง พิกัด และปุ่มโทร 1669","If the older adult falls or presses SOS, the safety rules act at once without waiting for AI. The caregiver sees a red card, the location and a button to call 1669."),go:()=>eldShow("#sosB")}
 ];
 let mode=new URLSearchParams(location.search).get("mode")==="sum"?"sum":"agent",cur=0;
 const $=s=>document.querySelector(s),fE=$("#fE"),fF=$("#fF");
@@ -69,23 +69,23 @@ const fit=()=>{const h=innerHeight-$("header").offsetHeight-$("#flow").offsetHei
 const doc=f=>{try{return f.contentDocument}catch(e){return null}};
 const pickDad=()=>{const d=doc(fF),b=d&&d.querySelector('#who [data-ei="1"]');if(b&&b.getAttribute("aria-pressed")!=="true")b.click()};
 function famTab(i,card){const d=doc(fF);if(!d)return;pickDad();const t=d.querySelector(`[data-tab="${i}"]`);if(t)t.click();if(card)setTimeout(()=>{const c=d.querySelector(".card.agent");if(c)c.scrollIntoView({behavior:"smooth",block:"start"})},150);else d.scrollingElement.scrollTo({top:0,behavior:"smooth"})}
-function famShow(sel){famTab(0,false);setTimeout(()=>{const d=doc(fF),el=d&&d.querySelector(sel);if(el)el.scrollIntoView({behavior:"smooth",block:"center"})},200)}
+function famShow(sel){famTab(0,false);setTimeout(()=>{const d=doc(fF);if(!d)return;let el=d.querySelector(sel);if(el&&!el.offsetParent){const f=d.querySelector('[data-view="full"]');if(f)f.click();el=d.querySelector(sel)}if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),100)},200)}
 function eldShow(sel){const d=doc(fE);if(!d)return;const el=d.querySelector(sel);if(el)el.scrollIntoView({behavior:"smooth",block:"center"})}
 const setLang=f=>{const d=doc(f),b=d&&d.querySelector("#lang");if(b&&(d.documentElement.lang||"th")!==lang)b.click()};
 function loadE(){fE.src="app.html?role=eld";fE.onload=()=>setTimeout(()=>setLang(fE),200)}
-function loadF(){fF.src="app.html?role=fam&mode="+mode;fF.onload=()=>setTimeout(()=>{setLang(fF);pickDad();S[cur].go()},300)}
+function loadF(){fF.src="app.html?role=fam&view=simple&mode="+mode;fF.onload=()=>setTimeout(()=>{setLang(fF);pickDad();S[cur].go()},300)}
 function chrome(){document.documentElement.lang=lang;
- $("#story").innerHTML=tx("เดโม: <b>พ่อประวิทย์ 74 ปี ไม่ได้วัดมา 3 วัน</b>","Demo: <b>Dad Prawit, 74, has not measured for 3 days</b>");
+ $("#story").innerHTML=tx("เดโม: <b>ผู้สูงอายุ (คุณประวิทย์ 74 ปี) ไม่ได้วัดมา 3 วัน</b>","Demo: <b>an older adult (Mr Prawit, 74) has not measured for 3 days</b>");
  $("#mode").setAttribute("aria-label",tx("โหมด AI","AI mode"));
  $("#mode").innerHTML=[["agent",tx("Agent ทำให้","Agent acts")],["sum",tx("AI สรุป คุณทำเอง","AI summary, you act")]].map(m=>`<button data-mode="${m[0]}" aria-pressed="${mode===m[0]}">${m[1]}</button>`).join("");
  $("#lang").textContent=lang==="th"?"EN":"ไทย";
- $("#hE").innerHTML=tx("มือถือพ่อ <span>· ผู้สูงอายุ</span>","Dad's phone <span>· older adult</span>");
- $("#hF").innerHTML=tx("มือถือลูก <span>· ผู้ดูแล</span>","Child's phone <span>· caregiver</span>");
+ $("#hE").innerHTML=tx("มือถือผู้สูงอายุ","Older adult's phone");
+ $("#hF").innerHTML=tx("มือถือผู้ดูแล","Caregiver's phone");
  fE.title=tx("มือถือผู้สูงอายุ","Older adult's phone");fF.title=tx("มือถือผู้ดูแล","Caregiver's phone");
  $("#links").innerHTML=tx("เปิดแยก: ","Open alone: ")+`<a href="app.html?role=eld" target="_blank" rel="noopener">${tx("ฝั่งผู้สูงอายุ","Older adult")}</a> · <a href="app.html?role=fam" target="_blank" rel="noopener">${tx("ฝั่งผู้ดูแล","Caregiver")}</a>`}
 function step(i,run=true){cur=i;const s=S[i];
  $("#flow").innerHTML=S.map((x,j)=>`<button data-i="${j}" class="${x.sos?"sos":""}" ${j===i?'aria-current="step"':""}><b>${x.t()}</b><span>${x.d()}</span></button>`).join("");
- $("#say").innerHTML=`<small>${tx(`ขั้นที่ ${i+1} · ดูที่${s.p==="E"?"มือถือพ่อ":"มือถือลูก"}`,`Step ${i+1} · watch ${s.p==="E"?"Dad's phone":"the child's phone"}`)}</small>${s.say()}`;
+ $("#say").innerHTML=`<small>${tx(`ขั้นที่ ${i+1} · ดูที่${s.p==="E"?"มือถือผู้สูงอายุ":"มือถือผู้ดูแล"}`,`Step ${i+1} · watch the ${s.p==="E"?"older adult's":"caregiver's"} phone`)}</small>${s.say()}`;
  $("#phE").classList.toggle("on",s.p==="E");$("#phF").classList.toggle("on",s.p==="F");$("#phE").classList.toggle("dim",s.p!=="E");$("#phF").classList.toggle("dim",s.p!=="F");
  if(run)s.go();fit()}
 document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
