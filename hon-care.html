@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HON Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, calm, trustworthy — a nurse beside you, not a hospital system
+   IDEA: the caregiver's side of HON: what Mom measures on her phone reaches the family
+   PICTURE: the working app itself — today's card, vascular age, live alert with map
+   COLOUR and TYPE: deep clinic teal, warm paper, coral accent; triage green/amber/red only for status. IBM Plex Sans Thai.
+   LAYOUT: one phone-width column, sticky bottom tabs; on wide screens a centred device with a side note */
+:root{color-scheme:light dark;
+--bg:light-dark(#f6f1ea,#12191b);--paper:light-dark(#fffdf9,#1b2427);--ink:light-dark(#1d2a2e,#eef2f1);--mute:light-dark(#5d6b6f,#a3b1b4);
+--line:light-dark(#e6ddd1,#2c393d);--teal:light-dark(#0f4c5c,#0d3a46);--tealT:light-dark(#0f4c5c,#8fd0de);--teal2:light-dark(#e3eef0,#173238);--coral:#e8664a;
+--g:light-dark(#1f8a4c,#4cc47f);--gbg:light-dark(#e5f4e9,#16301f);--y:light-dark(#a36a00,#f2b544);--ybg:light-dark(#fdf1d8,#33290f);--r:light-dark(#c0322a,#ff7a70);--rbg:light-dark(#fbe6e3,#3a1a17);
+--map:light-dark(#eae4da,#1e2a2d);--road:light-dark(#fffdf9,#33444a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif;overflow-x:clip}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.wrap{display:flex;justify-content:center;gap:40px;padding:24px 16px;align-items:flex-start}
+.side{max-width:300px;padding-top:40px}.side h1{font-size:44px;line-height:1.05;margin:0 0 12px;color:var(--tealT)}.side p{color:var(--mute);margin:0 0 12px}
+.app{width:100%;max-width:440px;background:var(--paper);border-radius:28px;box-shadow:0 20px 50px -20px rgba(15,76,92,.35);overflow:hidden;display:flex;flex-direction:column;min-height:min(880px,calc(100vh - 48px));position:relative}
+@media(max-width:820px){.side{display:none}.wrap{padding:0}.app{border-radius:0;box-shadow:none;max-width:none;min-height:100vh}}
+header.top{background:var(--teal);color:#fff;padding:16px 18px 18px}
+.row{display:flex;align-items:center;gap:10px}
+.brand{font-weight:700;font-size:20px;flex:1;line-height:1.3}.brand small{display:block;font-weight:400;font-size:13px;opacity:.8}
+.hb{background:rgba(255,255,255,.15);border:0;border-radius:999px;padding:0 14px;min-height:42px;color:#fff;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.hb svg{width:18px;height:18px}
+.who{display:flex;gap:8px;margin-top:14px;overflow-x:auto}
+.who button{flex:none;display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.1);border:2px solid transparent;border-radius:16px;padding:6px 12px 6px 6px;color:#fff;text-align:left;min-height:56px}
+.who button[aria-pressed=true]{background:rgba(255,255,255,.22);border-color:#fff}
+.who b{display:block;font-size:15px;line-height:1.2}.who span{font-size:12px;opacity:.85}
+.av{width:40px;height:40px;border-radius:50%;flex:none;position:relative;overflow:hidden;background:#f3c9a8}
+.av:before{content:"";position:absolute;left:11px;top:7px;width:18px;height:18px;border-radius:50%;background:#e8b08a}
+.av:after{content:"";position:absolute;left:4px;top:26px;width:32px;height:24px;border-radius:50%;background:var(--c,#d97a5c)}
+.sync{font-size:12px;opacity:.8;margin-top:10px}
+main{flex:1;padding:18px 18px 100px;overflow-y:auto}
+h2{font-size:22px;line-height:1.2;margin:4px 0 12px}h3{font-size:17px;margin:0 0 6px;line-height:1.35}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.alert{border:0}.alert.y{background:var(--ybg)}.alert.r{background:var(--rbg)}.alert.g{background:var(--gbg)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;border-radius:999px;padding:3px 12px}
+.tag.g{color:var(--g);background:var(--gbg)}.tag.y{color:var(--y);background:var(--ybg)}.tag.r{color:var(--r);background:var(--rbg)}
+.dot{width:10px;height:10px;border-radius:50%;background:currentColor;display:inline-block}
+.btn{border:0;border-radius:14px;min-height:46px;padding:0 16px;font-weight:600;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn.alt{background:var(--teal2);color:var(--ink)}.btn.red{background:var(--r);color:#fff}.btn.full{width:100%}
+.btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mini{font-size:13px;color:var(--mute)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:var(--teal2);border-radius:14px;padding:12px}.stat b{font-size:24px;display:block;line-height:1.25;white-space:nowrap}.stat .mini{white-space:nowrap}
+.va{display:flex;gap:16px;align-items:center}
+.ring{width:112px;height:112px;flex:none;position:relative}.ring svg{width:100%;height:100%}
+.ring div{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1}
+.ring b{font-size:34px}.ring small{font-size:12px;color:var(--mute)}
+.fig{position:relative;height:120px;margin-top:6px}.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.list{list-style:none;margin:0;padding:0}.list li{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}.list li:last-child{border:0}
+.list .v{color:var(--mute);white-space:nowrap;text-align:right}
+nav.tabs{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--paper);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:2}
+nav.tabs button{background:none;border:0;min-height:56px;border-radius:12px;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative}
+nav.tabs button[aria-selected=true]{color:var(--tealT);background:var(--teal2);font-weight:700}
+nav.tabs svg{width:22px;height:22px}
+.badge{position:absolute;top:6px;right:calc(50% - 20px);background:var(--r);color:#fff;font-size:11px;border-radius:999px;min-width:18px;height:18px;display:grid;place-items:center;padding:0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;min-height:44px;padding:0 14px;font-size:15px}
+.chip[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:#fff}
+.chat{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.msg{max-width:88%;padding:10px 14px;border-radius:16px;white-space:pre-wrap}
+.msg.me{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px}.msg.ai{align-self:flex-start;background:var(--teal2);border-bottom-left-radius:4px}
+.composer{display:flex;gap:8px;position:sticky;bottom:76px;background:var(--paper);padding-top:8px}
+.composer input{flex:1;border:1px solid var(--line);border-radius:14px;padding:0 14px;min-height:48px;font-size:16px;background:var(--bg)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;padding:10px 0 10px 44px;position:relative;border-bottom:1px solid var(--line);cursor:pointer}
+.steps li:before{content:counter(s);position:absolute;left:0;top:10px;width:32px;height:32px;border-radius:50%;background:var(--teal2);display:grid;place-items:center;font-weight:700}
+.steps li.done{opacity:.55}.steps li.done:before{content:"✓";background:var(--gbg);color:var(--g)}
+.glist button{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;min-height:64px}
+.glist small{display:block;color:var(--mute);font-size:13px}
+.back{background:none;border:0;color:var(--tealT);font-weight:600;min-height:44px;padding:0}
+pre.sum{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:14px;font:14px/1.6 "IBM Plex Sans Thai",sans-serif;margin:0 0 12px}
+.note{font-size:13px;color:var(--mute);border-left:3px solid var(--coral);padding-left:10px;margin:10px 0}
+.timer{font-size:32px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.map{border-radius:16px;overflow:hidden;background:var(--map);position:relative}.map svg{display:block;width:100%;height:auto}
+.lock{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);background:color-mix(in srgb,var(--paper) 45%,transparent)}
+.esc{list-style:none;margin:10px 0 0;padding:0}
+.esc li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;padding:8px 0;align-items:start}
+.esc i{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:block;margin-top:2px}
+.esc li.on i{background:var(--r);border-color:var(--r)}.esc li.ok i{background:var(--g);border-color:var(--g)}
+.esc time{font-size:13px;color:var(--mute);white-space:nowrap}
+.sw{position:relative;width:52px;height:30px;flex:none;border-radius:999px;border:0;background:var(--line)}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}
+.sw[aria-checked=true]{background:var(--g)}.sw[aria-checked=true]:after{left:25px}
+.set{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.set:last-child{border:0}.set div{flex:1}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--teal2);border-radius:14px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:10px;min-height:44px;font-size:14px}
+.seg button[aria-pressed=true]{background:var(--paper);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--mute);font-weight:600}
+td.c,th.c{text-align:center}
+.toast{position:absolute;left:12px;right:12px;bottom:84px;z-index:5;background:var(--r);color:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 12px 30px -8px rgba(0,0,0,.4);display:flex;gap:12px;align-items:center}
+.toast b{display:block}.toast button{background:#fff;color:var(--r);border:0;border-radius:12px;min-height:44px;padding:0 14px;font-weight:700;flex:none}
+.aibox{white-space:pre-wrap;background:var(--paper);border-radius:12px;padding:12px;margin:12px 0 8px;font-size:15px}.aibox:empty{display:none}
+.ailab{display:inline-flex;gap:4px;align-items:center;font-size:12px;font-weight:700;color:var(--coral);letter-spacing:.02em}
+.wf{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:0 0 14px;list-style:none;padding:0}
+.wf li{background:var(--teal2);border-radius:12px;padding:8px 6px;text-align:center;font-size:12px;line-height:1.3;position:relative}
+.wf li b{display:block;font-size:12px}.wf li.ok{background:var(--gbg);color:var(--g)}.wf li.ok b{color:var(--ink)}.wf li.ai:after{content:"AI";position:absolute;top:-7px;right:-2px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;border-radius:6px;padding:0 5px}
+.wf span{display:block;font-size:11px;color:var(--mute)}
+textarea.in{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;font:16px/1.5 inherit;font-family:inherit;background:var(--bg);color:var(--ink);resize:vertical;min-height:72px}
+.ent{padding:10px 0;border-bottom:1px solid var(--line)}.ent:last-child{border:0}.ent p{margin:4px 0 0}
+@media(prefers-reduced-motion:no-preference){.fade{animation:f .25s ease-out}@keyframes f{from{opacity:0;transform:translateY(6px)}}.pulse{animation:p 1.4s ease-out infinite}@keyframes p{0%{r:8;opacity:.7}100%{r:26;opacity:0}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <h1>HON Care</h1>
+    <p id="sideP"></p>
+    <p class="mini" id="sideN"></p>
+  </aside>
+  <div class="app" id="app">
+    <div id="toast"></div>
+    <header class="top">
+      <div class="row">
+        <div class="brand">HON Care<small id="tagline"></small></div>
+        <button class="hb" id="sec" aria-label="Security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></button>
+        <button class="hb" id="lang" aria-label="Switch language">EN</button>
+      </div>
+      <div class="who" id="who"></div>
+      <div class="sync" id="sync"></div>
+    </header>
+    <main id="view"></main>
+    <nav class="tabs" id="tabs" role="tablist"></nav>
+  </div>
+</div>
+<script>
+{
+let lang="th";try{lang=localStorage.getItem("hc-lang")||"th"}catch(e){}
+const tx=(a,b)=>lang==="th"?a:b,$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const E=[
+{id:"s",name:["แม่สมศรี","Mom Somsri"],age:71,col:"#d97a5c",cond:["เบาหวาน · ความดันสูง · สมองเสื่อมระยะต้น","Diabetes · Hypertension · Early dementia"],
+ last:["วัดล่าสุด 06:48 วันนี้","Measured 06:48 today"],agi:-0.64,pwv:8.4,si:7.1,aix:21,hr:66,spo2:97,bp:"138/84",
+ agiT:[-0.52,-0.55,-0.58,-0.6,-0.62,-0.64],sys:[138,142,135,150,146,139,138],glu:[112,98,105,88,92,79,68],
+ meds:[["07:00","Metformin 500 mg"],["07:00","Amlodipine 5 mg"],["18:00","Metformin 500 mg"],["21:00","Donepezil 5 mg"]],
+ en:"Somsri, female, 71. Type 2 diabetes, hypertension, early dementia. Meds: Metformin 500mg twice daily, Amlodipine 5mg morning, Donepezil 5mg bedtime. Fasting glucose last 7 days 112,98,105,88,92,79,68 (falling, 68 today = low). HON phone PPG: Arterial Age Index (AGI) -0.64 (low risk, below -0.6), improving for 6 months, PWV 8.4 m/s (good <9.0), resting HR 66, SpO2 97%."},
+{id:"p",name:["พ่อประวิทย์","Dad Prawit"],age:74,col:"#4f7d8c",cond:["ความดันสูง · ไขมันสูง · เคยสูบบุหรี่","Hypertension · High cholesterol · Ex-smoker"],
+ last:["ไม่ได้วัดมา 3 วัน","Not measured for 3 days"],agi:-0.21,pwv:10.6,si:9.2,aix:31,hr:78,spo2:95,bp:"152/92",
+ agiT:[-0.38,-0.35,-0.33,-0.29,-0.25,-0.21],sys:[146,150,148,155,158,152,152],glu:null,
+ meds:[["07:00","Amlodipine 10 mg"],["21:00","Atorvastatin 20 mg"]],
+ en:"Prawit, male, 74. Hypertension, high cholesterol, ex-smoker. Meds: Amlodipine 10mg morning, Atorvastatin 20mg bedtime. Morning BP last 7 days systolic 146-158. HON phone PPG: AGI -0.21 (worsening for 2 weeks, medium risk), PWV 10.6 m/s (above 9.0 good threshold), resting HR 78, SpO2 95%. Has not measured for 3 days."}];
+const months=[["ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค."],["Feb","Mar","Apr","May","Jun","Jul"]],days=[["จ","อ","พ","พฤ","ศ","ส","อา"],["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]];
+const SYM=[
+{id:"face",lv:"r",t:["หน้าเบี้ยว / ปากเบี้ยว","Face drooping"]},{id:"arm",lv:"r",t:["แขนขาอ่อนแรงข้างเดียว","One-sided weakness"]},{id:"speech",lv:"r",t:["พูดไม่ชัด","Slurred speech"]},
+{id:"chest",lv:"r",t:["เจ็บแน่นหน้าอก","Chest pain"]},{id:"breath",lv:"r",t:["หายใจลำบาก","Hard to breathe"]},{id:"wake",lv:"r",t:["ปลุกไม่ตื่น / ซึมมาก","Hard to wake"]},
+{id:"head",lv:"r",t:["ล้มแล้วศีรษะกระแทก","Fell and hit head"]},{id:"vlow",lv:"r",t:["น้ำตาลต่ำกว่า 54","Glucose below 54"]},{id:"low",lv:"y",t:["น้ำตาล 54–69","Glucose 54–69"]},
+{id:"fever",lv:"y",t:["ไข้เกิน 38°C","Fever over 38°C"]},{id:"confuse",lv:"y",t:["สับสนมากขึ้นเฉียบพลัน","Suddenly more confused"]},{id:"noeat",lv:"y",t:["ไม่กินอาหารเกิน 1 วัน","Not eating over a day"]},
+{id:"fall",lv:"y",t:["ล้ม ไม่มีแผล ลุกได้","Fell, unhurt"]},{id:"bp",lv:"y",t:["ความดันตัวบนเกิน 180","Systolic over 180"]},{id:"dizzy",lv:"y",t:["เวียนหัว หน้ามืด","Dizzy or faint"]},
+{id:"cough",lv:"g",t:["ไอเล็กน้อย","Mild cough"]},{id:"constip",lv:"g",t:["ท้องผูก","Constipation"]},{id:"sleep",lv:"g",t:["นอนไม่หลับ","Can't sleep"]}];
+const ADV={r:["โทร 1669 ทันที จดเวลาที่เริ่มมีอาการ ห้ามให้อาหาร น้ำ หรือยาทางปาก ถ้าอาเจียนให้นอนตะแคง อยู่ด้วยจนรถพยาบาลมา","Call 1669 now. Note when it started. Nothing by mouth. If vomiting, lay them on their side. Stay until help arrives."],
+y:["ยังไม่ฉุกเฉิน แต่ควรปรึกษาหมอหรือ รพ.สต. ภายใน 24 ชม. วัดค่าซ้ำและจดอาการไว้ ถ้าแย่ลงให้ถือเป็นสีแดง","Not an emergency, but call the doctor or clinic within 24 hours. Recheck and note symptoms. If worse, treat as red."],
+g:["ดูแลที่บ้านได้ สังเกตต่อ 1–2 วัน ถ้าไม่ดีขึ้นหรือมีอาการใหม่ให้เช็กอีกครั้ง","Home care is fine. Watch 1–2 days; check again if not better or new symptoms."]};
+const LV={g:["เขียว · ดูแลที่บ้านได้","Green · Home care"],y:["เหลือง · พบหมอภายใน 24 ชม.","Amber · Doctor within 24 h"],r:["แดง · ฉุกเฉิน","Red · Emergency"]};
+const G=[
+{id:"hypo",timer:15,t:["น้ำตาลต่ำ (ต่ำกว่า 70)","Low blood sugar (below 70)"],s:["กฎ 15–15","The 15–15 rule"],st:[
+["ถ้าปลุกไม่ตื่นหรือกลืนไม่ได้ ห้ามป้อนอะไรทางปาก โทร 1669","If they can't be woken or can't swallow, give nothing by mouth; call 1669"],
+["ถ้ารู้ตัวและกลืนได้ ให้น้ำตาลเร็ว 15 กรัม เช่น น้ำผลไม้ ½ แก้ว หรือน้ำตาลทราย 3 ช้อนชาละลายน้ำ","If awake and able to swallow, give 15 g fast sugar: ½ glass juice or 3 tsp sugar in water"],
+["รอ 15 นาที แล้ววัดน้ำตาลซ้ำ","Wait 15 minutes, then recheck"],["ถ้ายังต่ำกว่า 70 ให้ทำซ้ำ ทำ 2 รอบแล้วยังต่ำ โทรหาหมอ","Still below 70: repeat. Still low after 2 rounds: call the doctor"],
+["ดีขึ้นแล้วให้กินอาหารว่างที่มีแป้ง เช่น ขนมปัง 1 แผ่น","Once better, a starchy snack such as 1 slice of bread"],["แจ้งหมอ อาจต้องปรับยาเบาหวาน","Tell the doctor; diabetes medicine may need changing"]]},
+{id:"vasc",t:["ค่า AGI แย่ลง","AGI getting worse"],s:["สิ่งที่ผู้ดูแลช่วยได้","What a caregiver can do"],st:[
+["ให้วัดผ่านเว็บ HON ทุกเช้า วางปลายนิ้วปิดกล้องและแฟลชนิ่งๆ 30 วินาที เพื่อให้เห็นแนวโน้ม","Measure with HON every morning: fingertip still over camera and flash for 30 s, so the trend is reliable"],
+["เช็กว่ากินยาความดันและยาไขมันครบทุกมื้อ ยาที่ขาดบ่อยทำให้หลอดเลือดแข็งเร็วขึ้น","Check BP and cholesterol medicines are taken every dose; missed doses speed up stiffening"],
+["ลดเค็ม: งดน้ำปลาเพิ่ม ลดน้ำซุป อาหารแปรรูป","Cut salt: no extra fish sauce, less soup broth and processed food"],
+["ชวนเดินวันละ 20–30 นาที ตามที่ร่างกายไหว","Walk together 20–30 minutes a day as able"],
+["ถ้าแย่ลงต่อเนื่อง 2 สัปดาห์ ส่งรายงาน HON ให้หมอและนัดตรวจ","If worse for 2 weeks straight, send the HON report to the doctor and book a visit"],
+["ถ้ามีเจ็บหน้าอก แขนขาอ่อนแรง หรือพูดไม่ชัด โทร 1669 ทันที","Chest pain, one-sided weakness or slurred speech: call 1669 now"]]},
+{id:"stroke",t:["สงสัยหลอดเลือดสมอง","Suspected stroke"],s:["BE-FAST","BE-FAST"],st:[
+["ดูหน้า: ให้ยิ้ม ปากเบี้ยวไหม","Face: smile — one side droops?"],["ดูแขน: ยกแขน 2 ข้าง ข้างหนึ่งตกไหม","Arms: raise both — one drifts?"],
+["ฟังเสียง: พูดประโยคง่ายๆ ชัดไหม","Speech: simple sentence — clear?"],["ถ้ามีข้อใดข้อหนึ่ง โทร 1669 ทันที จดเวลาที่เริ่ม","Any yes: call 1669 now, note the time"],["ห้ามให้ยา อาหาร หรือน้ำ","No medicine, food or water"]]},
+{id:"fall",t:["ผู้สูงอายุล้ม","After a fall"],s:["อย่าเพิ่งพยุงลุก","Don't lift right away"],st:[
+["อย่ารีบดึงลุก ถามว่าเจ็บตรงไหน","Don't pull them up; ask where it hurts"],["ศีรษะกระแทก เจ็บสะโพกมาก หรือขยับไม่ได้ โทร 1669","Hit head, bad hip pain or can't move: call 1669"],
+["ถ้าไม่เจ็บ ให้พลิกตะแคง คลานไปหาเก้าอี้ที่มั่นคง","If unhurt, roll to side and crawl to a sturdy chair"],["ใช้เก้าอี้ช่วยดันตัวขึ้นนั่ง แล้วพักก่อน","Push up onto the chair, then rest"],["เฝ้าดู 24 ชม. ถ้าซึม อาเจียน ปวดหัว ไปโรงพยาบาล","Watch 24 h; drowsy, vomiting or headache means hospital"]]},
+{id:"sundown",t:["สับสนช่วงเย็น (สมองเสื่อม)","Evening confusion (dementia)"],s:["รับมืออย่างใจเย็น","Respond calmly"],st:[
+["พูดช้า ประโยคสั้น ทีละเรื่อง","Speak slowly, one thing at a time"],["อย่าเถียงหรือแก้ความจำ ให้รับฟังและเบี่ยงความสนใจ","Don't argue; listen and redirect"],
+["เช็กว่าหิว ปวด หรืออยากเข้าห้องน้ำไหม","Check hunger, pain, toilet"],["เปิดไฟสว่างก่อนค่ำ ทำกิจวัตรเดิมทุกวัน","Lights on before dusk; same routine daily"],
+["ถ้าเดินออกนอกบ้านบ่อย เปิดเขตปลอดภัยในแท็บเตือนภัย","If they wander, turn on the safe zone in Alerts"]]}];
+let clog=[[],[]],brief=["",""],sumDone=[false,false],dict=null,listening=false;try{const s=JSON.parse(localStorage.getItem("hc-log")||"null");if(Array.isArray(s)&&s.length===2)clog=s}catch(e){}
+let ei=0,tab=0,sel=new Set(),guide=null,done=new Set(),chat=[[],[]],sample=null,timerI=null,showSec=false,toast=null,simI=null;
+let locMode="emer",ev=null,hist=[],logs=[],rules={sos:1,fall:1,hr:1,spo2:1,zone:1,vasc:1,miss:1,med:1};
+const el=()=>E[ei];
+function addLog(w,a){const d=new Date();logs.unshift({t:d.toTimeString().slice(0,5),w,a});logs=logs.slice(0,12)}
+logs=[{t:"06:49",w:["ระบบ HON","HON system"],a:["รับค่าที่แม่สมศรีวัดผ่านเว็บ HON","Received Mom Somsri's HON reading"]},{t:"07:15",w:["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],a:["ดูค่าสุขภาพ — ไม่ได้ดูพิกัด","Viewed vitals — not location"]},{t:"22/11",w:["บริษัทประกัน","Insurer"],a:["ได้รับสรุปรายเดือนแบบไม่ระบุพิกัด","Got monthly summary, no location"]}];
+hist=[{lv:"y",e:1,t:["พ่อประวิทย์ไม่ได้วัดมา 3 วัน","Dad Prawit hasn't measured for 3 days"],w:["วันนี้ 07:30","Today 07:30"]},{lv:"y",e:0,t:["น้ำตาลแม่สมศรี 68 mg/dL","Mom Somsri glucose 68 mg/dL"],w:["วันนี้ 07:05","Today 07:05"]},{lv:"y",e:1,t:["AGI พ่อประวิทย์แย่ลงต่อเนื่อง 2 สัปดาห์","Dad Prawit's AGI worse for 2 weeks"],w:["เมื่อวาน","Yesterday"]}];
+const SIM={sos:{lv:"r",t:["SOS จากมือถือ","SOS from phone"],d:["กดปุ่มฉุกเฉินในหน้า HON","Emergency button pressed in HON"]},
+fall:{lv:"r",t:["ตรวจพบการล้ม","Fall detected"],d:["เซนเซอร์มือถือพบการตกกระแทก และไม่มีใครกดยกเลิกใน 30 วินาที","Phone sensors caught a drop and impact; no one cancelled in 30 s"]},
+hr:{lv:"r",t:["ชีพจรผิดปกติ","Abnormal heart rate"],d:["ชีพจรขณะพัก 132 ครั้ง/นาที SpO₂ 90%","Resting HR 132 bpm, SpO₂ 90%"]},
+man:{lv:"r",t:["ผู้ดูแลแจ้งเหตุฉุกเฉิน","Caregiver raised emergency"],d:["แจ้งจากหน้าเช็กอาการ","Raised from symptom check"]},
+zone:{lv:"y",t:["ออกนอกเขตปลอดภัย","Left the safe zone"],d:["อยู่ห่างจากบ้าน 350 ม. เวลา 16:40","350 m from home at 16:40"]}};
+const STEPS=[{d:0,w:["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary caregiver)"],h:["แจ้งเตือนเสียงดัง + สั่น","Loud alert + vibrate"]},{d:12,w:["คุณสมชาย (ผู้ดูแลสำรอง)","Somchai (backup)"],h:["ถ้าไม่มีใครรับทราบใน 2 นาที","If no one responds in 2 min"]},{d:30,w:["พยาบาล HON + 1669","HON nurse + 1669"],h:["ใน 5 นาที ส่งพิกัดและข้อมูลสุขภาพให้","At 5 min, location and health data shared"]}];
+const ic={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z M10 20a2 2 0 0 0 4 0"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',pulse:'<path d="M3 12h4l3-7 4 14 3-7h4"/>',book:'<path d="M5 4h11l3 3v13H5z M9 10h7 M9 14h7"/>'};
+function level(){if(!sel.size)return null;const l=[...sel].map(id=>SYM.find(s=>s.id===id).lv);return l.includes("r")?"r":l.includes("y")?"y":"g"}
+const agiLv=a=>a<-0.6?"g":"y";
+function drawLine(){const f=$("#fig");if(!f)return;const s=f.querySelector("svg"),W=f.clientWidth,H=f.clientHeight,p=20,e=el(),a=e.agiT,n=a.length,lo=-0.7,hi=-0.1;
+ const x=i=>p+i*(W-2*p)/(n-1),y=v=>10+(v-lo)/(hi-lo)*(H-34);
+ const th=y(-0.6),pth=a.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+","+y(v).toFixed(1)).join("");
+ s.innerHTML=`<rect x="${p}" y="0" width="${W-2*p}" height="${th}" fill="var(--gbg)"/><text x="${W-p-4}" y="14" text-anchor="end" font-size="11" fill="var(--g)">${tx("เสี่ยงต่ำ < −0.6","Low risk < −0.6")}</text>
+ <path d="${pth}" fill="none" stroke="var(--tealT)" stroke-width="2.5"/>${a.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="${i===n-1?5:3}" fill="${i===n-1?"var(--coral)":"var(--tealT)"}"/>`).join("")}
+ ${months[lang==="th"?0:1].map((m,i)=>`<text x="${x(i)}" y="${H-4}" text-anchor="middle" font-size="11" fill="var(--mute)">${m}</text>`).join("")}`}
+const ro=new ResizeObserver(drawLine);
+function ring(e){const lv=agiLv(e.agi),c={g:"var(--g)",y:"var(--y)",r:"var(--r)"}[lv],frac=Math.min(1,Math.max(0.05,-e.agi)),C=2*Math.PI*46;
+ return `<div class="ring"><svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="46" fill="none" stroke="var(--teal2)" stroke-width="10"/><circle cx="56" cy="56" r="46" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(C*frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 56 56)"/></svg><div><span><b style="font-size:28px">${e.agi.toFixed(2)}</b><br><small>AGI</small></span></div></div>`}
+function briefBox(){return `<div class="aibox fade" id="briefBox">${brief[ei]?esc(brief[ei]):""}</div><button class="btn alt full" id="mkBrief" style="margin-top:${brief[ei]?0:12}px">${brief[ei]?tx("สรุปใหม่จากค่าล่าสุด","Refresh brief"):tx("ให้ AI สรุปเช้านี้ (1 นาทีอ่านจบ)","Get the AI morning brief (1-min read)")}</button>`}
+function workflow(){const e=el(),n=clog[ei].length,W=[
+[tx("1 วัดค่า","1 Measure"),"HON",e.id==="s",0],[tx("2 วิเคราะห์","2 Analyse"),tx("สรุปเช้า","Brief"),!!brief[ei],1],[tx("3 เตือน","3 Alert"),tx("ผู้ดูแล","Caregiver"),true,0],
+[tx("4 บันทึก","4 Log"),n?n+tx(" รายการ"," items"):tx("อาการ","Symptoms"),n>0,1],[tx("5 ส่งหมอ","5 Doctor"),tx("สรุป","Summary"),sumDone[ei],1]];
+ return `<p class="ailab" style="margin:0 0 6px">${tx("WORKFLOW ดูแลวันนี้","TODAY'S CARE WORKFLOW")}</p><ol class="wf">${W.map(w=>`<li class="${w[2]?"ok":""} ${w[3]?"ai":""}"><b>${w[0]}</b><span>${w[1]}</span></li>`).join("")}</ol>`}
+function careLog(){const L=clog[ei];return `<div class="card" id="logCard"><span class="ailab">AI</span><h3>${tx("บันทึกอาการ พิมพ์หรือพูดก็ได้","Care log — type or speak")}</h3>
+<p class="mini" style="margin:0 0 8px">${tx("เล่าสิ่งที่เห็นแบบภาษาพูด AI จะจัดหมวด ประเมินความเร่งด่วน และใส่ในสรุปส่งหมอให้เอง ไม่ต้องจดเอง","Describe what you see in plain words. AI sorts it, rates urgency and adds it to the doctor summary for you.")}</p>
+<textarea class="in" id="logIn" placeholder="${tx("เช่น แม่ไม่ค่อยกินข้าวเช้า บ่นเวียนหัวตอนลุก","e.g. Mom barely ate breakfast and felt dizzy standing up")}"></textarea>
+<div class="row" style="margin-top:8px">${dict?`<button class="btn alt" id="mic" aria-label="${tx("พูด","Speak")}">${listening?tx("หยุดฟัง","Stop"):tx("พูด","Speak")}</button>`:""}<button class="btn" id="saveLog" style="flex:1">${tx("บันทึกให้ AI จัดการ","Save and let AI sort it")}</button></div>
+${dict?"":`<p class="mini" style="margin:6px 0 0">${tx("บนมือถือ กดไมค์ที่แป้นพิมพ์เพื่อพูดแทนพิมพ์ได้","On a phone, use the keyboard mic to speak instead of typing")}</p>`}
+<div style="margin-top:10px">${L.map((x,i)=>`<div class="ent fade"><div class="row" style="justify-content:space-between"><span class="tag ${x.lv}"><span class="dot"></span>${{g:tx("เขียว","Green"),y:tx("เหลือง","Amber"),r:tx("แดง","Red")}[x.lv]} · ${esc(x.cat)}</span><span class="mini">${x.t}</span></div><p style="font-weight:600">${esc(x.sum)}</p>${x.next?`<p class="mini">${esc(x.next)}</p>`:""}${x.lv==="r"?`<div class="btns" style="margin-top:8px"><a class="btn red" href="tel:1669">${tx("โทร 1669","Call 1669")}</a><button class="btn" data-sim="man">${tx("แจ้งครอบครัว+พิกัด","Alert family + location")}</button></div>`:""}</div>`).join("")}</div></div>`}
+const KW={face:/หน้าเบี้ยว|ปากเบี้ยว|droop/,arm:/อ่อนแรง|weak/,speech:/พูดไม่ชัด|พูดไม่ออก|slur/,chest:/เจ็บหน้าอก|แน่นหน้าอก|chest/,breath:/หายใจ|หอบ|breath/,wake:/ปลุกไม่ตื่น|ซึม|drows|won'?t wake/,head:/หัวกระแทก|ศีรษะกระแทก|hit (her|his)? ?head/,fever:/ไข้|fever/,confuse:/สับสน|งง|confus/,noeat:/ไม่กิน|ไม่ค่อยกิน|ไม่ยอมกิน|กินน้อย|won'?t eat|barely ate|not eat/,fall:/ล้ม|fell|fall/,dizzy:/เวียน|มึน|หน้ามืด|dizz/,cough:/ไอ|cough/,constip:/ท้องผูก|constip/,sleep:/นอนไม่หลับ|sleep/};
+const rank={g:0,y:1,r:2},maxLv=(a,b)=>rank[a]>=rank[b]?a:b;
+function ruleIds(t){const s=t.toLowerCase(),ids=Object.keys(KW).filter(k=>KW[k].test(s));if(ids.includes("head"))return ids.filter(i=>i!=="fall");return ids}
+function ruleLv(ids){return ids.reduce((a,id)=>maxLv(a,SYM.find(x=>x.id===id).lv),"g")}
+async function saveLog(){const ta=$("#logIn"),raw=ta.value.trim();if(!raw)return;const b=$("#saveLog");b.disabled=true;b.textContent=tx("AI กำลังจัดการ...","AI is sorting...");
+ const ids=ruleIds(raw),rl=ruleLv(ids),now=new Date().toTimeString().slice(0,5);let ent=null;
+ if(sample){try{const v=await sample.json(SYS()+`\n\nThe caregiver logged this note: """${raw}"""\nReturn JSON only: {"summary": one short line in ${lang==="th"?"Thai":"English"} written for a doctor, "category": one of ${lang==="th"?'"อาการ","อาหาร","ยา","อารมณ์","กิจกรรม","อื่นๆ"':'"Symptom","Meal","Medicine","Mood","Activity","Other"'}, "level": "g"|"y"|"r" (r = emergency, y = see doctor within 24h, g = home care), "next": one short next step for the caregiver in ${lang==="th"?"Thai":"English"}}`,{modelTier:"quick"});
+  if(v&&v.summary)ent={t:now,raw,sum:String(v.summary),cat:String(v.category||""),lv:maxLv(rank[v.level]!==undefined?v.level:"g",rl),next:String(v.next||""),ai:true}}catch(e){}}
+ if(!ent){const cat=ids.length?tx("อาการ","Symptom"):/ยา|med|pill/i.test(raw)?tx("ยา","Medicine"):/กิน|ข้าว|อาหาร|eat|meal/i.test(raw)?tx("อาหาร","Meal"):tx("อื่นๆ","Other");
+  ent={t:now,raw,sum:raw,cat,lv:rl,next:ADV[rl][lang==="th"?0:1].split(/(?<=[.。]) |\s(?=ถ้า)/)[0],ai:false}}
+ clog[ei].unshift(ent);try{localStorage.setItem("hc-log",JSON.stringify(clog))}catch(e){}
+ addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],[`บันทึกอาการของ${el().name[0]}`,`Logged a note for ${el().name[1]}`]);render(true);const c=$("#logCard");if(c)c.scrollIntoView({block:"start"})}
+async function mkBrief(){const box=$("#briefBox"),e=el();const fb=e.id==="s"?tx("สถานะ: ความดันคงที่ ค่า AGI ดีขึ้น แต่น้ำตาลลดลง 4 วันติด เช้านี้ 68\nทำวันนี้: 1) ทำตามกฎ 15–15 ถ้าแม่รู้ตัว 2) ให้อาหารเช้าก่อนยา Metformin 3) โทรถามหมอเรื่องลดยา\nเฝ้าดู: เหงื่อออก มือสั่น สับสนมากขึ้น","Status: BP steady, AGI improving, but glucose has fallen 4 days to 68 today\nToday: 1) 15–15 rule if she's alert 2) breakfast before Metformin 3) call the doctor about the dose\nWatch for: sweating, shaky hands, more confusion"):tx("สถานะ: ไม่ได้วัด 3 วัน AGI −0.21 แย่ลง 2 สัปดาห์ ความดันเฉลี่ยราว 152\nทำวันนี้: 1) ชวนพ่อวัดด้วย HON 2) เช็กยา Amlodipine กับ Atorvastatin 3) ส่งสรุปให้หมอ นัดตรวจใน 1–2 สัปดาห์\nเฝ้าดู: ปวดหัวรุนแรง เจ็บหน้าอก แขนขาอ่อนแรง","Status: no reading for 3 days; AGI −0.21 and worsening 2 weeks; BP around 152\nToday: 1) get Dad to measure with HON 2) check Amlodipine and Atorvastatin 3) send the summary, book a visit within 1–2 weeks\nWatch for: severe headache, chest pain, one-sided weakness");
+ const b=$("#mkBrief");if(b){b.disabled=true;b.textContent=tx("AI กำลังสรุป...","AI is writing...")}
+ if(sample){try{const logs=clog[ei].map(x=>x.t+" "+x.sum).join("; ")||"none";
+  const r=await sample(SYS()+`\n\nWrite the caregiver's morning brief from today's readings and these care-log notes: ${logs}. Exactly 3 lines, plain text: "${tx("สถานะ:","Status:")} ...", "${tx("ทำวันนี้:","Today:")} 1) 2) 3)", "${tx("เฝ้าดู:","Watch for:")} ...". Max 60 words.`,{modelTier:"quick",onText:({text})=>{if(box)box.textContent=text}});brief[ei]=r.text}catch(x){brief[ei]=fb}}else brief[ei]=fb;
+ render(true)}
+function home(){const e=el(),lv=agiLv(e.agi),diff=0;
+ const top=e.id==="s"?`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${tx("น้ำตาลเช้านี้ 68 mg/dL ต่ำกว่าปกติ","Morning glucose 68 mg/dL is low")}</h3><p style="margin:0 0 12px">${tx("ต่ำกว่า 70 คือน้ำตาลต่ำ และลดลงติดกัน 4 วัน ถ้าแม่รู้ตัวและกลืนได้ ทำตามคู่มือตอนนี้ แล้วแจ้งหมอเรื่องยาเบาหวาน","Below 70 is low, and it has fallen 4 days running. If she's awake and can swallow, follow the guide now, then tell her doctor about her diabetes medicine.")}</p><button class="btn full" data-guide="hypo">${tx("เปิดคู่มือน้ำตาลต่ำ","Open low-sugar guide")}</button>${briefBox()}</div>`
+ :`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${tx("พ่อไม่ได้วัดมา 3 วัน และค่า AGI แย่ลง 2 สัปดาห์","Dad hasn't measured for 3 days and his AGI has worsened for 2 weeks")}</h3><p style="margin:0 0 12px">${tx("ชวนพ่อเปิดเว็บ HON วัดด้วยมือถือเช้านี้ เช็กว่ากินยาความดันครบ แล้วส่งรายงานให้หมอ","Get Dad to measure with HON on his phone this morning, check his BP medicine, then send the report to his doctor.")}</p><div class="btns"><button class="btn" id="nudge">${tx("ส่งเตือนไปมือถือพ่อ","Nudge Dad's phone")}</button><button class="btn alt" data-guide="vasc">${tx("ดูวิธีช่วย","What to do")}</button></div>${briefBox()}</div>`;
+ return `${workflow()}${top}${careLog()}
+<div class="card"><div class="row" style="justify-content:space-between"><h3>${tx("ดัชนีหลอดเลือด AGI","Arterial index AGI")}</h3><span class="tag ${lv}"><span class="dot"></span>${{g:tx("เสี่ยงต่ำ","Low risk"),y:tx("ควรเฝ้าระวัง","Keep watch"),r:tx("เสี่ยงสูง","High risk")}[lv]}</span></div>
+<div class="va">${ring(e)}<div><p style="margin:0;font-weight:600">${e.agi<-0.6?tx("อยู่ในเกณฑ์เสี่ยงต่ำ และดีขึ้นต่อเนื่อง 6 เดือน","In the low-risk zone and improving for 6 months"):tx("สูงกว่าเกณฑ์เสี่ยงต่ำ และแย่ลงต่อเนื่อง 2 สัปดาห์","Above the low-risk zone and worsening for 2 weeks")}</p>
+<p class="mini" style="margin:2px 0 0">${tx("เกณฑ์ HON: ต่ำกว่า −0.6 = เสี่ยงต่ำ ยิ่งติดลบยิ่งดี","HON scale: below −0.6 = low risk; more negative is better")}<br>${tx("จากคลื่นชีพจร (PPG) ที่ HON วัดด้วยกล้องมือถือ","From the pulse wave (PPG) HON reads with the phone camera")}</p></div></div>
+<div class="fig" id="fig" aria-label="AGI trend"><svg></svg></div>
+<ul class="list" style="margin-top:8px"><li><span>PWV ${tx("ความเร็วคลื่นชีพจร","pulse wave velocity")}</span><span class="v" style="color:${e.pwv<9?"var(--g)":"var(--y)"}">${e.pwv} m/s · ${tx("ดี < 9.0","good < 9.0")}</span></li>
+<li><span>${tx("ดัชนีความแข็ง SI","Stiffness index SI")}</span><span class="v">${e.si} m/s · ${tx("ดี < 8.0","good < 8.0")}</span></li><li><span>Augmentation Index</span><span class="v">${e.aix}%</span></li></ul>
+<p class="note">${tx("ค่าประมาณจากมือถือ ไม่ใช่การวินิจฉัย ใช้ดูแนวโน้มและคุยกับหมอ","Phone estimate, not a diagnosis — use it for trends and doctor visits")}</p></div>
+<div class="grid2" style="margin-bottom:14px"><div class="stat"><span class="mini">${tx("ความดัน","BP")}</span><b>${e.bp}</b><span class="mini">mmHg</span></div><div class="stat"><span class="mini">${e.glu?tx("น้ำตาลเช้า","Glucose"):tx("ชีพจรขณะพัก","Resting HR")}</span><b style="${e.glu?"color:var(--coral)":""}">${e.glu?68:e.hr}</b><span class="mini">${e.glu?"mg/dL ↓":"bpm"}</span></div>
+<div class="stat"><span class="mini">SpO₂</span><b>${e.spo2}%</b><span class="mini">${tx("ออกซิเจนในเลือด","blood oxygen")}</span></div><div class="stat"><span class="mini">${tx("วัดเดือนนี้","Measured this month")}</span><b>${e.id==="s"?18:11}/24 ${tx("วัน","days")}</b><span class="mini">${e.last[lang==="th"?0:1]}</span></div></div>
+<div class="card"><h3>${tx("ยาวันนี้","Today's medicines")}</h3><ul class="list">${e.meds.map(m=>`<li><span>${m[1]}</span><span class="v">${m[0]}</span></li>`).join("")}</ul></div>
+<div class="card"><h3>${tx("สรุปส่งหมอ","Doctor summary")}</h3><p class="mini" style="margin:0 0 10px">${tx("AGI ความดัน และอาการ 7 วัน ให้หมออ่านใน 30 วินาที","AGI, BP and symptoms for 7 days — a 30-second read")}</p><div id="sumBox"></div><button class="btn alt full" id="mkSum">${tx("สร้างสรุป","Create summary")}</button></div>`}
+function mapSvg(show){const e=el(),out=ev&&ev.k==="zone";const ex=out?262:150,ey=out?62:118;
+ return `<svg viewBox="0 0 360 220" role="img" aria-label="${tx("แผนที่ตำแหน่ง","Location map")}">
+<rect width="360" height="220" fill="var(--map)"/><path d="M0 150 H360 M120 0 V220 M0 40 L360 90 M250 0 V220" stroke="var(--road)" stroke-width="14" fill="none"/>
+<rect x="20" y="170" width="80" height="40" rx="6" fill="var(--gbg)"/><text x="60" y="194" text-anchor="middle" font-size="11" fill="var(--g)">${tx("สวน","Park")}</text>
+<circle cx="150" cy="118" r="52" fill="var(--gbg)" fill-opacity=".55" stroke="var(--g)" stroke-dasharray="5 4"/><text x="150" y="182" text-anchor="middle" font-size="11" fill="var(--g)">${tx("เขตปลอดภัย 200 ม.","Safe zone 200 m")}</text>
+<path d="M140 120 l10 -9 l10 9 v10 h-20z" fill="var(--tealT)"/>
+<circle cx="322" cy="196" r="7" fill="var(--tealT)" stroke="#fff" stroke-width="2"/><text x="310" y="200" text-anchor="end" font-size="11" fill="var(--ink)">${tx("คุณ · 4.2 กม.","You · 4.2 km")}</text>
+${show?`<circle class="pulse" cx="${ex}" cy="${ey}" r="8" fill="var(--r)"/><circle cx="${ex}" cy="${ey}" r="8" fill="var(--r)" stroke="#fff" stroke-width="2.5"/><text x="${ex}" y="${ey-16}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">${e.name[lang==="th"?0:1]}</text>`:""}</svg>`}
+function alerts(){const e=el(),live=ev&&ev.e===ei,show=locMode==="always"||(locMode==="emer"&&live);
+ const el2=live?Math.floor((Date.now()-ev.at)/1000):0;
+ return `<h2>${tx("เตือนภัยและพิกัด","Alerts & location")}</h2>
+${live?`<div class="card alert ${SIM[ev.k].lv} fade"><span class="tag ${SIM[ev.k].lv}"><span class="dot"></span>${SIM[ev.k].t[lang==="th"?0:1]}</span><h3 style="margin-top:8px">${e.name[lang==="th"?0:1]} · ${SIM[ev.k].d[lang==="th"?0:1]}</h3>
+<ol class="esc">${STEPS.map((s,i)=>{const st=ev.ack?(i===0?"ok":""):(el2>=s.d?"on":"");return `<li class="${st}"><i></i><div><b>${s.w[lang==="th"?0:1]}</b><div class="mini">${s.h[lang==="th"?0:1]}</div></div><time>${i===0?"0:00":i===1?"2:00":"5:00"}</time></li>`}).join("")}</ol>
+${ev.ack?`<p style="margin:8px 0;font-weight:600;color:var(--g)">${tx("รับทราบแล้ว ระบบหยุดส่งต่อ แจ้งครอบครัวว่าคุณกำลังไป","Acknowledged — escalation stopped; family told you're on the way")}</p>`:`<p class="mini">${tx("เดโมเร่งเวลา ×10","Demo runs at 10× speed")}</p>`}
+<div class="btns" style="margin-top:8px">${ev.ack?"":`<button class="btn" id="ack">${tx("รับทราบ กำลังไป","On my way")}</button>`}<a class="btn red" href="tel:1669">${tx("โทร 1669","Call 1669")}</a><button class="btn alt" id="endEv">${tx("ปิดเหตุการณ์","Close event")}</button></div></div>`:""}
+<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3>${tx("ตำแหน่งของ","Location of")} ${e.name[lang==="th"?0:1]}</h3><span class="mini">${show?tx("แชร์อยู่","Sharing"):tx("ซ่อนอยู่","Hidden")}</span></div>
+<div class="map">${mapSvg(show)}${show?"":`<div class="lock"><div><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p style="margin:6px 0 0;font-weight:600">${locMode==="off"?tx("ผู้สูงอายุปิดการแชร์ตำแหน่ง","Location sharing is off"):tx("เปิดเผยเฉพาะเมื่อมีเหตุฉุกเฉินหรือออกนอกเขตปลอดภัย","Shown only during an emergency or when leaving the safe zone")}</p><p class="mini" style="margin:4px 0 0">${tx("ตามที่ผู้สูงอายุยินยอมไว้","As the older person consented")}</p></div></div>`}</div>
+${show?`<p class="mini" style="margin:8px 0 0">${tx("อัปเดต 10 วินาทีที่แล้ว · ความแม่นยำ ±15 ม. · การดูครั้งนี้ถูกบันทึก","Updated 10 s ago · ±15 m · this view is logged")}</p>`:""}</div>
+<div class="card"><h3>${tx("ฝั่งผู้สูงอายุ: HON Safety","Elder side: HON Safety")}</h3><p class="mini" style="margin:0 0 10px">${tx("เปิดบนมือถือผู้สูงอายุ มีปุ่ม SOS และตรวจจับการล้ม ส่งแจ้งเตือนจริงพร้อมพิกัดถึงมือถือผู้ดูแลผ่านแอป ntfy","Open on the elder's phone: SOS button and fall detection, sending real alerts with location to the caregiver via the ntfy app")}</p><a class="btn full" href="https://jajakarntima29-choo.github.io/hon-prototype/hon-safety.html" target="_blank" rel="noopener">${tx("เปิด HON Safety","Open HON Safety")}</a><p class="mini" style="margin:6px 0 0">jajakarntima29-choo.github.io/hon-prototype/hon-safety.html</p></div>
+<div class="card"><h3>${tx("จำลองเหตุการณ์ (เดโม)","Simulate an event (demo)")}</h3><div class="btns">${Object.keys(SIM).filter(k=>k!=="man").map(k=>`<button class="btn alt" data-sim="${k}">${SIM[k].t[lang==="th"?0:1]}</button>`).join("")}</div></div>
+<div class="card"><h3>${tx("ประวัติการแจ้งเตือน","Alert history")}</h3><ul class="list">${hist.map(h=>`<li><span><span class="tag ${h.lv}" style="padding:0 6px;margin-right:6px"><span class="dot"></span></span>${h.t[lang==="th"?0:1]}</span><span class="v">${h.w[lang==="th"?0:1]}</span></li>`).join("")}</ul></div>
+<div class="card"><h3>${tx("ตั้งค่าการเตือน","Alert rules")}</h3>${[
+["sos",tx("ปุ่ม SOS ในหน้า HON","SOS button in HON"),tx("แดง · ส่งต่อทันที","Red · escalates")],["fall",tx("ตรวจจับการล้ม","Fall detection"),tx("แดง · เซนเซอร์มือถือ (เดโม) ถัดไปใช้จี้ SOS","Red · phone sensors (demo), SOS pendant next")],
+["hr",tx("ชีพจร < 45 หรือ > 120 ขณะพัก, SpO₂ < 92%","HR < 45 or > 120 at rest, SpO₂ < 92%"),tx("แดง","Red")],["zone",tx("ออกนอกเขตปลอดภัย","Leaves the safe zone"),tx("เหลือง · สำหรับผู้มีภาวะสมองเสื่อม","Amber · for dementia")],
+["vasc",tx("AGI แย่ลงต่อเนื่อง 2 สัปดาห์","AGI worse for 2 weeks"),tx("เหลือง","Amber")],["miss",tx("ไม่ได้วัดเกิน 2 วัน","No measurement for 2+ days"),tx("เหลือง · เตือนที่มือถือผู้สูงอายุก่อน","Amber · nudges the elder's phone first")],
+["med",tx("ลืมกินยา","Missed medicine"),tx("เหลือง","Amber")]].map(r=>`<div class="set"><div><b style="font-weight:600">${r[1]}</b><div class="mini">${r[2]}</div></div><button class="sw" role="switch" aria-checked="${!!rules[r[0]]}" data-rule="${r[0]}" aria-label="${r[1]}"></button></div>`).join("")}</div>`}
+function security(){const P=[[tx("ผู้ดูแลหลัก","Primary caregiver"),"✓",tx("ฉุกเฉิน","Emergency"),"✓"],[tx("ผู้ดูแลสำรอง","Backup caregiver"),tx("สรุป","Summary"),tx("ฉุกเฉิน","Emergency"),"—"],[tx("พยาบาล HON","HON nurse"),"✓",tx("ฉุกเฉิน","Emergency"),"✓"],[tx("บริษัทประกัน","Insurer"),tx("สรุปรายเดือน","Monthly"),"✕","✕"]];
+ return `<button class="back" id="secBack">${tx("‹ กลับ","‹ Back")}</button><h2>${tx("ความปลอดภัยและความเป็นส่วนตัว","Security & privacy")}</h2>
+<p class="mini">${tx("ข้อมูลสุขภาพและพิกัดเป็นข้อมูลอ่อนไหวตาม PDPA ผู้สูงอายุเป็นเจ้าของข้อมูล และเลือกได้ว่าใครเห็นอะไร","Health and location data are sensitive under PDPA. The older person owns it and chooses who sees what.")}</p>
+<div class="card"><h3>${tx("การแชร์ตำแหน่ง","Location sharing")}</h3><div class="seg">${[["emer",tx("เฉพาะฉุกเฉิน","Emergency only")],["always",tx("ตลอดเวลา","Always")],["off",tx("ปิด","Off")]].map(m=>`<button data-loc="${m[0]}" aria-pressed="${locMode===m[0]}">${m[1]}</button>`).join("")}</div>
+<p class="mini" style="margin:8px 0 0">${tx("แนะนำ: เฉพาะฉุกเฉิน — ตำแหน่งเปิดเมื่อมี SOS ล้ม ชีพจรผิดปกติ หรือออกนอกเขต และปิดเองหลังปิดเหตุการณ์ 60 นาที ประวัติตำแหน่งลบอัตโนมัติใน 30 วัน","Recommended: emergency only — opens on SOS, fall, abnormal vitals or leaving the zone, and closes 60 min after the event ends. History auto-deletes after 30 days.")}</p></div>
+<div class="card"><h3>${tx("ใครเห็นอะไร","Who sees what")}</h3><table><thead><tr><th>${tx("บทบาท","Role")}</th><th class="c">${tx("ค่าสุขภาพ","Vitals")}</th><th class="c">${tx("พิกัด","Location")}</th><th class="c">${tx("แชต AI","AI chat")}</th></tr></thead><tbody>${P.map(r=>`<tr><td>${r[0]}</td><td class="c">${r[1]}</td><td class="c">${r[2]}</td><td class="c">${r[3]}</td></tr>`).join("")}</tbody></table>
+<p class="mini" style="margin:8px 0 0">${tx("บริษัทประกันไม่เคยได้รับพิกัด","Insurers never receive location")}</p></div>
+<div class="card"><h3>${tx("ระบบป้องกัน","Protection")}</h3><ul class="list">${[
+[tx("เข้าสู่ระบบ","Sign-in"),tx("Passkey / สแกนหน้า + OTP","Passkey / Face + OTP")],[tx("ดูพิกัดหรือรายงาน","Open location or report"),tx("ยืนยันตัวตนซ้ำทุกครั้ง","Re-verify every time")],
+[tx("ส่งข้อมูล","In transit"),"TLS 1.3"],[tx("เก็บข้อมูล","At rest"),tx("AES-256 แยกกุญแจรายครอบครัว","AES-256, key per family")],[tx("พิกัด","Location"),tx("เข้ารหัสปลายทาง เปิดได้เฉพาะเหตุฉุกเฉิน","End-to-end, emergency unlock")],
+[tx("ที่เก็บข้อมูล","Data region"),tx("เซิร์ฟเวอร์ในประเทศไทย","Servers in Thailand")],[tx("เครื่องหาย","Lost phone"),tx("ถอนสิทธิ์จากระยะไกล","Revoke remotely")],[tx("ความผิดปกติ","Anomalies"),tx("แจ้งเมื่อมีการเข้าถึงจากอุปกรณ์ใหม่","Alert on new-device access")]]
+.map(r=>`<li><span>${r[0]}</span><span class="v">${r[1]}</span></li>`).join("")}</ul></div>
+<div class="card"><h3>${tx("ความยินยอม (PDPA)","Consent (PDPA)")}</h3><ul class="list"><li><span>${tx("แม่สมศรี ยินยอมแชร์ค่าสุขภาพ + พิกัดฉุกเฉิน","Mom Somsri: vitals + emergency location")}</span><span class="v">12 ก.ค. 2569</span></li><li><span>${tx("พ่อประวิทย์ ยินยอมแชร์ค่าสุขภาพ","Dad Prawit: vitals")}</span><span class="v">12 ก.ค. 2569</span></li></ul><p class="mini" style="margin:8px 0 0">${tx("ถอนความยินยอมได้ทุกเมื่อจากแอป HON","Withdraw any time from the HON app")}</p></div>
+<div class="card"><h3>${tx("บันทึกการเข้าถึง","Access log")}</h3><p class="mini" style="margin:0 0 6px">${tx("ผู้สูงอายุเห็นบันทึกนี้ในแอป HON ของตัวเอง","The older person sees this log in their own HON app")}</p><ul class="list">${logs.map(l=>`<li><span>${esc(l.w[lang==="th"?0:1])}<div class="mini">${esc(l.a[lang==="th"?0:1])}</div></span><span class="v">${l.t}</span></li>`).join("")}</ul></div>
+<p class="note">${tx("ต้นแบบนี้แสดงการออกแบบระบบ ยังไม่ได้เข้ารหัสหรือเชื่อมต่อจริง","This prototype shows the design; encryption and live connections are not implemented")}</p>`}
+function ask(){const c=chat[ei],e=el(),q=e.id==="s"?[tx("แม่ไม่ยอมกินข้าว ควรให้ยาเบาหวานไหม","Mom won't eat — still give her diabetes pill?"),tx("ค่า AGI ของแม่หมายความว่าอะไร","What does Mom's AGI mean?"),tx("แม่สับสนตอนเย็นทุกวัน ทำยังไงดี","Mom gets confused every evening")]:[tx("AGI ของพ่อแย่ลง ต้องกังวลไหม","Dad's AGI is getting worse — should I worry?"),tx("ความดัน 152 ต้องไปหาหมอไหม","BP 152 — see a doctor?"),tx("ชวนพ่อวัดทุกวันยังไงดี","How do I get Dad to measure daily?")];
+ return `<h2>${tx("ถาม HON Care","Ask HON Care")}</h2><p class="mini">${tx("AI รู้โรค ยา ค่า AGI และค่าล่าสุดของ","The AI knows the conditions, medicines, AGI and latest readings of")} ${e.name[lang==="th"?0:1]}</p>
+<div class="chat" id="chat">${c.map(m=>`<div class="msg ${m.r==="user"?"me":"ai"}">${esc(m.c)}</div>`).join("")}</div>
+${c.length?"":`<div class="chips" style="margin-bottom:12px">${q.map(x=>`<button class="chip" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div>`}
+<p class="note">${tx("HON Care ไม่ใช่การวินิจฉัย ถ้าไม่แน่ใจหรืออาการแย่ลง โทรหาหมอหรือ 1669","HON Care doesn't diagnose. If unsure or worse, call the doctor or 1669.")}</p>
+<form class="composer" id="cf"><input id="q" placeholder="${tx("พิมพ์คำถาม...","Type a question...")}" autocomplete="off" aria-label="question"><button class="btn">${tx("ส่ง","Send")}</button></form>`}
+function tri(){const lv=level();return `<h2>${tx("เช็กอาการ","Symptom check")}</h2><p class="mini">${tx("เลือกอาการที่เห็นตอนนี้ แอปจะบอกว่าควรทำอะไรต่อ","Pick what you see now; the app tells you what to do next")}</p>
+<div class="chips" style="margin-bottom:14px">${SYM.map(s=>`<button class="chip" data-s="${s.id}" aria-pressed="${sel.has(s.id)}">${s.t[lang==="th"?0:1]}</button>`).join("")}</div>
+${lv?`<div class="card alert ${lv} fade"><span class="tag ${lv}"><span class="dot"></span>${LV[lv][lang==="th"?0:1]}</span><p style="margin:10px 0">${ADV[lv][lang==="th"?0:1]}</p>
+${lv==="r"?`<div class="btns"><a class="btn red" href="tel:1669">${tx("โทร 1669","Call 1669")}</a><button class="btn" data-sim="man">${tx("แจ้งครอบครัว+พิกัด","Alert family + location")}</button></div>`:""}
+<div id="triAi" style="margin-top:10px;white-space:pre-wrap"></div><button class="btn alt full" id="triMore" style="margin-top:10px">${tx("ให้ AI อธิบายเพิ่ม","Ask AI to explain")}</button></div>`:""}
+${sel.size?`<button class="btn alt" id="clr">${tx("ล้าง","Clear")}</button>`:""}`}
+function guides(){if(guide){const g=G.find(x=>x.id===guide),L=lang==="th"?0:1;return `<button class="back" id="bk">${tx("‹ กลับ","‹ Back")}</button><h2>${g.t[L]}</h2><span class="tag y">${g.s[L]}</span>
+<ol class="steps" style="margin-top:10px">${g.st.map((s,i)=>`<li data-st="${i}" class="${done.has(i)?"done":""}" tabindex="0">${s[L]}</li>`).join("")}</ol>
+${g.timer?`<div class="card" style="margin-top:14px"><div class="timer" id="tm">${g.timer}:00</div><button class="btn full" id="tStart">${tx("เริ่มจับเวลา 15 นาที","Start 15-min timer")}</button></div>`:""}
+<p class="note">${tx("ฉบับร่าง รอพยาบาลตรวจ","Draft, pending nurse review")}</p>`}
+ const L=lang==="th"?0:1;return `<h2>${tx("คู่มือทีละขั้น","Step-by-step guides")}</h2><p class="mini">${tx("ฉบับร่าง รอพยาบาลตรวจ","Draft, pending nurse review")}</p><div class="glist">${G.map(g=>`<button data-guide="${g.id}"><span><b>${g.t[L]}</b><small>${g.s[L]}</small></span><span aria-hidden="true">›</span></button>`).join("")}</div>
+<h3 style="margin-top:16px">${tx("AGI คืออะไร","What is AGI?")}</h3><div class="card"><p style="margin:0">${tx("HON ใช้กล้องและแฟลชมือถืออ่านรูปคลื่นชีพจรจากปลายนิ้ว แล้วประเมินว่าหลอดเลือดแข็งแค่ไหน ค่า AGI ยิ่งติดลบมากยิ่งดี (ต่ำกว่า −0.6 = เสี่ยงต่ำ) หลอดเลือดที่แข็งเร็วสัมพันธ์กับความเสี่ยงโรคหัวใจและหลอดเลือดสมอง ผู้ดูแลช่วยได้ด้วยการวัดสม่ำเสมอ กินยาครบ ลดเค็ม และพาเดิน","HON uses the phone camera and flash to read the fingertip pulse waveform to estimate how stiff the arteries are. A more negative AGI is better (below −0.6 = low risk). Faster stiffening is linked to heart disease and stroke risk. Caregivers help through regular measuring, medicine adherence, less salt and walking.")}</p></div>`}
+const TABS=[["home",tx("วันนี้","Today")],["bell",tx("เตือนภัย","Alerts")],["chat",tx("ถาม AI","Ask AI")],["pulse",tx("เช็กอาการ","Symptoms")],["book",tx("คู่มือ","Guides")]];
+function render(keep){document.documentElement.lang=lang;$("#lang").textContent=lang==="th"?"EN":"ไทย";
+ $("#tagline").textContent=tx("ผู้ช่วยของคนดูแล · เชื่อมกับ HON","Caregiver companion · linked to HON");$("#sync").textContent=tx("รับค่าที่วัดผ่านเว็บ HON (กล้อง+แฟลชมือถือ) · ข้อมูลจำลอง","Readings from HON web (phone camera + flash) · sample data");
+ $("#sideP").textContent=tx("HON ให้ผู้สูงอายุวัดสุขภาพด้วยกล้องมือถือ ส่วน HON Care ส่งข้อมูลเดียวกันมาเป็นความรู้ การเตือน และพิกัดให้ครอบครัวที่ดูแล","HON lets the older person measure with a phone camera. HON Care turns that same data into know-how, alerts and location for the family caring for them.");
+ $("#sideN").textContent=tx("ต้นแบบสำหรับเดโม ข้อมูลจำลอง คู่มือเป็นฉบับร่างรอพยาบาลตรวจ","Demo prototype, sample data, draft guides pending nurse review");
+ $("#who").innerHTML=E.map((e,i)=>`<button aria-pressed="${i===ei}" data-ei="${i}"><span class="av" style="--c:${e.col}"></span><span><b>${e.name[lang==="th"?0:1]} · ${e.age}</b><span>${e.last[lang==="th"?0:1]}</span></span></button>`).join("");
+ const nAlert=ev&&!ev.ack?1:0;
+ $("#tabs").innerHTML=TABS.map((n,i)=>`<button role="tab" aria-selected="${!showSec&&i===tab}" data-tab="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">${ic[n[0]]}</svg>${n[1]}${i===1&&nAlert?`<span class="badge">1</span>`:""}</button>`).join("");
+ const v=$("#view"),sy=v.scrollTop;v.innerHTML=showSec?security():[home,alerts,ask,tri,guides][tab]();ro.disconnect();const f=$("#fig");if(f)ro.observe(f);v.scrollTop=keep?sy:0;renderToast()}
+function renderToast(){const t=$("#toast");if(!ev||ev.ack||(tab===1&&!showSec&&ev.e===ei)){t.innerHTML="";return}const e=E[ev.e];
+ t.innerHTML=`<div class="toast fade"><div style="flex:1"><b>${SIM[ev.k].t[lang==="th"?0:1]} · ${e.name[lang==="th"?0:1]}</b><span style="font-size:14px">${tx("แตะเพื่อดูพิกัดและรับทราบ","Tap to see location and respond")}</span></div><button id="goEv">${tx("เปิด","Open")}</button></div>`}
+function startSim(k){ev={k,e:k==="zone"?0:ei,at:Date.now(),ack:false};if(k==="zone")ei=0;
+ hist.unshift({lv:SIM[k].lv,e:ev.e,t:[SIM[k].t[0]+" · "+E[ev.e].name[0],SIM[k].t[1]+" · "+E[ev.e].name[1]],w:[tx("เมื่อสักครู่","Just now"),"Just now"]});
+ addLog(["ระบบ HON","HON system"],[`เปิดเผยพิกัด${E[ev.e].name[0]}ให้ผู้ดูแล (เหตุ: ${SIM[k].t[0]})`,`Unlocked ${E[ev.e].name[1]}'s location for caregivers (${SIM[k].t[1]})`]);
+ clearInterval(simI);simI=setInterval(()=>{if(!ev||ev.ack||Date.now()-ev.at>36000){clearInterval(simI)}if(tab===1&&!showSec)render(true)},1000);render()}
+function fallback(q){const s=q.toLowerCase(),p=el().id==="p";
+ if(/หลอดเลือด|vascular|agi/.test(s))return p?tx("ค่า AGI ของพ่ออยู่ที่ −0.21 สูงกว่าเกณฑ์เสี่ยงต่ำ (−0.6) และแย่ลงต่อเนื่อง 2 สัปดาห์ ยังไม่ใช่เหตุฉุกเฉิน แต่ควรใส่ใจ\n\n1. ชวนพ่อวัดทุกเช้าให้ได้ค่าต่อเนื่อง\n2. เช็กว่ากิน Amlodipine และ Atorvastatin ครบ\n3. ลดเค็ม ชวนเดินวันละ 20–30 นาที\n4. ส่งรายงาน HON ให้หมอและนัดตรวจภายใน 1–2 สัปดาห์","Dad's AGI is −0.21, above the low-risk line (−0.6), and has worsened for 2 weeks. Not an emergency, but worth acting on.\n\n1. Get him measuring every morning\n2. Check he takes Amlodipine and Atorvastatin\n3. Less salt; walk 20–30 min a day\n4. Send the HON report to his doctor and book a visit within 1–2 weeks"):tx("ค่า AGI ของแม่อยู่ที่ −0.64 อยู่ในเกณฑ์เสี่ยงต่ำ และดีขึ้นต่อเนื่อง 6 เดือน ทำต่อแบบเดิม: วัดทุกเช้า กินยาครบ และเดินสม่ำเสมอ","Mom's AGI is −0.64, in the low-risk zone and improving for 6 months. Keep it up: measure each morning, take medicines, walk regularly.");
+ if(/กิน|eat|ข้าว/.test(s))return tx("ถ้าแม่กินน้อย การให้ Metformin ตามปกติอาจทำให้น้ำตาลต่ำ และเช้านี้ได้ 68 แล้ว\n\n1. ให้อาหารอ่อน นม หรือน้ำผลไม้ทีละน้อย\n2. วัดน้ำตาลก่อนให้ยามื้อถัดไป\n3. โทรถามหมอหรือเภสัชกรวันนี้ — อย่าปรับยาเอง\n\nถ้าปลุกไม่ตื่นหรือสับสนมาก โทร 1669","If Mom eats little, her usual Metformin can push sugar too low — it was already 68 this morning.\n\n1. Offer soft food, milk or juice in small amounts\n2. Check glucose before the next dose\n3. Call her doctor or pharmacist today — don't change it yourself\n\nIf she can't be woken or is very confused, call 1669.");
+ if(/ความดัน|bp|15\d/.test(s))return tx("ความดันระดับนี้สูงกว่าเป้าแต่ยังไม่ฉุกเฉิน ให้นั่งพัก 5 นาทีแล้ววัดซ้ำ จดไว้ให้หมอดู ถ้าเกิน 180 หรือมีปวดหัวรุนแรง เจ็บหน้าอก แขนขาอ่อนแรง ไปโรงพยาบาลทันที","That's above target but not an emergency. Rest 5 minutes and recheck; log it for the doctor. Over 180, or with severe headache, chest pain or weakness, go to hospital now.");
+ if(/สับสน|confus/.test(s))return tx("อาการสับสนช่วงเย็นพบบ่อยในคนสมองเสื่อม ลองดูคู่มือ \"สับสนช่วงเย็น\" ถ้าแม่มักเดินออกจากบ้าน เปิดเตือนออกนอกเขตปลอดภัยไว้ และถ้าสับสนเพิ่มขึ้นเฉียบพลัน ให้วัดน้ำตาลก่อน","Evening confusion is common with dementia — see the \"Evening confusion\" guide. If she wanders, keep the safe-zone alert on. If confusion is suddenly worse, check her sugar first.");
+ if(/วัด|measure/.test(s))return tx("1. ผูกการวัดกับกิจวัตร เช่น วัดหลังดื่มน้ำตอนตื่น\n2. กด \"ส่งเตือนไปมือถือพ่อ\" ในหน้าวันนี้\n3. ชมเมื่อวัดครบ และบอกว่าครบ 24 วันได้ส่วนลดประกัน","1. Tie it to a routine, like right after his morning water\n2. Tap \"Nudge Dad's phone\" on Today\n3. Praise streaks — 24 days a month earns the insurance discount");
+ return tx("เรื่องนี้แนะนำให้ปรึกษาหมอหรือพยาบาล HON ระหว่างนี้ลองใช้แท็บเช็กอาการเพื่อดูความเร่งด่วน","Please check with the doctor or HON nurse. Meanwhile, use Symptoms to see how urgent it is.")}
+const SYS=()=>`You are HON Care, a warm assistant for a Thai family caregiver (not a medical professional) looking after an older parent who measures daily with HON (phone camera + flash PPG on the fingertip). Elder profile: ${el().en}
+Rules: Answer in ${lang==="th"?"Thai":"English"}. Short: one-sentence answer, then up to 4 numbered steps. Use the elder's data. AGI is a phone-camera estimate, not a diagnosis. Never state or estimate a vascular age in years; talk only about the AGI value, its zone and trend. Never diagnose or change doses; say ask the doctor/pharmacist. Emergency signs (stroke signs, chest pain, breathing trouble, can't wake, glucose <54) → call 1669 first. Plain text.`;
+async function aiAsk(q){const c=chat[ei];c.push({r:"user",c:q},{r:"assistant",c:tx("กำลังคิด...","Thinking...")});render();const i=c.length-1;
+ const upd=()=>{const b=document.querySelectorAll("#chat .msg");if(b[i])b[i].textContent=c[i].c;b[i]?.scrollIntoView({block:"nearest"})};
+ if(sample){try{const msgs=c.slice(0,-1).map(m=>({role:m.r,content:m.c}));msgs[0]={role:"user",content:SYS()+"\n\nQuestion: "+msgs[0].content};
+  const r=await sample(msgs,{cache:false,modelTier:"quick",onText:({text})=>{c[i].c=text;upd()}});c[i].c=r.text;upd();return}catch(e){}}
+ c[i].c=fallback(q)+"\n\n— "+tx("ตอนนี้ใช้ AI ไม่ได้ จึงตอบจากคลังคำตอบที่เตรียมไว้","AI unavailable; answer from the prepared library");upd()}
+async function triAi(){const box=$("#triAi"),lv=level();if(!box)return;if(!sample){box.textContent=tx("ตอนนี้ใช้ AI ไม่ได้","AI unavailable right now");return}
+ box.textContent=tx("กำลังคิด...","Thinking...");const names=[...sel].map(id=>SYM.find(s=>s.id===id).t[1]).join(", ");
+ try{await sample(SYS()+`\n\nCaregiver reports: ${names}. Rule-based triage set ${({r:"RED emergency",y:"AMBER doctor within 24h",g:"GREEN home care"})[lv]} — do not change it. In 3 short lines explain why this matters for this elder and what to watch.`,{modelTier:"quick",onText:({text})=>box.textContent=text})}catch(e){box.textContent=tx("ตอนนี้ใช้ AI ไม่ได้","AI unavailable right now")}}
+function summary(){const e=el(),avg=a=>Math.round(a.reduce((x,y)=>x+y)/a.length),sy=sel.size?[...sel].map(id=>SYM.find(s=>s.id===id).t[lang==="th"?0:1]).join(", "):tx("ไม่มีบันทึก","none logged");
+ return tx(`สรุปสำหรับแพทย์ — ${e.name[0]} ${e.age} ปี
+โรค: ${e.cond[0]}
+ยา: ${e.meds.map(m=>m[1]+" "+m[0]).join(", ")}
+ดัชนีหลอดเลือด AGI (HON): ${e.agi} · PWV ${e.pwv} m/s · แนวโน้ม 6 เดือน ${e.agiT[0]} → ${e.agi}
+ความดันเช้า 7 วัน: ตัวบนเฉลี่ย ${avg(e.sys)} (สูงสุด ${Math.max(...e.sys)})${e.glu?`\nน้ำตาลเช้า 7 วัน: ${e.glu.join(", ")} — ลดลง 4 วัน วันนี้ 68`:""}
+อาการที่ญาติสังเกต: ${sy}${clog[ei].length?"\nบันทึกผู้ดูแล:\n"+clog[ei].map(x=>"- "+x.t+" "+x.sum).join("\n"):""}`,`Summary for doctor — ${e.name[1]}, ${e.age}
+Conditions: ${e.cond[1]}
+Medicines: ${e.meds.map(m=>m[1]+" "+m[0]).join(", ")}
+Arterial index AGI (HON): ${e.agi} · PWV ${e.pwv} m/s · 6-month trend ${e.agiT[0]} → ${e.agi}
+Morning BP, 7 days: mean systolic ${avg(e.sys)} (max ${Math.max(...e.sys)})${e.glu?`\nFasting glucose, 7 days: ${e.glu.join(", ")} — falling, 68 today`:""}
+Caregiver observed: ${sy}${clog[ei].length?"\nCaregiver log:\n"+clog[ei].map(x=>"- "+x.t+" "+x.sum).join("\n"):""}`)}
+document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data-st]");if(!b)return;const d=b.dataset;
+ if(b.id==="lang"){lang=lang==="th"?"en":"th";try{localStorage.setItem("hc-lang",lang)}catch(x){}render(true);return}
+ if(b.id==="sec"){showSec=true;addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],["เปิดหน้าความปลอดภัย","Opened security settings"]);render();return}
+ if(b.id==="secBack"){showSec=false;render();return}
+ if(d.ei!==undefined){ei=+d.ei;sel.clear();render();return}
+ if(d.tab!==undefined){tab=+d.tab;showSec=false;guide=tab===4?guide:null;render();return}
+ if(d.guide){guide=d.guide;done=new Set();tab=4;showSec=false;clearInterval(timerI);render();return}
+ if(b.id==="bk"){guide=null;clearInterval(timerI);render();return}
+ if(d.st!==undefined){const i=+d.st;done.has(i)?done.delete(i):done.add(i);b.classList.toggle("done");return}
+ if(d.s){sel.has(d.s)?sel.delete(d.s):sel.add(d.s);render(true);return}
+ if(b.id==="clr"){sel.clear();render(true);return}
+ if(b.id==="triMore"){triAi();return}
+ if(d.q){aiAsk(d.q);return}
+ if(d.sim){tab=1;showSec=false;startSim(d.sim);return}
+ if(b.id==="goEv"){tab=1;showSec=false;if(ev)ei=ev.e;render();return}
+ if(b.id==="ack"&&ev){ev.ack=true;addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],["รับทราบเหตุฉุกเฉินและดูพิกัด","Acknowledged emergency, viewed location"]);render(true);return}
+ if(b.id==="endEv"){ev=null;clearInterval(simI);addLog(["ระบบ HON","HON system"],["ปิดเหตุการณ์ — พิกัดจะปิดใน 60 นาที","Event closed — location locks in 60 min"]);render(true);return}
+ if(d.rule){rules[d.rule]=!rules[d.rule];b.setAttribute("aria-checked",!!rules[d.rule]);return}
+ if(d.loc){locMode=d.loc;addLog(["แม่สมศรี (เจ้าของข้อมูล)","Mom Somsri (data owner)"],[`ตั้งการแชร์ตำแหน่ง: ${d.loc==="emer"?"เฉพาะฉุกเฉิน":d.loc==="always"?"ตลอดเวลา":"ปิด"}`,`Location sharing set to ${d.loc}`]);render(true);return}
+ if(b.id==="nudge"){b.textContent=tx("ส่งแล้ว · ขึ้นแจ้งเตือนในมือถือพ่อ","Sent · notification on Dad's phone");b.disabled=true;return}
+ if(b.id==="saveLog"){saveLog();return}
+ if(b.id==="mkBrief"){mkBrief();return}
+ if(b.id==="mic"&&dict){if(listening){dict.stop().catch(()=>{})}else{dict.start().catch(()=>{})}return}
+ if(b.id==="mkSum"){sumDone[ei]=true;$("#sumBox").innerHTML=`<pre class="sum fade" id="sumTxt">${esc(summary())}</pre>`;b.textContent=tx("คัดลอก","Copy");b.id="cpSum";return}
+ if(b.id==="cpSum"){navigator.clipboard.writeText($("#sumTxt").textContent).then(()=>b.textContent=tx("คัดลอกแล้ว","Copied")).catch(()=>{});return}
+ if(b.id==="tStart"){clearInterval(timerI);let s=900;const tm=$("#tm");timerI=setInterval(()=>{s--;if(!document.body.contains(tm)||s<0){clearInterval(timerI);return}tm.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0")},1000);b.disabled=true;return}});
+document.addEventListener("keydown",k=>{if(k.key==="Enter"&&k.target.dataset&&k.target.dataset.st!==undefined){k.preventDefault();k.target.click()}});
+document.addEventListener("submit",s=>{s.preventDefault();const q=$("#q").value.trim();if(q)aiAsk(q)});
+render();
+if(window.claude&&claude.use){claude.use("sample").then(s=>{sample=s}).catch(()=>{});
+ claude.use("dictation").then(d=>{if(!d)return;dict=d;d.onFinal(({text})=>{const t=$("#logIn");if(t)t.value=(t.value?t.value+" ":"")+text});d.onState(({state})=>{listening=state==="listening";const m=$("#mic");if(m)m.textContent=listening?tx("หยุดฟัง","Stop"):tx("พูด","Speak")});if(tab===0&&!showSec)render(true)}).catch(()=>{})}
+}
+</script>
+</body>
+</html>
