@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HON Family</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* VOICE: warm, calm, trustworthy — a nurse beside you, not a hospital system
    IDEA: the caregiver's side of HON: what Mrs Somsri measures on her phone reaches the family
@@ -19,7 +19,7 @@
 --map:light-dark(#eae4da,#1e2a2d);--road:light-dark(#fffdf9,#33444a)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans Thai Looped","IBM Plex Sans Thai",system-ui,sans-serif;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Anuphan",system-ui,sans-serif;overflow-x:clip}
 button,input{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:3px solid var(--coral);outline-offset:2px}
 .wrap{display:flex;justify-content:center;gap:40px;padding:24px 16px;align-items:flex-start}
@@ -79,7 +79,7 @@ nav.tabs svg{width:22px;height:22px}
 .glist button{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;min-height:64px}
 .glist small{display:block;color:var(--mute);font-size:13px}
 .back{background:none;border:0;color:var(--tealT);font-weight:600;min-height:44px;padding:0}
-pre.sum{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:14px;font:14px/1.6 "IBM Plex Sans Thai Looped","IBM Plex Sans Thai",sans-serif;margin:0 0 12px}
+pre.sum{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:14px;font:14px/1.6 "Anuphan",sans-serif;margin:0 0 12px}
 .note{font-size:13px;color:var(--mute);border-left:3px solid var(--coral);padding-left:10px;margin:10px 0}
 .timer{font-size:32px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
 .map{border-radius:16px;overflow:hidden;background:var(--map);position:relative}.map svg{display:block;width:100%;height:auto}
@@ -129,44 +129,67 @@ code.code{display:block;background:var(--teal2);padding:10px 12px;border-radius:
 #ov1669{display:flex;align-items:center;justify-content:center;width:min(340px,90vw);min-height:72px;margin-top:14px;border-radius:24px;border:3px solid #fff;color:#fff;font-size:24px;font-weight:700;text-decoration:none}
 #ok{background:#fff;color:var(--r);border:0;border-radius:24px;font-size:26px;font-weight:700;min-height:86px;width:min(340px,90vw);margin-top:24px}
 @media(prefers-reduced-motion:no-preference){.fade{animation:f .25s ease-out}@keyframes f{from{opacity:0;transform:translateY(6px)}}.pulse{animation:p 1.4s ease-out infinite}@keyframes p{0%{r:8;opacity:.7}100%{r:26;opacity:0}}}
-:root{--forest:#102813;--linen:#f4eee3;--paper:#fffdf8;--line:#eadcc6}
-html{scrollbar-width:thin;scrollbar-color:#d6c8ae transparent}
-.app{background:var(--linen)}
-header.top{background:var(--teal);border-radius:0 0 26px 26px;padding:18px 18px 20px}
-.brand{font-size:21px;letter-spacing:.01em}.brand small{opacity:.75;margin-top:2px}
-.hb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
-.roleseg{background:rgba(0,0,0,.18);border-radius:16px}.roleseg button{border-radius:12px}.roleseg button[aria-pressed=true]{color:var(--forest);box-shadow:none}
-.who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:visible}
-.who button{min-width:0;padding:8px 10px 8px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:18px;transition:background .15s,color .15s}
-.who button[aria-pressed=true]{background:var(--paper);border-color:var(--paper);color:var(--forest)}
-.who button>span:last-child{min-width:0;overflow:hidden}
-.who b{display:block;font-size:14px;line-height:1.25}.who button>span:last-child>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.who button[aria-pressed=true] span{opacity:.75}
-.sync{opacity:.7}
-main{padding:16px 16px 100px}
-.card{background:var(--paper);border:1px solid rgba(42,75,56,.08);border-radius:22px;padding:18px}
+:root:not([data-theme=dark]){--cream:#fdf7f8;--beige:#f4ecdf;--beige2:#e8dcc8;--green:#2a4b38;--forest:#102813;--goldT:#a8823a;--paper:#f4ecdf;--line:#e8dcc8;--teal2:#fdf7f8;--ink:#1d2a22;--mute:#6f6a5e;--bg:#efe7da}
+html{scrollbar-width:thin;scrollbar-color:#d9cbb4 transparent}
+.app{background:var(--cream);box-shadow:0 24px 60px -28px rgba(42,75,56,.45)}
+.side h1{color:var(--green)}
+header.top{background:var(--cream);color:var(--green);padding:20px 18px 4px}
+.brand{font-size:24px;letter-spacing:-.01em;color:var(--green)}.brand small{color:var(--mute);opacity:1;font-size:13px;margin-top:2px}
+.hb{background:var(--beige);border:0;color:var(--green);min-height:40px}
+.roleseg{background:var(--beige);border-radius:16px;margin-top:16px}.roleseg button{color:var(--green);border-radius:12px}.roleseg button[aria-pressed=true]{background:var(--green);color:#fff;box-shadow:none}
+.who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:visible;margin-top:10px}
+.who button{min-width:0;padding:10px 10px 10px 8px;background:var(--beige);border:0;border-radius:18px;color:var(--ink);min-height:62px;align-items:center}
+.who button[aria-pressed=true]{background:var(--green);color:#fff}
+.who button>span:last-child{min-width:0}
+.who b{display:block;font-size:15px;line-height:1.25}
+.who button>span:last-child>span{display:block;font-size:12px;line-height:1.3;opacity:.8;white-space:normal}
+.sync{color:var(--mute);opacity:1;margin-top:8px}
+main{padding:14px 18px 100px}
+h2,h3{color:var(--green)}
+.card{background:var(--beige);border:0;border-radius:20px;padding:18px}
 .alert{border:0}
-.btn{border-radius:14px}
-.viewrow{margin:0 0 8px}.viewrow button{background:rgba(42,75,56,.07);border-radius:999px;padding:0 14px;min-height:36px;font-size:13px}
-.card.agent:not(.alert){--g:#9fdcb2;--ink:#f6f1e7;--line:rgba(255,255,255,.12);background:var(--forest);color:#f6f1e7;border:0;border-radius:26px;padding:20px}
-.agent:not(.alert) .mini{color:rgba(246,241,231,.7)}
+.btn{background:var(--green);border-radius:14px}
+.btn.alt{background:var(--cream);color:var(--green);border:1px solid var(--beige2)}
+.tag{white-space:nowrap;flex:none}
+.ailab{color:var(--goldT)}
+.note{border-left-color:var(--gold)}
+.list li{border-bottom-color:var(--beige2)}
+.viewrow{margin:0 0 6px}.viewrow button{background:none;color:var(--goldT);padding:0;min-height:36px;font-size:14px}
+.card.agent:not(.alert){--g:#9fdcb2;--ink:#fdf7f8;--line:rgba(255,255,255,.14);background:var(--green);color:#fdf7f8;border:0;border-radius:24px;padding:20px}
+.agent:not(.alert) h3{color:#fff;font-size:19px;line-height:1.4}
+.agent:not(.alert) .mini{color:rgba(253,247,248,.72)}
 .agent:not(.alert) .ailab{color:var(--gold);letter-spacing:.04em}
-.agent:not(.alert) h3{font-size:19px;line-height:1.4}
-.agent:not(.alert) .draft{background:rgba(255,255,255,.07);color:#f6f1e7}
-.agent:not(.alert) .btn{background:var(--gold);color:var(--forest);font-weight:700}
-.agent:not(.alert) .btn.alt{background:rgba(255,255,255,.1);color:#f6f1e7;font-weight:600}
-.agent:not(.alert) .task{border-top:1px solid rgba(255,255,255,.12)}
+.agent:not(.alert) .draft{background:rgba(255,255,255,.08);color:#fdf7f8}
+.agent:not(.alert) .btn{background:var(--gold);color:var(--forest);font-weight:700;border:0}
+.agent:not(.alert) .btn.alt{background:rgba(255,255,255,.12);color:#fdf7f8;font-weight:600}
+.agent:not(.alert) .task{border-top:1px solid rgba(255,255,255,.14)}
 .simple .agent:not(.alert) .task{border-top:0;padding-top:6px}
 .agent:not(.alert) :focus-visible{outline-color:var(--gold)}
-.simpleonly.btn.alt{background:transparent;border:1px solid rgba(42,75,56,.18);color:var(--teal)}
-.stat{background:var(--linen)}
-nav.tabs{background:var(--paper);border-top:1px solid rgba(42,75,56,.08)}
-nav.tabs button[aria-selected=true]{background:none;color:var(--teal)}
+.cgbtn{margin:0 0 6px;background:var(--beige);color:var(--green);gap:8px}.cgbtn svg{width:20px;height:20px}
+.simpleonly.btn.alt{background:none;border:0;color:var(--goldT);min-height:40px;margin:0 0 10px!important}
+.stat{background:var(--beige)}
+.grid2 .stat b{color:var(--green)}
+nav.tabs{background:var(--cream);border-top:1px solid var(--beige2)}
+nav.tabs button[aria-selected=true]{background:none;color:var(--green)}
 nav.tabs button[aria-selected=true]:before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 4px 4px;background:var(--gold)}
-.seg{background:rgba(42,75,56,.07)}
-.wf li{background:var(--paper);border:1px solid rgba(42,75,56,.08)}
+.seg{background:var(--beige)}.seg button{color:var(--green)}.seg button[aria-pressed=true]{background:var(--green);color:#fff;box-shadow:none}
+.wf li{background:var(--beige);border:0}.wf li.ok{background:var(--gbg)}
 .wf li.ai:after{background:var(--gold);color:var(--forest)}
-.nudge{background:var(--forest);border-radius:24px}
+.nudge{background:var(--green);border-radius:22px}
+.glist button{background:var(--beige);border:0}
+.chip{background:var(--cream);border-color:var(--beige2)}
+.composer{background:var(--cream);position:static;padding-top:4px}.composer input{background:#fff}
+pre.sum,code.code,textarea.in{background:var(--cream)}
+.msg.ai{background:var(--beige)}
+.steps li:before{background:var(--beige)}
+.medc.ok{background:var(--gbg)}
+.dial{width:210px;height:210px;margin:18px auto 6px;border-radius:50%;background:var(--cream);border:10px solid var(--beige2);display:grid;place-items:center;transition:border-color .3s}
+.busy .dial{border-color:var(--gold)}
+.bigv{font-size:64px;color:var(--green);margin:0;text-align:center}.bigv i{display:block;font-style:normal}.bigv:not(.on) i{color:var(--gold);height:64px}.bigv:not(.on) small{display:none}.bigv:not(.on) svg{width:60px;height:60px;margin-top:4px}.busy .bigv:not(.on) svg{animation:hb 1s ease-in-out infinite}@keyframes hb{50%{transform:scale(1.12)}}.bigv small{display:block;font-size:16px;margin-top:6px}
+.idle #pw,.idle .meter{display:none}
+#pw{background:var(--cream)}.map .lock svg{width:28px;height:28px;display:inline-block}
+.meter{background:var(--beige2)}.meter i{background:var(--gold)}
+.mst{background:none;padding:6px 0;margin:4px 0 14px;color:var(--mute)}.mst.ok,.mst.warn,.mst.bad{padding:10px 12px}
 </style>
 </head>
 <body>
@@ -199,12 +222,12 @@ let lang="th";try{lang=localStorage.getItem("hc-lang")||"th"}catch(e){}
 const tx=(a,b)=>lang==="th"?a:b,$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const E=[
 {id:"s",name:["คุณสมศรี","Mrs Somsri"],age:71,col:"#d97a5c",cond:["เบาหวาน · ความดันสูง · สมองเสื่อมระยะต้น","Diabetes · Hypertension · Early dementia"],
- last:["วัดล่าสุด 06:48 วันนี้","Measured 06:48 today"],agi:-0.64,pwv:8.4,si:7.1,aix:21,hr:66,spo2:97,bp:"138/84",
+ last:["วัดแล้ว 06:48","Measured 06:48"],agi:-0.64,pwv:8.4,si:7.1,aix:21,hr:66,spo2:97,bp:"138/84",
  agiT:[-0.52,-0.55,-0.58,-0.6,-0.62,-0.64],sys:[138,142,135,150,146,139,138],glu:[112,98,105,88,92,79,68],
  meds:[["07:00","Metformin 500 mg"],["07:00","Amlodipine 5 mg"],["18:00","Metformin 500 mg"],["21:00","Donepezil 5 mg"]],
  en:"Somsri, female, 71. Type 2 diabetes, hypertension, early dementia. Meds: Metformin 500mg twice daily, Amlodipine 5mg morning, Donepezil 5mg bedtime. Fasting glucose last 7 days 112,98,105,88,92,79,68 (falling, 68 today = low). HON phone PPG: Arterial Age Index (AGI) -0.64 (low risk, below -0.6), improving for 6 months, PWV 8.4 m/s (good <9.0), resting HR 66, SpO2 97%."},
 {id:"p",name:["คุณประวิทย์","Mr Prawit"],age:74,col:"#4f7d8c",cond:["ความดันสูง · ไขมันสูง · เคยสูบบุหรี่","Hypertension · High cholesterol · Ex-smoker"],
- last:["ไม่ได้วัดมา 3 วัน","Not measured for 3 days"],agi:-0.21,pwv:10.6,si:9.2,aix:31,hr:78,spo2:95,bp:"152/92",
+ last:["ไม่ได้วัด 3 วัน","Missed 3 days"],agi:-0.21,pwv:10.6,si:9.2,aix:31,hr:78,spo2:95,bp:"152/92",
  agiT:[-0.38,-0.35,-0.33,-0.29,-0.25,-0.21],sys:[146,150,148,155,158,152,152],glu:null,
  meds:[["07:00","Amlodipine 10 mg"],["21:00","Atorvastatin 20 mg"]],
  en:"Prawit, male, 74. Hypertension, high cholesterol, ex-smoker. Meds: Amlodipine 10mg morning, Atorvastatin 20mg bedtime. Morning BP last 7 days systolic 146-158. HON phone PPG: AGI -0.21 (worsening for 2 weeks, medium risk), PWV 10.6 m/s (above 9.0 good threshold), resting HR 78, SpO2 95%. Has not measured for 3 days."}];
@@ -334,15 +357,15 @@ async function mkBrief(){const box=$("#briefBox"),e=el();const fb=e.id==="s"?tx(
   const r=await sample(SYS()+`\n\nWrite the caregiver's morning brief from today's readings and these care-log notes: ${logs}. Exactly 3 lines, plain text: "${tx("สถานะ:","Status:")} ...", "${tx("ทำวันนี้:","Today:")} 1) 2) 3)", "${tx("เฝ้าดู:","Watch for:")} ...". Max 60 words.`,{modelTier:"quick",onText:({text})=>{if(box)box.textContent=text}});brief[ei]=r.text}catch(x){brief[ei]=fb}}else brief[ei]=fb;
  render(true)}
 let aiLive=false,agentAi={},agentBusy=false,agentSt={},insAi={},insBusy=false,mode=(()=>{const q=new URLSearchParams(location.search).get("mode");return q==="sum"||q==="agent"?q:lsg("hf-mode")||"agent"})(),view=(()=>{const q=new URLSearchParams(location.search).get("view");return q==="full"||q==="simple"?q:lsg("hf-view")||"simple"})();try{agentSt=JSON.parse(lsg("hf-agent")||"{}")}catch(e){}
-function agentObs(){const e=el(),L=lang==="th"?0:1,mine=ei===linkEi,o=[],now=new Date();
+function agentObs(){const e=el(),L=lang==="th"?0:1,mine=ei===linkEi,o=[],now=new Date(),cr=cgl[ei],lr=lastR(ei),today=!!(lr&&dayKey(lr.at)===dayKey(Date.now()));
  if(ev&&!ev.ack&&ev.e===ei)return {red:true,o:[[tx("มีเหตุฉุกเฉินที่ยังไม่มีใครรับทราบ","An emergency alert has not been acknowledged yet")]]};
  if(mine&&live&&(live.hr<45||live.hr>120))return {red:true,o:[[tx(`ชีพจรล่าสุด ${live.hr} ครั้ง/นาที ผิดปกติมาก`,`Latest heart rate ${live.hr} bpm is far out of range`)]]};
  let med=-1;e.meds.forEach((m,i)=>{const [h,mi]=m[0].split(":").map(Number),due=new Date(now);due.setHours(h,mi+30,0,0);const k=dayKey(Date.now())+"|"+ei+"|"+i;if(due<=now&&!medOk[k])med=i});
  if(med>=0)o.push(["med",tx(`ยังไม่ได้กด "กินแล้ว" ยา ${e.meds[med][1]} (เวลา ${e.meds[med][0]})`,`${e.meds[med][1]} (${e.meds[med][0]}) not marked as taken`),med]);
- if(e.id==="p"&&!(mine&&live&&dayKey(live.at)===dayKey(Date.now())))o.push(["measure",tx(`${e.name[0]}ไม่ได้วัดมา 3 วัน`,`${e.name[1]} has not measured for 3 days`)]);
+ if(e.id==="p"&&!today)o.push(["measure",tx(`${e.name[0]}ไม่ได้วัดมา 3 วัน`,`${e.name[1]} has not measured for 3 days`)]);
  if(e.id==="p")o.push(["agi",tx(`ค่า AGI ${e.agi} แย่ลงต่อเนื่อง 2 สัปดาห์ (ควรเฝ้าระวัง)`,`AGI ${e.agi}, worse for 2 weeks (keep watch)`)]);
  if(e.id==="s")o.push(["sugar",tx("น้ำตาลลดลง 4 วันติด เช้านี้ 68","Glucose down 4 days in a row, 68 this morning")]);
- if(mine&&live&&dayKey(live.at)===dayKey(Date.now()))o.push(["live",tx(`วัดจริงวันนี้ ${hhmm(live.at)} ชีพจร ${live.hr} ครั้ง/นาที`,`Measured today ${hhmm(live.at)}: ${live.hr} bpm`)]);
+ if(today)o.push(["live",tx(`วัดจริงวันนี้ ${hhmm(lr.at)} ชีพจร ${lr.hr} ครั้ง/นาที${lr===cr?" (ผู้ดูแลวัดให้)":""}`,`Measured today ${hhmm(lr.at)}: ${lr.hr} bpm${lr===cr?" (by a caregiver)":""}`)]);
  return {red:false,o}}
 function agentTasks(ob){const e=el(),L=lang==="th"?0:1,t=[],has=k=>ob.o.find(x=>x[0]===k);
  const m=has("med");if(m)t.push({id:"remind_med",i:m[2],t:tx(`ส่งเตือนกินยา ${e.meds[m[2]][1]} ไปที่มือถือ${e.name[0]}`,`Send a ${e.meds[m[2]][1]} reminder to ${e.name[1]}'s phone`),why:tx("ยามื้อนี้เลยเวลามาแล้วกว่า 30 นาที","This dose is more than 30 minutes late")});
@@ -413,10 +436,16 @@ let nudge=null;
 function nudgeCard(){if(!nudge)return "";const t=nudge.n==="med"?tx(`ผู้ดูแลเตือน: ถึงเวลากินยา ${nudge.m}`,`Your caregiver: time to take ${nudge.m}`):tx("ผู้ดูแลชวนวัดชีพจรวันนี้","Your caregiver asks you to check your pulse today");
  return `<div class="nudge fade" role="status"><b>${esc(t)}</b><span>${tx("ส่งมาเมื่อ","Sent at")} ${hhmm(nudge.at)}</span><div class="btns" style="margin-top:12px"><button class="btn xl" id="nuGo" style="background:#fff;color:var(--ink)">${nudge.n==="med"?tx("ไปที่ยาวันนี้","Open medicines"):tx("ไปวัดชีพจร","Measure now")}</button><button class="btn alt" id="nuOk">${tx("รับทราบ","OK")}</button></div></div>`}
 function nudgeDone(){if(nudge)lss("hf-nudge-at",String(nudge.at));nudge=null}
-function home(){const e=el(),lv=agiLv(e.agi),diff=0;
+function cgMeasure(){const e=el(),r=cgl[ei],st=mStTxt||[r?tx(`วัดล่าสุด ${hhmm(r.at)}`,`Last measured ${hhmm(r.at)}`):tx("พร้อมวัด","Ready"),""];
+ return `<button class="back" data-cgm="0">‹ ${tx("กลับหน้าวันนี้","Back to Today")}</button><div class="card ${mBusy?"busy":"idle"}" style="text-align:center"><h2 style="margin-bottom:4px">${tx(`วัดชีพจรให้${e.name[0]}`,`Measure ${e.name[1]}`)}</h2><p class="mini" style="margin:0">${tx("ใช้มือถือเครื่องนี้ ให้ผู้สูงอายุวางปลายนิ้วชี้ปิดกล้องหลังและไฟแฟลช นั่งนิ่งๆ 30 วินาที","Use this phone: the older adult rests a fingertip over the back camera and flash and sits still for 30 seconds")}</p>
+<div class="dial"><div class="bigv${r&&!mBusy?" on":""}" id="mHr"><i>${r&&!mBusy?r.hr:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.3 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.3 4.1 6.6C19.5 16.4 12 21 12 21z"/></svg>'}</i><small>${tx("ครั้ง/นาที","bpm")}</small></div></div>
+<canvas id="pw" width="900" height="220" aria-label="${tx("คลื่นชีพจร","Pulse wave")}"></canvas><div class="meter"><i id="mBar"></i></div>
+<div class="mst ${st[1]}" id="mSt">${st[0]}</div><button class="btn full xl" id="mGo">${mBusy?tx("หยุด","Stop"):tx("เริ่มวัด","Start")}</button></div>
+<p class="note">${tx("ผู้สูงอายุจะกดวัดเองที่มือถือตัวเอง หรือผู้ดูแลกดวัดให้ก็ได้ ผลเข้าแอปเดียวกัน · ไม่ใช่อุปกรณ์การแพทย์","The older adult can measure on their own phone, or a caregiver can do it here; both land in the same app · Not a medical device")}</p>`}
+function home(){if(cgm)return cgMeasure();const e=el(),lv=agiLv(e.agi),diff=0;
  const top=e.id==="s"?`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${tx("น้ำตาลเช้านี้ 68 mg/dL ต่ำกว่าปกติ","Morning glucose 68 mg/dL is low")}</h3><p style="margin:0 0 12px">${tx("ต่ำกว่า 70 คือน้ำตาลต่ำ และลดลงติดกัน 4 วัน ถ้าคุณสมศรีรู้ตัวและกลืนได้ ทำตามคู่มือตอนนี้ แล้วแจ้งหมอเรื่องยาเบาหวาน","Below 70 is low, and it has fallen 4 days running. If she's awake and can swallow, follow the guide now, then tell her doctor about her diabetes medicine.")}</p><button class="btn full" data-guide="hypo">${tx("เปิดคู่มือน้ำตาลต่ำ","Open low-sugar guide")}</button>${briefBox()}</div>`
- :`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${live&&linkEi===1?tx(`คุณประวิทย์วัดแล้ว ${hhmm(live.at)} ชีพจร ${live.hr} ครั้ง/นาที แต่ค่า AGI ยังแย่ลง 2 สัปดาห์`,`Mr Prawit measured at ${hhmm(live.at)}, HR ${live.hr} bpm, but his AGI has worsened for 2 weeks`):tx("คุณประวิทย์ไม่ได้วัดมา 3 วัน และค่า AGI แย่ลง 2 สัปดาห์","Mr Prawit hasn't measured for 3 days and his AGI has worsened for 2 weeks")}</h3><p style="margin:0 0 12px">${tx("ชวนคุณประวิทย์เปิดเว็บ HON วัดด้วยมือถือเช้านี้ เช็กว่ากินยาความดันครบ แล้วส่งรายงานให้หมอ","Get Mr Prawit to measure with HON on his phone this morning, check his BP medicine, then send the report to his doctor.")}</p><div class="btns"><button class="btn" id="nudge">${tx("ส่งเตือนไปมือถือคุณประวิทย์","Nudge Mr Prawit's phone")}</button><button class="btn alt" data-guide="vasc">${tx("ดูวิธีช่วย","What to do")}</button></div>${briefBox()}</div>`;
- return `${viewRow()}<div class="more">${workflow()}${modeSeg()}</div>${mode==="sum"?insightCard():agentCard()}<button class="btn alt full simpleonly" data-view="full" style="margin:-4px 0 14px">${tx("ดูรายละเอียดทั้งหมด","Show all details")}</button><div class="more">${linkCard()}${top}${careLog()}</div>
+ :`<div class="card alert y fade"><span class="tag y"><span class="dot"></span>${tx("ควรดูแลวันนี้","Needs attention")}</span><span class="mini" style="margin-left:8px">${tx("ตรวจด้วยกฎความปลอดภัย","Safety-rule check")}</span><h3 style="margin-top:8px">${lastR(1)?tx(`คุณประวิทย์วัดแล้ว ${hhmm(lastR(1).at)} ชีพจร ${lastR(1).hr} ครั้ง/นาที แต่ค่า AGI ยังแย่ลง 2 สัปดาห์`,`Mr Prawit measured at ${hhmm(lastR(1).at)}, HR ${lastR(1).hr} bpm, but his AGI has worsened for 2 weeks`):tx("คุณประวิทย์ไม่ได้วัดมา 3 วัน และค่า AGI แย่ลง 2 สัปดาห์","Mr Prawit hasn't measured for 3 days and his AGI has worsened for 2 weeks")}</h3><p style="margin:0 0 12px">${tx("ชวนคุณประวิทย์เปิดเว็บ HON วัดด้วยมือถือเช้านี้ เช็กว่ากินยาความดันครบ แล้วส่งรายงานให้หมอ","Get Mr Prawit to measure with HON on his phone this morning, check his BP medicine, then send the report to his doctor.")}</p><div class="btns"><button class="btn" id="nudge">${tx("ส่งเตือนไปมือถือคุณประวิทย์","Nudge Mr Prawit's phone")}</button><button class="btn alt" data-guide="vasc">${tx("ดูวิธีช่วย","What to do")}</button></div>${briefBox()}</div>`;
+ return `${viewRow()}<div class="more">${workflow()}${modeSeg()}</div>${mode==="sum"?insightCard():agentCard()}<button class="btn full cgbtn" data-cgm="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>${tx(`วัดชีพจรให้${e.name[0]}ตอนนี้`,`Measure ${e.name[1]} now`)}</button><button class="btn alt full simpleonly" data-view="full" style="margin:-4px 0 14px">${tx("ดูรายละเอียดทั้งหมด","Show all details")}</button><div class="more">${linkCard()}${top}${careLog()}</div>
 <div class="card"><div class="row" style="justify-content:space-between"><h3>${tx("ดัชนีหลอดเลือด AGI","Arterial index AGI")}</h3><span class="tag ${lv}"><span class="dot"></span>${{g:tx("เสี่ยงต่ำ","Low risk"),y:tx("ควรเฝ้าระวัง","Keep watch")}[lv]}</span></div>
 <div class="va">${ring(e)}<div><p style="margin:0;font-weight:600">${e.agi<-0.6?tx("อยู่ในเกณฑ์เสี่ยงต่ำ และดีขึ้นต่อเนื่อง 6 เดือน","In the low-risk zone and improving for 6 months"):tx("สูงกว่าเกณฑ์เสี่ยงต่ำ และแย่ลงต่อเนื่อง 2 สัปดาห์","Above the low-risk zone and worsening for 2 weeks")}</p>
 <p class="mini" style="margin:2px 0 0">${tx("เกณฑ์ HON: ต่ำกว่า −0.6 = เสี่ยงต่ำ ยิ่งติดลบยิ่งดี","HON scale: below −0.6 = low risk; more negative is better")}<br>${tx("จากคลื่นชีพจร (PPG) ที่ HON วัดด้วยกล้องมือถือ","From the pulse wave (PPG) HON reads with the phone camera")}</p></div></div>
@@ -498,7 +527,7 @@ const me=()=>E[linkEi],dayKey=ms=>new Date(ms).toDateString(),medKey=(i,ms)=>day
 async function post(body){ensureTopic();try{const r=await fetch("https://ntfy.sh/",{method:"POST",body:JSON.stringify({topic,...body})});return r.ok}catch(e){return false}}
 function eLog(m){elog.unshift({t:hhmm(Date.now()),m});elog=elog.slice(0,20);lss("hf-elog",JSON.stringify(elog))}
 
-const DUR=30,FS=30;let mv=null,mctx=null,mStream=null,mTimer=null,mT=[],mV=[],mT0=0,mNo=0,mBusy=false,mStTxt=null;
+const DUR=30,FS=30;let mv=null,mctx=null,mStream=null,mTimer=null,mT=[],mV=[],mT0=0,mNo=0,mBusy=false,mStTxt=null,cgm=false,cgl={};try{cgl=JSON.parse(lsg("hf-cgl")||"{}")}catch(e){}function lastR(i){const c=cgl[i],l=i===linkEi?live:null;return c&&(!l||c.at>l.at)?c:l}function applyCg(){Object.keys(cgl).forEach(k=>{const c=cgl[k],e=E[+k];if(e&&lastR(+k)===c){e.hr=c.hr;e.last=[`ผู้ดูแลวัดให้ ${hhmm(c.at)}`,`Caregiver measured ${hhmm(c.at)}`]}})}applyCg();
 function movAvg(a,w){const o=new Array(a.length);let s=0,q=[];for(let i=0;i<a.length;i++){q.push(a[i]);s+=a[i];if(q.length>w)s-=q.shift();o[i]=s/q.length}return o}
 function centred(a,w){const h=Math.floor(w/2),o=new Array(a.length);for(let i=0;i<a.length;i++){let s=0,n=0;for(let j=Math.max(0,i-h);j<=Math.min(a.length-1,i+h);j++){s+=a[j];n++}o[i]=s/n}return o}
 function pulse(v){const base=centred(v,FS*2),d=v.map((x,i)=>base[i]-x);return movAvg(d,4)}
@@ -517,7 +546,7 @@ function mSample(){if(!mStream||mv.readyState<2)return;mctx.drawImage(mv,0,0,48,
  const t=performance.now()/1000,el2=t-mT0,bar=$("#mBar");
  if(!(r>60&&r>g*1.5)){mNo++;if(mNo>FS*2){mT=[];mV=[];mT0=t;mSet(tx("ไม่พบนิ้ว วางปลายนิ้วปิดกล้องให้มิด","No finger — cover the camera fully with your fingertip"),"warn")}if(bar)bar.style.width="0%";return}
  mNo=0;mT.push(t);mV.push(r);const s=pulse(mV);mDraw(s);if(bar)bar.style.width=Math.min(100,el2/DUR*100)+"%";
- if(mT.length%15===0){const k=Math.max(0,mT.length-FS*10),b=beats(mT.slice(k),s.slice(k)),h=$("#mHr");if(b&&b.hr>35&&b.hr<200&&h)h.firstChild.textContent=b.hr;mSet(tx(`กำลังวัด... เหลือ ${Math.max(0,Math.ceil(DUR-el2))} วินาที`,`Measuring... ${Math.max(0,Math.ceil(DUR-el2))} s left`))}
+ if(mT.length%15===0){const k=Math.max(0,mT.length-FS*10),b=beats(mT.slice(k),s.slice(k)),h=$("#mHr");if(b&&b.hr>35&&b.hr<200&&h)h.firstChild.textContent=b.hr,h.classList.add("on");mSet(tx(`กำลังวัด... เหลือ ${Math.max(0,Math.ceil(DUR-el2))} วินาที`,`Measuring... ${Math.max(0,Math.ceil(DUR-el2))} s left`))}
  if(el2>=DUR)mFinish()}
 async function mStart(){if(mBusy)return;mBusy=true;if(!mv){mv=document.createElement("video");mv.setAttribute("playsinline","");mv.muted=true;mv.className="hidvid";document.body.appendChild(mv);const c=document.createElement("canvas");c.width=48;c.height=48;mctx=c.getContext("2d",{willReadFrequently:true})}
  mT=[];mV=[];mNo=0;
@@ -527,14 +556,15 @@ async function mStart(){if(mBusy)return;mBusy=true;if(!mv){mv=document.createEle
 function mStop(){clearInterval(mTimer);mTimer=null;if(mStream){mStream.getTracks().forEach(t=>t.stop());mStream=null}mBusy=false}
 async function mFinish(){const s=pulse(mV),b=beats(mT,s),q=quality(b);mStop();
  if(!b||q==="bad"||b.hr<35||b.hr>200){mSet(tx("สัญญาณไม่ชัด ยังไม่ได้ส่ง ลองวัดใหม่","Signal unclear — not sent. Please measure again"),"warn");render(true);return}
+ if(role==="fam"){const e=el(),at=Date.now();cgl[ei]={hr:b.hr,q,at};lss("hf-cgl",JSON.stringify(cgl));applyCg();addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],[`วัดชีพจรให้${e.name[0]} ${b.hr} ครั้ง/นาที`,`Measured ${e.name[1]}: ${b.hr} bpm`]);if(ei===linkEi&&topic)post({title:`HON: ผู้ดูแลวัดให้${e.name[0]}`,message:`ชีพจร ${b.hr} ครั้ง/นาที · สัญญาณ${QT[q][0]} · เวลา ${hhmm(at)}`,priority:3,tags:["heart","hon_cg_reading"]});mSet(tx("บันทึกแล้ว ผู้ดูแลทุกคนเห็นผลนี้","Saved — every caregiver can see this"),"ok");render(true);return}
  const at=Date.now();mLast={hr:b.hr,q,n:b.n,at,sent:null};mSet(tx("วัดเสร็จแล้ว กำลังส่งให้ผู้ดูแล...","Done — sending to your caregiver..."),"ok");render(true);
  const ok=await post({title:`HON: ${me().name[0]} วัดชีพจรแล้ว`,message:`ชีพจร ${b.hr} ครั้ง/นาที · สัญญาณ${QT[q][0]} · เวลา ${hhmm(at)}`,priority:3,tags:["heart","hon_reading","hr_"+b.hr,"q_"+q]});
  mLast.sent=ok;lss("hf-mlast",JSON.stringify(mLast));eLog(tx(`วัดชีพจร ${b.hr} ครั้ง/นาที`,`Pulse ${b.hr} bpm`)+(ok?tx(" · ส่งแล้ว"," · sent"):tx(" · ส่งไม่สำเร็จ"," · not sent")));
  mSet(ok?tx("ส่งให้ผู้ดูแลแล้ว","Sent to your caregiver"):tx("ส่งไม่สำเร็จ ตรวจอินเทอร์เน็ต","Not sent — check the internet"),ok?"ok":"bad");render(true)}
 
 function eMeasure(){const e=me(),L=lang==="th"?0:1,lv=agiLv(e.agi),st=mStTxt||[mLast?tx(`วัดล่าสุด ${hhmm(mLast.at)}`,`Last measured ${hhmm(mLast.at)}`):tx("พร้อมวัด","Ready"),""];
- return `<div class="card" style="text-align:center"><h2 style="margin-bottom:4px">${tx("วัดชีพจร 30 วินาที","30-second pulse check")}</h2><p class="mini" style="margin:0">${tx("วางปลายนิ้วชี้ปิดกล้องหลังและไฟแฟลชให้มิด อย่ากดแรง นั่งนิ่งๆ","Cover the back camera and flash with your fingertip, press lightly, sit still")}</p>
-<div class="bigv" id="mHr">${mLast&&!mBusy?mLast.hr:"—"}<small> ${tx("ครั้ง/นาที","bpm")}</small></div>
+ return `<div class="card ${mBusy?"busy":"idle"}" style="text-align:center"><h2 style="margin-bottom:4px">${tx("วัดชีพจร 30 วินาที","30-second pulse check")}</h2><p class="mini" style="margin:0">${tx("วางปลายนิ้วชี้ปิดกล้องหลังและไฟแฟลชให้มิด อย่ากดแรง นั่งนิ่งๆ","Cover the back camera and flash with your fingertip, press lightly, sit still")}</p>
+<div class="dial"><div class="bigv${mLast&&!mBusy?" on":""}" id="mHr"><i>${mLast&&!mBusy?mLast.hr:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.4C1.2 8.3 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.3 4.1 6.6C19.5 16.4 12 21 12 21z"/></svg>'}</i><small>${tx("ครั้ง/นาที","bpm")}</small></div></div>
 <canvas id="pw" width="900" height="220" aria-label="${tx("คลื่นชีพจร","Pulse wave")}"></canvas><div class="meter"><i id="mBar"></i></div>
 <div class="mst ${st[1]}" id="mSt">${st[0]}</div><button class="btn full xl" id="mGo">${mBusy?tx("หยุด","Stop"):tx("เริ่มวัด","Start")}</button></div>
 ${mLast?`<div class="card"><h3>${tx("ผลล่าสุด","Latest result")}</h3><p style="margin:0">${tx(`ชีพจร ${mLast.hr} ครั้ง/นาที · สัญญาณ${QT[mLast.q][0]} · ${hhmm(mLast.at)}`,`Pulse ${mLast.hr} bpm · ${QT[mLast.q][1]} signal · ${hhmm(mLast.at)}`)}</p><p class="mini" style="margin:4px 0 0">${mLast.sent?tx("ผู้ดูแลเห็นผลนี้แล้วในแอป","Your caregiver can see this in their app"):mLast.sent===false?tx("ยังส่งไม่สำเร็จ","Not sent yet"):""}</p></div>`:""}
@@ -585,7 +615,7 @@ async function setFall(v){
  const sw=$("#fallSw");if(sw)sw.setAttribute("aria-checked",fallOn)}
 document.addEventListener("visibilitychange",async()=>{if(fallOn&&document.visibilityState==="visible"){try{wake=await navigator.wakeLock.request("screen")}catch(e){}}});
 function printReport(){const e=el(),L=lang==="th"?0:1,w=window.open("","_blank");if(!w)return;
- w.document.write(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><title>HON ${tx("รายงานสำหรับแพทย์","Doctor report")} · ${e.name[L]}</title><style>body{font:15px/1.6 "IBM Plex Sans Thai Looped","IBM Plex Sans Thai",system-ui,sans-serif;color:#1d2a2e;max-width:760px;margin:32px auto;padding:0 24px}h1{color:#2a4b38;margin:0}h1 b{color:#a8823a}.m{color:#5d6b6f;font-size:13px}pre{white-space:pre-wrap;font:inherit;background:#f4efe5;border-radius:12px;padding:16px}table{border-collapse:collapse;width:100%;margin:12px 0}td{border-bottom:1px solid #e6ddd1;padding:6px 4px}</style></head><body>
+ w.document.write(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><title>HON ${tx("รายงานสำหรับแพทย์","Doctor report")} · ${e.name[L]}</title><style>body{font:15px/1.6 "Anuphan",system-ui,sans-serif;color:#1d2a2e;max-width:760px;margin:32px auto;padding:0 24px}h1{color:#2a4b38;margin:0}h1 b{color:#a8823a}.m{color:#5d6b6f;font-size:13px}pre{white-space:pre-wrap;font:inherit;background:#f4efe5;border-radius:12px;padding:16px}table{border-collapse:collapse;width:100%;margin:12px 0}td{border-bottom:1px solid #e6ddd1;padding:6px 4px}</style></head><body>
 <h1><b>HON</b> ${tx("รายงานสำหรับแพทย์","Report for the doctor")}</h1><p class="m">${tx("สร้างเมื่อ","Created")} ${new Date().toLocaleString(lang==="th"?"th-TH":"en-GB")}</p>
 <table><tr><td>${tx("ผู้สูงอายุ","Patient")}</td><td>${e.name[L]} · ${e.age}</td></tr><tr><td>${tx("โรคประจำตัว","Conditions")}</td><td>${e.cond[L]}</td></tr><tr><td>AGI (HON)</td><td>${e.agi} (${tx("6 เดือน","6 months")}: ${e.agiT.join(" → ")})</td></tr><tr><td>PWV</td><td>${e.pwv} m/s</td></tr><tr><td>${tx("ความดันล่าสุด","Latest BP")}</td><td>${e.bp} mmHg</td></tr>${live&&ei===linkEi?`<tr><td>${tx("ชีพจรจริงล่าสุด","Latest live pulse")}</td><td>${live.hr} bpm · ${hhmm(live.at)}</td></tr>`:""}</table>
 <pre>${esc(summary())}</pre><p class="m">${tx("ข้อมูลจากแอป HON ใช้ประกอบการตัดสินใจของแพทย์ ไม่ใช่ผลการวินิจฉัย ไม่ใช่อุปกรณ์การแพทย์ · ต้นแบบ ข้อมูลจำลอง","From the HON app to support the doctor's judgement; not a diagnosis, not a medical device · prototype with sample data")}</p></body></html>`);
@@ -597,7 +627,7 @@ function render(keep){document.documentElement.lang=lang;$("#lang").textContent=
  $("#tagline").textContent=R?tx(`สำหรับคุณ${me().name[0].replace(/^(พ่อ|แม่|คุณ)/,"")}`,`For ${me().name[1].replace(/^Dad /,"Mr ").replace(/^Mrs Somsri /,"Mrs ")}`):tx("ผู้ช่วยของผู้ดูแลผู้สูงอายุ","For caregivers of older adults");$("#sync").textContent=R?tx("วัด กินยา ขอความช่วยเหลือ ผู้ดูแลเห็นทันที","Measure, take medicines, ask for help — your caregiver sees it at once"):tx("ค่าจริงจากมือถือผู้สูงอายุ + ข้อมูลจำลองสำหรับเดโม","Live readings from the older adult's phone + sample data for the demo");
  $("#sideP").textContent=tx("ผู้สูงอายุวัดชีพจรด้วยกล้องมือถือ กดยืนยันกินยา และขอความช่วยเหลือได้ในปุ่มเดียว ผู้ดูแลเห็นค่าจริงทันที พร้อม AI ที่บอกว่าต้องทำอะไรต่อ","Older adults measure their pulse with the phone camera, confirm medicines and call for help with one button. The caregiver sees it live, with AI that says what to do next.");
  $("#sideN").textContent=tx("ต้นแบบสำหรับเดโม ข้อมูลจำลอง คู่มือเป็นฉบับร่างรอพยาบาลตรวจ","Demo prototype, sample data, draft guides pending nurse review");
- $("#who").innerHTML=E.map((e,i)=>`<button aria-pressed="${i===ei}" data-ei="${i}"><span class="av" style="--c:${e.col}"></span><span><b>${e.name[lang==="th"?0:1]} · ${e.age}</b><span>${e.last[lang==="th"?0:1]}</span></span></button>`).join("");
+ $("#who").innerHTML=E.map((e,i)=>`<button aria-pressed="${i===ei}" data-ei="${i}"><span class="av" style="--c:${e.col}"></span><span><b>${e.name[lang==="th"?0:1]}</b><span>${e.last[lang==="th"?0:1]}</span></span></button>`).join("");
  const nAlert=ev&&!ev.ack?1:0;
  const T=R?ETABS():TABS();$("#tabs").style.gridTemplateColumns=`repeat(${T.length},1fr)`;
  $("#tabs").innerHTML=T.map((n,i)=>`<button role="tab" aria-selected="${R?i===etab:!showSec&&i===tab}" ${R?`data-etab="${i}"`:`data-tab="${i}"`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">${ic[n[0]]}</svg>${n[1]}${!R&&i===1&&nAlert?`<span class="badge">1</span>`:""}</button>`).join("");
@@ -654,7 +684,7 @@ document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data
  if(b.id==="sec"){showSec=true;addLog(["คุณมะลิ (ผู้ดูแลหลัก)","Mali (primary)"],["เปิดหน้าความปลอดภัย","Opened security settings"]);render();return}
  if(b.id==="secBack"){showSec=false;render();return}
  if(d.ei!==undefined){ei=+d.ei;sel.clear();render();return}
- if(d.tab!==undefined){tab=+d.tab;showSec=false;guide=tab===4?guide:null;render();return}
+ if(d.tab!==undefined){if(cgm){cgm=false;if(mBusy)mStop();mStTxt=null}tab=+d.tab;showSec=false;guide=tab===4?guide:null;render();return}
  if(d.guide){guide=d.guide;done=new Set();tab=4;showSec=false;clearInterval(timerI);render();return}
  if(b.id==="bk"){guide=null;clearInterval(timerI);render();return}
  if(d.st!==undefined){const i=+d.st;done.has(i)?done.delete(i):done.add(i);b.classList.toggle("done");return}
@@ -670,6 +700,7 @@ document.addEventListener("click",ev0=>{const b=ev0.target.closest("button,[data
  if(d.loc){locMode=d.loc;addLog([el().name[0]+" (เจ้าของข้อมูล)",el().name[1]+" (data owner)"],[`ตั้งการแชร์ตำแหน่ง: ${d.loc==="emer"?"เฉพาะฉุกเฉิน":d.loc==="always"?"ตลอดเวลา":"ปิด"}`,`Location sharing set to ${d.loc}`]);render(true);return}
  if(d.role){if(d.role===role)return;role=d.role;lss("hf-role",role);showSec=false;if(role==="fam")mStop();else ensureTopic();startPoll();render();return}
  if(d.etab!==undefined){etab=+d.etab;if(etab!==0&&mBusy){mStop();mStTxt=null}render();return}
+ if(d.cgm!==undefined){if(d.cgm==="1"){cgm=true;mStTxt=null}else{cgm=false;if(mBusy)mStop();mStTxt=null}render(true);scrollTo(0,0);return}
  if(b.id==="mGo"){mBusy?(mStop(),mSet(tx("หยุดแล้ว","Stopped")),render(true)):mStart();return}
  if(b.id==="sosB"){confirmThen("sos");return}
  if(b.id==="simFall"){confirmThen("fall");return}
