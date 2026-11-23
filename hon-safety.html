@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HON Safety · SOS และตรวจจับการล้ม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* HON Safety — elder-side page for GitHub Pages.
+   SOS button + phone fall detection + location, sends a real push to the caregiver via ntfy. */
+:root{--bg:#f6f1ea;--paper:#fffdf9;--ink:#1d2a2e;--mute:#5d6b6f;--line:#e6ddd1;--teal:#0f4c5c;--teal2:#e3eef0;--r:#c0322a;--rbg:#fbe6e3;--g:#1f8a4c;--gbg:#e5f4e9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 "IBM Plex Sans Thai",system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 18px 60px}
+h1{font-size:28px;margin:0}h2{font-size:20px;margin:0 0 8px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:16px}
+.mini{font-size:14px;color:var(--mute)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #e8664a;outline-offset:2px}
+#sos{display:block;width:min(260px,70vw);aspect-ratio:1;margin:8px auto 14px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,#e9584f,#b3261e);color:#fff;font-size:44px;font-weight:700;box-shadow:0 18px 40px -12px rgba(179,38,30,.6),inset 0 -8px 0 rgba(0,0,0,.15)}
+#sos small{display:block;font-size:17px;font-weight:600}
+.btn{border:0;border-radius:16px;min-height:54px;padding:0 18px;font-weight:600;background:var(--teal);color:#fff;width:100%}
+.btn.alt{background:var(--teal2);color:var(--ink)}.btn.g{background:var(--g)}
+.row{display:flex;gap:10px;align-items:center}
+.sw{position:relative;width:60px;height:34px;flex:none;border-radius:999px;border:0;background:#cfc6ba}
+.sw:after{content:"";position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:#fff;transition:left .15s}
+.sw[aria-checked=true]{background:var(--g)}.sw[aria-checked=true]:after{left:30px}
+input{font:inherit;width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px;background:#fff}
+label{font-size:15px;font-weight:600;display:block;margin:10px 0 4px}
+.status{font-size:15px;padding:8px 12px;border-radius:12px;background:var(--teal2);margin-top:10px}
+.meter{height:10px;background:var(--teal2);border-radius:999px;overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--teal);width:0}
+#over{position:fixed;inset:0;background:var(--r);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;z-index:9}
+#over.on{display:flex}
+#over h2{font-size:30px;margin:0 0 6px}#count{font-size:96px;font-weight:700;line-height:1}
+#ok{background:#fff;color:var(--r);border:0;border-radius:24px;font-size:28px;font-weight:700;min-height:90px;width:min(340px,90vw);margin-top:24px}
+details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+ol{padding-left:22px;margin:6px 0}code{background:var(--teal2);padding:1px 6px;border-radius:6px;font-size:15px;word-break:break-all}
+.log li{font-size:15px;margin-bottom:4px}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><div><h1>HON Safety</h1><div class="mini" id="who">ผู้ใช้: —</div></div><span class="mini">ส่วนหนึ่งของ HON Care</span></div>
+
+  <div class="card" style="text-align:center">
+    <button id="sos" aria-label="ขอความช่วยเหลือ SOS">SOS<small>กดเมื่อต้องการความช่วยเหลือ</small></button>
+    <p class="mini" style="margin:0">กดแล้วมีเวลา 5 วินาทีให้ยกเลิก จากนั้นจะแจ้งผู้ดูแลพร้อมตำแหน่ง</p>
+  </div>
+
+  <div class="card">
+    <div class="row"><div style="flex:1"><h2>ตรวจจับการล้ม</h2><div class="mini">ใช้เซนเซอร์ในมือถือ ทำงานขณะเปิดหน้านี้ไว้</div></div>
+    <button class="sw" id="fallSw" role="switch" aria-checked="false" aria-label="เปิดตรวจจับการล้ม"></button></div>
+    <div class="status" id="fallSt">ปิดอยู่</div>
+    <div class="meter" aria-hidden="true"><i id="bar"></i></div>
+    <div class="mini" id="gval" style="margin-top:4px">แรง: — g</div>
+    <button class="btn alt" id="testFall" style="margin-top:12px">จำลองการล้ม (สำหรับเดโม)</button>
+  </div>
+
+  <div class="card">
+    <h2>ประวัติการแจ้ง</h2>
+    <ul class="log" id="log"><li class="mini">ยังไม่มีการแจ้ง</li></ul>
+  </div>
+
+  <div class="card">
+    <details id="setup">
+      <summary>ตั้งค่า (สำหรับผู้ดูแล)</summary>
+      <label for="name">ชื่อผู้สูงอายุ</label><input id="name" placeholder="เช่น แม่สมศรี">
+      <label for="topic">รหัสห้องแจ้งเตือน (ntfy topic)</label><input id="topic" autocomplete="off" spellcheck="false">
+      <p class="mini">รหัสนี้ใช้เหมือนรหัสผ่าน ใครรู้รหัสจะเห็นการแจ้งเตือนได้ อย่าเผยแพร่</p>
+      <button class="btn" id="save">บันทึก</button>
+      <button class="btn alt" id="testSend" style="margin-top:8px">ส่งแจ้งเตือนทดสอบ</button>
+      <h2 style="margin-top:16px">ผู้ดูแลรับแจ้งเตือนอย่างไร</h2>
+      <ol class="mini">
+        <li>ติดตั้งแอป <b>ntfy</b> (App Store / Google Play)</li>
+        <li>กด + แล้วใส่รหัสห้อง: <code id="topicShow"></code></li>
+        <li>หรือเปิดบนคอม: <a id="topicLink" target="_blank" rel="noopener"></a></li>
+        <li>กด "ส่งแจ้งเตือนทดสอบ" เพื่อเช็กว่าได้รับ</li>
+      </ol>
+    </details>
+  </div>
+  <p class="mini">ต้นแบบสำหรับเดโม ไม่ใช่อุปกรณ์ทางการแพทย์ หากฉุกเฉินให้โทร 1669 ด้วยทุกครั้ง</p>
+</main>
+
+<div id="over" role="alertdialog" aria-live="assertive">
+  <h2 id="ovT">คุณโอเคไหม?</h2>
+  <p id="ovD" style="margin:0 0 12px">ถ้าไม่กดภายในเวลานี้ จะแจ้งผู้ดูแลพร้อมตำแหน่ง</p>
+  <div id="count">30</div>
+  <button id="ok">ฉันโอเค ยกเลิก</button>
+  <a href="tel:1669" style="color:#fff;margin-top:18px;font-weight:600">โทร 1669</a>
+</div>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const rnd=()=>{const a=new Uint8Array(10);crypto.getRandomValues(a);return "hon-care-"+[...a].map(x=>x.toString(36).padStart(2,"0")).join("").slice(0,16)};
+let cfg={name:ls.get("hs-name")||"ผู้สูงอายุ",topic:ls.get("hs-topic")||rnd()};ls.set("hs-topic",cfg.topic);
+let log=[];try{log=JSON.parse(ls.get("hs-log")||"[]")}catch(e){}
+function showCfg(){$("#who").textContent="ผู้ใช้: "+cfg.name;$("#name").value=cfg.name==="ผู้สูงอายุ"?"":cfg.name;$("#topic").value=cfg.topic;
+ $("#topicShow").textContent=cfg.topic;const u="https://ntfy.sh/"+cfg.topic;$("#topicLink").href=u;$("#topicLink").textContent=u}
+function showLog(){$("#log").innerHTML=log.length?log.slice(0,8).map(l=>`<li><b>${l.t}</b> ${l.m}</li>`).join(""):'<li class="mini">ยังไม่มีการแจ้ง</li>'}
+showCfg();showLog();
+
+/* location: asked only at alert time, never tracked in the background */
+function getLoc(){return new Promise(res=>{if(!navigator.geolocation)return res(null);
+ navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude,acc:Math.round(p.coords.accuracy)}),()=>res(null),{enableHighAccuracy:true,timeout:8000,maximumAge:30000})})}
+
+async function send(kind,test){
+ const loc=test?null:await getLoc();const map=loc?`https://maps.google.com/?q=${loc.lat.toFixed(6)},${loc.lng.toFixed(6)}`:null;
+ const now=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
+ const title=test?"ทดสอบ HON Care":(kind==="fall"?"ตรวจพบการล้ม: ":"SOS: ")+cfg.name;
+ const msg=test?"การเชื่อมต่อใช้งานได้":`${kind==="fall"?"มือถือตรวจพบการล้มและไม่มีการตอบรับ":"กดขอความช่วยเหลือ"} เวลา ${now}\n${loc?`ตำแหน่ง ±${loc.acc} ม. แตะเพื่อเปิดแผนที่`:"ไม่ได้รับตำแหน่ง (ไม่อนุญาตหรือสัญญาณอ่อน)"}\nถ้าติดต่อไม่ได้ ให้โทร 1669`;
+ const body={topic:cfg.topic,title,message:msg,priority:test?3:5,tags:[test?"white_check_mark":"rotating_light"]};
+ if(map){body.click=map;body.actions=[{action:"view",label:"เปิดแผนที่",url:map}]}
+ let ok=false;try{const r=await fetch("https://ntfy.sh/",{method:"POST",body:JSON.stringify(body)});ok=r.ok}catch(e){}
+ log.unshift({t:now,m:(test?"ทดสอบ":kind==="fall"?"ล้ม":"SOS")+(ok?" · ส่งถึงผู้ดูแลแล้ว":" · ส่งไม่สำเร็จ ตรวจอินเทอร์เน็ต")+(loc?" · มีตำแหน่ง":"")});log=log.slice(0,20);ls.set("hs-log",JSON.stringify(log));showLog();
+ return ok}
+
+/* confirmation overlay: SOS 5 s, fall 30 s */
+let cd=null;
+function confirmThen(kind){if(cd)return;const sec=kind==="fall"?30:5;let n=sec;
+ $("#ovT").textContent=kind==="fall"?"คุณโอเคไหม?":"กำลังขอความช่วยเหลือ";
+ $("#ovD").textContent=kind==="fall"?"ตรวจพบการล้ม ถ้าไม่กดภายในเวลานี้ จะแจ้งผู้ดูแลพร้อมตำแหน่ง":"จะแจ้งผู้ดูแลพร้อมตำแหน่ง กดยกเลิกได้ถ้ากดผิด";
+ $("#count").textContent=n;$("#over").classList.add("on");try{navigator.vibrate&&navigator.vibrate([400,200,400])}catch(e){}
+ cd=setInterval(async()=>{n--;$("#count").textContent=Math.max(n,0);if(n%5===0){try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}}
+  if(n<=0){clearInterval(cd);$("#ovT").textContent="กำลังแจ้งผู้ดูแล...";$("#ovD").textContent="";$("#ok").style.display="none";
+   const ok=await send(kind);$("#ovT").textContent=ok?"แจ้งผู้ดูแลแล้ว":"ส่งไม่สำเร็จ โปรดโทร 1669";$("#ovD").textContent=ok?"ผู้ดูแลได้รับตำแหน่งของคุณแล้ว อยู่นิ่งๆ รอความช่วยเหลือ":"";
+   $("#ok").style.display="";$("#ok").textContent="ปิด";cd="done"}},1000)}
+$("#ok").onclick=()=>{if(cd&&cd!=="done")log.unshift({t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),m:"ยกเลิกเอง (ผู้ใช้โอเค)"}),showLog();clearInterval(cd);cd=null;$("#over").classList.remove("on");$("#ok").textContent="ฉันโอเค ยกเลิก"};
+$("#sos").onclick=()=>confirmThen("sos");
+$("#testFall").onclick=()=>confirmThen("fall");
+
+/* fall detection: free fall (<0.5 g) → impact (>2.5 g) within 1 s → mostly still for 2 s */
+const G=9.81;let got=false,on=false,ffAt=0,impAt=0,still=[],wake=null;
+function onMotion(e){const a=e.accelerationIncludingGravity;if(!a||a.x==null)return;if(!got){got=true;$("#fallSt").textContent="กำลังเฝ้าดู · มือถือต้องอยู่กับตัว"}const g=Math.sqrt(a.x*a.x+a.y*a.y+a.z*a.z)/G,t=performance.now();
+ $("#bar").style.width=Math.min(100,g/4*100)+"%";$("#gval").textContent="แรง: "+g.toFixed(2)+" g";
+ if(cd)return;
+ if(g<0.5)ffAt=t;
+ if(g>2.5&&t-ffAt<1000&&!impAt){impAt=t;still=[];$("#fallSt").textContent="ตรวจพบแรงกระแทก กำลังตรวจสอบ...";}
+ if(impAt){if(t-impAt>300)still.push(Math.abs(g-1));
+  if(t-impAt>2300){const calm=still.filter(v=>v<0.3).length/Math.max(1,still.length);impAt=0;ffAt=0;
+   if(calm>0.7)confirmThen("fall");$("#fallSt").textContent="กำลังเฝ้าดู · มือถือต้องอยู่กับตัว";}}}
+async function setFall(v){
+ if(v){if(typeof DeviceMotionEvent!=="undefined"&&typeof DeviceMotionEvent.requestPermission==="function"){try{await DeviceMotionEvent.requestPermission()}catch(e){}}
+  if(!("DeviceMotionEvent" in window)){$("#fallSt").textContent="เครื่องนี้ไม่มีเซนเซอร์ ใช้ปุ่มจำลองแทน";return}
+  window.addEventListener("devicemotion",onMotion);on=true;got=false;$("#fallSt").textContent="กำลังเฝ้าดู · มือถือต้องอยู่กับตัว";
+  setTimeout(()=>{if(on&&!got)$("#fallSt").textContent="ไม่ได้รับค่าจากเซนเซอร์ (ไม่อนุญาตหรือเครื่องไม่รองรับ) ใช้ปุ่ม SOS หรือปุ่มจำลองแทน"},3000);
+  try{wake=await navigator.wakeLock.request("screen")}catch(e){}}
+ else{window.removeEventListener("devicemotion",onMotion);on=false;$("#fallSt").textContent="ปิดอยู่";try{wake&&wake.release()}catch(e){}}
+ $("#fallSw").setAttribute("aria-checked",on)}
+$("#fallSw").onclick=()=>setFall(!on);
+document.addEventListener("visibilitychange",async()=>{if(on&&document.visibilityState==="visible"){try{wake=await navigator.wakeLock.request("screen")}catch(e){}}});
+
+$("#save").onclick=()=>{cfg.name=$("#name").value.trim()||"ผู้สูงอายุ";const tp=$("#topic").value.trim().replace(/[^A-Za-z0-9_-]/g,"");cfg.topic=tp.length>=12?tp:rnd();ls.set("hs-name",cfg.name);ls.set("hs-topic",cfg.topic);showCfg();$("#save").textContent="บันทึกแล้ว";setTimeout(()=>$("#save").textContent="บันทึก",1500)};
+$("#testSend").onclick=async()=>{const b=$("#testSend");b.textContent="กำลังส่ง...";const ok=await send("test",true);b.textContent=ok?"ส่งแล้ว เช็กแอป ntfy":"ส่งไม่สำเร็จ";setTimeout(()=>b.textContent="ส่งแจ้งเตือนทดสอบ",2500)};
+}
+</script>
+</body>
+</html>
